@@ -1,0 +1,89 @@
+<mvc:View controllerName="bsim.hcmapp.man.movement.controller.History"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.m.semantic">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="historyPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appDescription}">
+        <semantic:content>
+            <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
+                <Table inset="false" alternateRowColors="true">
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <Title text="Employee"></Title>
+                            <ToolbarSpacer/>
+                            <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
+                            <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
+                            <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
+                            <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
+                            <SearchField id="FieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
+                        </OverflowToolbar>
+                    </headerToolbar>   
+                    <columns>
+                        <Column width="3.5rem">
+                            <Text text="Employee Photo" visible="false"/>
+                        </Column>
+                        <Column width="7rem" minScreenWidth="Tablet" demandPopin="true">
+					        <Text text="Employee"/>
+                        </Column>
+                        <Column width="13rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Action Type and Reason for Action"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Date Action"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Date Request"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Status"/>
+                        </Column>
+                        <Column width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Person Responsible"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle" type="Navigation" press="onEmployeePressed">
+                            <cells>
+                                <Avatar src="{path: 'talentList>EmployeeNumber', formatter: '.formatter.formatEmployeePhotoUrl'}" displaySize="Custom"
+                                    initials="{path: 'talentList>EmployeeName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
+                                    tooltip="{talentList>EmployeeName}" class="sapMTableContentMargin"/>
+                                <VBox>
+                                    <Text text="Adit Surya Kencana (01003358)" />
+                                    <Text text="Project Expansion and CPP Mntc Div Head" />
+                                </VBox>
+                                <VBox class="sapMTableContentMargin">
+                                    <Text text="SP - I" />
+                                    <Text text="31/12/2020 - 31/12/2022" />
+                                    <Text text="Inctive" />
+                                </VBox>
+                                <Text text="31/12/2024" />
+                                <Text text="31/12/2024" />
+                                <Text text="Posted" class="sapMTableContentMargin greenText" />
+                                <Text text="" class="sapMTableContentMargin" />
+                            </cells>
+                        </ColumnListItem>
+                        <ColumnListItem vAlign="Middle" type="Navigation" press="onEmployeePressed">
+                        <cells>
+                                <Avatar src="{path: 'talentList>EmployeeNumber', formatter: '.formatter.formatEmployeePhotoUrl'}" displaySize="Custom"
+                                    initials="{path: 'talentList>EmployeeName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
+                                    tooltip="{talentList>EmployeeName}" class="sapMTableContentMargin"/>
+                                <VBox>
+                                    <Text text="Setya Nov (00100122)" />
+                                    <Text text="Employee Engagement Department Head" />
+                                </VBox>
+                                <VBox class="sapMTableContentMargin">
+                                    <Text text="SP - I" />
+                                    <Text text="31/12/2020 - 31/12/2022" />
+                                    <Text text="Inctive" />
+                                </VBox>
+                                <Text text="31/12/2024" />
+                                <Text text="31/12/2024" />
+                                <Text text="Submitted" class="sapMTableContentMargin orangeText" />
+                                <Text text="Apriyani Rahayu (HRBP) (11000096)" class="sapMTableContentMargin" />
+                            </cells>
+                        </ColumnListItem>   
+                    </items>
+                </Table>
+            </VBox>
+        </semantic:content>
+    </semantic:FullscreenPage>
+</mvc:View>

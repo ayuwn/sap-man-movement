@@ -1,0 +1,209 @@
+{
+    "_version": "1.60.0",
+    "sap.app": {
+        "id": "bsim.hcmapp.man.movement",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.16.3",
+            "toolsId": "95e7d961-84e2-43fa-aae8-1ae8379f8baf"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.120.21",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "bsim.hcmapp.man.movement.i18n.i18n"
+                }
+            },
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {}
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "controlAggregation": "pages",
+                "controlId": "App",
+                "transition": "slide",
+                "type": "View",
+                "viewType": "XML",
+                "path": "bsim.hcmapp.man.movement.view",
+                "async": true,
+                "viewPath": "bsim.hcmapp.man.movement.view",
+                "bypassed": {
+                    "target": [
+                        "overview"
+                    ]
+                },
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "overview",
+                    "pattern": "",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "overview"
+                    ]
+                },
+                {
+                    "name": "orgchart",
+                    "pattern": "orgchart",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "orgchart"
+                    ]
+                },
+                {
+                    "name": "approval",
+                    "pattern": "approval",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "approval"
+                    ]
+                },
+                {
+                    "name": "detailapproval",
+                    "pattern": "detailapproval",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "detailapproval"
+                    ]
+                },
+                {
+                    "name": "mutation",
+                    "pattern": "mutation",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "mutation"
+                    ]
+                },
+                {
+                    "name": "history",
+                    "pattern": "history",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "history"
+                    ]
+                }
+            ],
+            "targets": {
+                "overview": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "Overview",
+                    "viewId": "overviewPage",
+                    "viewLevel": 1
+                },
+                "orgchart": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "OrgChart",
+                    "viewId": "orgchart",
+                    "viewLevel": 1
+                },
+                "approval": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "Approval",
+                    "viewId": "approval",
+                    "viewLevel": 1
+                },
+                "detailapproval": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "DetailApproval",
+                    "viewId": "detailapproval",
+                    "viewLevel": 1
+                },
+                "mutation": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "Mutation",
+                    "viewId": "mutation",
+                    "viewLevel": 1
+                },
+                "history": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "History",
+                    "viewId": "history",
+                    "viewLevel": 1
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "bsim.hcmapp.man.movement.view.App",
+            "type": "XML"
+        }
+    }
+}

@@ -1,0 +1,62 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified">
+    
+    <Dialog id="dialog" class="sapUIResponsiveMargin">
+        <customHeader>
+             <Toolbar>
+                <Title text="Employee" />
+                <ToolbarSpacer />
+                <MenuButton icon="sap-icon://group" useDefaultActionOnly="true" menuPosition="BeginBottom">
+                    <menu>
+                        <Menu itemSelected="onMenuAction">
+                            <MenuItem text="Action Type">
+                                <items>
+                                    <MenuItem text="Status Change" icon="sap-icon://business-card"/>
+                                    <MenuItem text="Mutation" icon="sap-icon://offsite-work" press=".onMutation"/>
+                                    <MenuItem text="Promotion" icon="sap-icon://opportunities"/>
+                                    <MenuItem text="Demotion" icon="sap-icon://company-view"/>
+                                    <MenuItem text="Acting" icon="sap-icon://building"/>
+                                    <MenuItem text="Assignment" icon="sap-icon://account"/>
+                                </items>
+                            </MenuItem>
+                        </Menu>
+                    </menu>
+                </MenuButton>
+            </Toolbar>
+        </customHeader>
+        <content>
+            <f:SimpleForm id="form" layout="ResponsiveGridLayout" labelSpanL="4" labelSpanM="4" emptySpanL="1" emptySpanM="1" columnsL="1" columnsM="1">
+                <f:content>
+                   <HBox>
+                   <Image src="{/icon}" width="80px" height="100px"/>
+                   <VBox>
+                   <Title text="{/title}"/>
+                   <Text text="{/description}"/>
+                   </VBox>
+                   </HBox>
+                   <HBox>
+                   <Title text="Contact Detail"/>
+                   </HBox>
+                    <Label text="ID" />   
+                    <Text text="{/id}"/>
+                    <Label text="Location" />
+                    <Text text="{/location}" />
+                    <Label text="Mobile" />
+                    <Text text="{/phone}" />
+                    <Label text="Email" />
+                    <Text text="{/email}" />
+                    <Label text="Team" />
+                    <Text text="{/teamSize}" />
+                </f:content>
+            </f:SimpleForm>
+            </content>
+            <endButton>
+            <Button 
+                text="Cancel"
+                press=".onDialogClose" />
+            </endButton>
+    </Dialog>
+</core:FragmentDefinition>

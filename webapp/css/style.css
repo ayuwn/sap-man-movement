@@ -1,0 +1,59 @@
+.sapMQuickView {
+    max-width: 320px !important;
+    max-height: 480px !important;
+}
+
+.sapMQuickViewCard {
+    max-width: 320px !important;
+    max-height: 480px !important;
+}
+
+.sapMQuickViewPage .sapMMenuBtn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.sapMMenu {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.sapMMenuItem {
+    height: 2.5rem;
+}
+
+.sapMQuickViewPage .sapMLnk {
+    color: #0854a0 !important;
+}
+
+.sapMQuickViewPage .sapMLnk:hover {
+    color: #0a6ed1 !important;
+}
+
+.sapMActionSheet {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2) !important;
+}
+
+.redText {
+    color: red;
+}
+
+.italicText {
+    font-style: italic;
+}
+
+.titleText {
+    color: black;
+}
+
+.greenText {
+    color: green;
+}
+
+.orangeText {
+    color: orange;
+}
+
+/* .greyBackground {
+    background-color: #69696b;
+} */

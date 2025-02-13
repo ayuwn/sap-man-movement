@@ -1,0 +1,7 @@
+<mvc:View 
+    controllerName="bsim.hcmapp.man.movement.controller.App"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App id="App" autoFocus="false"/>
+</mvc:View>

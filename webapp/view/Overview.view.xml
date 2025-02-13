@@ -1,0 +1,77 @@
+<mvc:View controllerName="bsim.hcmapp.man.movement.controller.Overview"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.m.semantic"
+    xmlns:layout="sap.ui.layout"
+    xmlns:core="sap.ui.core">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="overviewPage" floatingFooter="false" title="{i18n>appDescription}">
+        <semantic:content>
+            <Toolbar height="auto">
+                <FlexBox alignItems="Center" justifyContent="Center" width="100%" class="sapUiSmallMarginTop">
+                    <layout:HorizontalLayout>
+                        <FlexBox direction="Column" class="sapUiSmallMarginEnd" >
+                            <Label text="Year:"/>
+                            <DatePicker
+                                id="yearSelectOverview"
+                                width="200px"
+                                displayFormat="yyyy"
+                                valueFormat="yyyy"
+                                dateValue="{/selectedYear}"
+                                change=".onYearChange"
+                                class="sapUiSmallMarginBottom"/>
+                        </FlexBox>
+                        
+                        <FlexBox direction="Column" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                            <Label text="Employee Name/NIK:"/>
+                            <SearchField
+                                id="searchFieldOverview"
+                                width="300px"
+                                search=".onSearch"/>
+                        </FlexBox>
+                        <VBox class="sapUiSmallMarginEnd">
+                            <Label />
+                            <HBox >
+                            <Button text="Hide Filter Bar" 
+                                press=".onToggleFilterBar"
+                                class="sapUiSmallMarginBegin"/>
+                            <Button text="Filters"
+                                    press=".onShowFilters"
+                                    class="sapUiSmallMarginBegin"/>
+                            <Button text="Go"
+                                type="Emphasized"
+                                press=".onSearch"
+                                class="sapUiSmallMarginBegin"/>
+                            </HBox>
+                        </VBox>
+                    </layout:HorizontalLayout>                     
+                </FlexBox>  
+            </Toolbar>
+            <FlexBox 
+                alignItems="Center"
+                justifyContent="Center"
+                class="sapUiMediumMarginTop">
+                <items>
+                    <GenericTile header="Action Request" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" press="onActReqPressed">
+                        <TileContent>
+                            <NumericContent value="22" icon="sap-icon://employee" withMargin="true"/>
+                        </TileContent>
+                    </GenericTile>
+                    <GenericTile header="Approval" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" press="onAppPressed">
+                        <TileContent>
+                            <NumericContent value="1" icon="sap-icon://employee-approvals" withMargin="true"/>
+                        </TileContent>
+                    </GenericTile>
+                </items>
+            </FlexBox>
+            <FlexBox 
+                direction="Column"
+                alignItems="Center"
+                class="sapUiMediumMarginTop">
+                <Text text="Submission Promotion Period is Open Only From 18 March 2024 to 15 August 2024" class="sapUiSmallMarginBottom"/>
+                <Text text="Please Ensure Your Request Submitted Within This Period" class="sapUiSmallMarginBottom"/>
+            </FlexBox>
+        </semantic:content>
+        <!-- <semantic:mainAction>
+        </semantic:mainAction> -->
+    </semantic:FullscreenPage>
+</mvc:View>

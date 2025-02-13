@@ -1,0 +1,70 @@
+<mvc:View controllerName="bsim.hcmapp.man.movement.controller.Approval"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.m.semantic">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appDescription}">
+        <semantic:content>
+            <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
+                <Table inset="false" alternateRowColors="true">
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <Title text="Employee"></Title>
+                            <ToolbarSpacer/>
+                            <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
+                            <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
+                            <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
+                            <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
+                            <SearchField id="schFieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
+                        </OverflowToolbar>
+                    </headerToolbar>   
+                    <columns>
+                        <Column width="3.5rem">
+                            <Text text="Employee Photo" visible="false"/>
+                        </Column>
+                        <Column width="8rem" minScreenWidth="Tablet" demandPopin="true">
+					        <Title text="Employee"/>
+                        </Column>
+                        <Column width="13rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Title text="Action Type and Reason for Action"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Title text="Date Action"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Title text="Date Request"/>
+                        </Column>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Title text="Status"/>
+                        </Column>
+                        <Column width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Title text="Person Responsible"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle" type="Navigation" press="onEmployeePressed">
+                            <cells>
+                                <Avatar src="{path: 'talentList>EmployeeNumber', formatter: '.formatter.formatEmployeePhotoUrl'}" displaySize="Custom"
+                                    initials="{path: 'talentList>EmployeeName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
+                                    tooltip="{talentList>EmployeeName}" class="sapMTableContentMargin"/>
+                                <VBox>
+                                    <Title text="Roy Keane (13000113)"/>
+                                    <Text text="HR BP" />
+                                </VBox>
+                                <VBox class="sapMTableContentMargin">
+                                    <Text text="" />
+                                </VBox>
+                                <Text text="" />
+                                <Text text="" />
+                                <Text text="Verified by HROD" class="sapMTableContentMargin orangeText" />
+                                <VBox class="sapMTableContentMargin">
+                                    <Title text="Talent Team" />
+                                    <Text text="Talent" />
+                                </VBox>
+                            </cells>
+                        </ColumnListItem>   
+                    </items>
+                </Table>
+            </VBox>
+        </semantic:content>
+    </semantic:FullscreenPage>
+</mvc:View>
