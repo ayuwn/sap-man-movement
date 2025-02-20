@@ -1,0 +1,18 @@
+{
+    "nodes": [
+        {
+            "id": "Jovander",
+            "Pernr": "00000294",
+            "EmployeeName": "Jovander",
+            "src": "/images/avatar.jpg",
+            "TotalTeam": 0,
+            "Location": "KANWIL Jakarta",
+            "Position": "Human Capital Management Director",
+            "Email": "Jovander@banksinarmas.com",
+            "Phone": "081944358879"
+        }
+    ],
+    "lines": [
+        
+    ]
+}

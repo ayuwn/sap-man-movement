@@ -63,13 +63,6 @@
                     </GenericTile>
                 </items>
             </FlexBox>
-            <FlexBox 
-                direction="Column"
-                alignItems="Center"
-                class="sapUiMediumMarginTop">
-                <Text text="Submission Promotion Period is Open Only From 18 March 2024 to 15 August 2024" class="sapUiSmallMarginBottom"/>
-                <Text text="Please Ensure Your Request Submitted Within This Period" class="sapUiSmallMarginBottom"/>
-            </FlexBox>
         </semantic:content>
         <!-- <semantic:mainAction>
         </semantic:mainAction> -->

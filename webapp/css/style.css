@@ -54,6 +54,10 @@
     color: orange;
 }
 
+.boldText {
+    font-weight: bold;
+}
+
 /* .greyBackground {
     background-color: #69696b;
 } */

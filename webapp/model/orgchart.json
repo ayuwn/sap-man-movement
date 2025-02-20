@@ -3,7 +3,7 @@
 		{
 			"id": "Dinter",
 			"title": "Sophie Dinter",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 35,
@@ -19,7 +19,7 @@
 		{
 			"id": "Ninsei",
 			"title": "Yamasaki Ninsei",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 9,
@@ -36,7 +36,7 @@
 		{
 			"id": "Mills",
 			"title": "Henry Mills",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 4,
@@ -53,7 +53,7 @@
 		{
 			"id": "Polak",
 			"title": "Adam Polak",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mills",
 			"location": "Praha",
 			"position": "Marketing Specialist",
@@ -63,7 +63,7 @@
 		{
 			"id": "Sykorova",
 			"title": "Vlasta Sykorova",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mills",
 			"location": "Praha",
 			"position": "Human Assurance Officer",
@@ -73,7 +73,7 @@
 		{
 			"id": "Pavlikova",
 			"title": "Nela Pavlikova",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mills",
 			"location": "Praha",
 			"position": "Marketing Specialist",
@@ -83,7 +83,7 @@
 		{
 			"id": "Musil",
 			"title": "Karel Musil",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mills",
 			"location": "Praha",
 			"position": "Communications Agent",
@@ -93,7 +93,7 @@
 		{
 			"id": "Rose",
 			"title": "Sophie Rose",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Ninsei",
 			"location": "Brno",
 			"position": "Marketing Planner",
@@ -103,7 +103,7 @@
 		{
 			"id": "Binder",
 			"title": "Jasmin Binder",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 2,
@@ -120,7 +120,7 @@
 		{
 			"id": "Doskocil",
 			"title": "Jiri Doskocil",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Binder",
 			"location": "Walldorf",
 			"position": "Vendor",
@@ -130,7 +130,7 @@
 		{
 			"id": "Buttmann",
 			"title": "Rebecca Buttmann",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Binder",
 			"location": "Walldorf",
 			"position": "Vendor",
@@ -140,7 +140,7 @@
 		{
 			"id": "Ortmann",
 			"title": "Leo Ortmann",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 24,
@@ -157,7 +157,7 @@
 		{
 			"id": "Mann",
 			"title": "Thomas Mann",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"attributes": [
 				{
 					"label": 4,
@@ -174,7 +174,7 @@
 		{
 			"id": "Toman",
 			"title": "Martin Toman",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mann",
 			"location": "Brno",
 			"position": "Data Engineer",
@@ -184,7 +184,7 @@
 		{
 			"id": "Lee",
 			"title": "James Lee",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Mann",
 			"location": "Brno",
 			"position": "Developer Associate",
@@ -194,7 +194,7 @@
 		{
 			"id": "York",
 			"title": "Michal York",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Mann",
 			"location": "Brno",
@@ -205,7 +205,7 @@
 		{
 			"id": "Lancaster",
 			"title": "Doris Lancaster",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Mann",
 			"location": "Brno",
@@ -216,7 +216,7 @@
 		{
 			"id": "Traube",
 			"title": "Arnold Traube",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Ortmann",
 			"location": "Walldorf",
@@ -227,7 +227,7 @@
 		{
 			"id": "Burke",
 			"title": "Bobby Burke",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Ortmann",
 			"attributes": [
@@ -245,7 +245,7 @@
 		{
 			"id": "Benton",
 			"title": "Sean Benton",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Burke",
 			"location": "Walldorf",
@@ -256,7 +256,7 @@
 		{
 			"id": "Barnes",
 			"title": "Daisy Barnes",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Burke",
 			"location": "Walldorf",
@@ -267,7 +267,7 @@
 		{
 			"id": "Seidl",
 			"title": "Philip Seidl",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Burke",
 			"location": "Walldorf",
@@ -278,7 +278,7 @@
 		{
 			"id": "Krenkel",
 			"title": "Albert Krenkel",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Burke",
 			"location": "Walldorf",
@@ -289,7 +289,7 @@
 		{
 			"id": "Kurumi",
 			"title": "Jo Kurumi",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Burke",
 			"location": "Walldorf",
@@ -300,7 +300,7 @@
 		{
 			"id": "House",
 			"title": "Ondrej House",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "Ortmann",
 			"attributes": [
@@ -318,7 +318,7 @@
 		{
 			"id": "Mrazkova",
 			"title": "Kveta Mrazkova",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "House",
 			"location": "Brno",
@@ -329,7 +329,7 @@
 		{
 			"id": "Baten",
 			"title": "Horst Baten",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "House",
 			"location": "Brno",
@@ -340,7 +340,7 @@
 		{
 			"id": "Zeleny",
 			"title": "Jakub Zeleny",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"icon": "sap-icon://person-placeholder",
 			"supervisor": "House",
 			"attributes": [
@@ -358,7 +358,7 @@
 		{
 			"id": "Asako",
 			"title": "Oye Asako",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "House",
 			"attributes": [
 				{
@@ -375,7 +375,7 @@
 		{
 			"id": "Hozumi",
 			"title": "Shirai Hozumi",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Asako",
 			"location": "Brno",
 			"position": "Junior Designer",
@@ -385,7 +385,7 @@
 		{
 			"id": "Borg",
 			"title": "Vaclav Borg",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "House",
 			"attributes": [
 				{
@@ -402,7 +402,7 @@
 		{
 			"id": "Vaclavikova",
 			"title": "Katerina Vaclavikova",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Borg",
 			"location": "Brno",
 			"position": "Research Senior Developer",
@@ -412,7 +412,7 @@
 		{
 			"id": "Backora",
 			"title": "Petr Backora",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Borg",
 			"location": "Brno",
 			"position": "Research Developer",
@@ -422,7 +422,7 @@
 		{
 			"id": "Havlicek",
 			"title": "Pavel Havlicek",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Zeleny",
 			"location": "Brno",
 			"position": "Junior Designer",
@@ -432,7 +432,7 @@
 		{
 			"id": "Vodickova",
 			"title": "Marie Vodickova",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Zeleny",
 			"location": "Brno",
 			"position": "Junior Designer",
@@ -442,7 +442,7 @@
 		{
 			"id": "Kovac",
 			"title": "Tomas Kovac",
-			"src": "/images/jh.jpg",
+			"src": "/images/avatar.jpg",
 			"supervisor": "Zeleny",
 			"location": "Brno",
 			"position": "Consultant",

@@ -6,11 +6,12 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/core/Fragment"
-], function (BaseController, formatter, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, Fragment) {
+    "sap/suite/ui/commons/networkgraph/layout/LayeredLayout",
+    "sap/suite/ui/commons/networkgraph/ActionButton"
+], function (BaseController, formatter, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, LayeredLayout, ActionButton) {
     "use strict";
 
-    return BaseController.extend("bsim.hcmapp.man.movement.controller.Mutation", {
+    return BaseController.extend("bsim.hcmapp.man.movement.controller.Employee", {
         formatter: formatter,
 
         onInit: function () {
@@ -27,7 +28,7 @@ sap.ui.define([
             });
             this.setModel(oEmployeeModel, "employee");
 
-            this.getRouter().getRoute("mutation").attachPatternMatched(this._onRouteMatched, this);
+            this.getRouter().getRoute("employee").attachPatternMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: function (oEvent) {
@@ -84,33 +85,8 @@ sap.ui.define([
             });
         },
 
-        onOpenDialog: function () {
-            var oView = this.getView();
-
-            // Create dialog lazily
-            if (!this._oDialog) {
-                // Load and create fragment asynchronously
-                Fragment.load({
-                    id: oView.getId(),
-                    name: "bsim.hcmapp.man.movement.view.fragments.DocumentUpload",
-                    controller: this
-                }).then(function (oDialog) {
-                    this._oDialog = oDialog;
-                    // Connect dialog to view's lifecycle management
-                    oView.addDependent(this._oDialog);
-                    this._oDialog.open();
-                }.bind(this));
-            } else {
-                this._oDialog.open();
-            }
-        },
-
-        onDialogClose: function () {
-            this._oDialog.close();
-        },
-
         onNavBack: function () {
-            this.getRouter().navTo("orgchart");
+            this.getRouter().navTo("overview");
         },
 
         _navBack: function () {

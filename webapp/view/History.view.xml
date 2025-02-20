@@ -2,7 +2,7 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:semantic="sap.m.semantic">
-    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="historyPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appDescription}">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="historyPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>history}">
         <semantic:content>
             <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
                 <Table inset="false" alternateRowColors="true">

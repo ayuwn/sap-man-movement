@@ -1,25 +1,25 @@
 <mvc:View
-   controllerName="bsim.hcmapp.man.movement.controller.DetailApproval"
+   controllerName="bsim.hcmapp.man.movement.controller.Mutation"
    xmlns:mvc="sap.ui.core.mvc"
    xmlns="sap.m"
    xmlns:f="sap.ui.layout.form"
    xmlns:l="sap.ui.layout"
    xmlns:core="sap.ui.core"
    xmlns:semantic="sap.m.semantic">
-    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" floatingFooter="false" title="{i18n>appApproval}">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>employeeStatusChange}">
         <semantic:content>
          <VBox class="sapUiSmallMargin">
             <!-- Employee Data Panel -->
             <Panel
                expandable="true"
                expanded="false"
-               headerText="Employee Approval"
+               headerText="Employee Data"
                width="auto"
                class="sapUiResponsiveMargin">
                <content>   
                   <!-- Employee Data Form -->
                     <f:SimpleForm
-                    id="employeeApprovalDataForm"
+                    id="employeeFormDisplay"
                     editable="true"
                     layout="ResponsiveGridLayout"
                     labelSpanXL="4"
@@ -72,7 +72,7 @@
                <content>         
                   <!-- Sanksi Aktif Form -->
                 <f:SimpleForm
-                id="employeeApprovalSanksiForm"
+                id="sanksiFormDisplay"
                 editable="true"
                 layout="ResponsiveGridLayout" 
                 labelSpanXL="4"
@@ -121,9 +121,9 @@
                     
                      <Label text="Tanggal Berlaku" required="true" />
                         <HBox  class="sapUiTinyMarginBeginEnd">
-                            <DatePicker id="tes" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="10rem" tooltip="{i18n>showFrom}" />
+                            <DatePicker id="tanggalBerlakutDatePickerDisplay" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="10rem" tooltip="{i18n>showFrom}" />
                             <Text text=" - " class="sapUiTinyMarginBeginEnd"/>
-                            <DatePicker id="b" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="10rem" tooltip="{i18n>showFrom}" />
+                            <DatePicker id="tanggalBerakhirEndsDatePickerDisplay" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="10rem" tooltip="{i18n>showFrom}" />
                         </HBox>
 
                     <Label text="" />
@@ -146,7 +146,8 @@
                <content>         
                   <!-- Action Request Form -->
                 <f:SimpleForm
-                id="employeeApprovalReqForm"
+                editable="true"
+                id="actionRequestFormDisplay"
                 layout="ResponsiveGridLayout" 
                 labelSpanXL="4"
                 labelSpanL="4"
@@ -163,9 +164,9 @@
                         </HBox>
                     <Label text="Tanggal Efektif" required="true" />
                         <HBox class="sapUiTinyMarginBeginEnd"> 
-                            <DatePicker id="a" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="9rem" tooltip="{i18n>showFrom}" />
+                            <DatePicker id="tanggalEfektifStartDatePickerDisplay" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="9rem" tooltip="{i18n>showFrom}" />
                             <Text text=" - " class="sapUiTinyMarginBeginEnd"/>
-                            <DatePicker id="q" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="9rem" tooltip="{i18n>showFrom}" />
+                            <DatePicker id="tanggalEfektifEndsDatePickerDisplay" dateValue="{overview>/reqStartDate}" change="onReqDateChanged" width="9rem" tooltip="{i18n>showFrom}" />
                         </HBox>
                     <Label text="" />
                     <HBox class="sapUiSmallMarginBeginEnd"> 
@@ -174,22 +175,22 @@
                             <Text text="" class="sapUiTinyMarginBeginEnd" />
                             <Text text="Menjadi" class="sapUiLargeMarginBeginEnd"/>
                         </HBox>
-                    <Label text="Posisi" />
+                    <Label text="Posisi" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Kantor (Personnel Area)" />
+                    <Label text="Kantor (Personnel Area)" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Cabang (Personel Area)" />
+                    <Label text="Cabang (Personel Area)" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Status" />
+                    <Label text="Status" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
@@ -199,12 +200,12 @@
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Jabatan" />
+                    <Label text="Jabatan" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Homebase" />
+                    <Label text="Homebase" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
@@ -259,25 +260,25 @@
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Penyesuaian Gaji" />
+                    <Label text="Penyesuaian Gaji" required="true"/>
                         <HBox>
-                            <Input value="" width="75%" class="sapUiTinyMarginBegin" editable="true"/>
+                            <Input value="" width="78%" class="sapUiTinyMarginBegin" editable="true"/>
                             <Text text="Rp"/>
                             <Input value="" width="77%" class="sapUiTinyMarginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Sebagai" />
+                    <Label text="Sebagai" required="true"/>
                         <HBox>
                             <Input value="" width="75%" class="sapUiTinyMarginBeginEnd" editable="true"/>
                         </HBox>
-                    <Label text="Dasar Pertimbangan" required="true"/>
+                    <Label text="Dasar Pertimbangan" />
                         <VBox class="sapUiTinyMarginBeginEnd">
                             <TextArea
-                                id="d"
+                                id="tindakanInputDisplay"
                                 width="50%"
                                 rows="4"
                                 maxLength="255"
-                                value=""
-                                liveChange=""
+                                value="{/kronologi}"
+                                liveChange=".onKronologiChange"
                                 valueLiveUpdate="true"
                                 editable="true"/>
                         </VBox>
@@ -286,57 +287,41 @@
                             <Label text="Harap lampirkan hasil Evaluasi di bagian Upload Dokumen" class="italicText"/> 
                             <Label text="Harap lampirkan PKWT terakhir (jika perpanjangan kontrak) di bagian Upload Dokumen" class="italicText"/>
                         </l:Grid>
-                        <Label />
                 </f:content>
-                </f:SimpleForm>      
-                <f:SimpleForm>
-                        <VBox justifyContent="Center" alignItems="Center">
-                        <HBox >
-                        <Button type="Accept" press="onPress"
-						ariaDescribedBy="acceptButtonDescription genericButtonDescription" width="7rem" text="Approve" />
-                        <Button type="Reject" press="onPress"
-						ariaDescribedBy="rejectButtonDescription genericButtonDescription" width="7rem" text="Reject" class="sapUiSmallMarginBegin"/>
-                        </HBox>
-                        </VBox>
-                </f:SimpleForm>         
+                </f:SimpleForm>               
                </content>               
             </Panel>
 
             <!-- Verification Panel -->
             <Panel
                expandable="true"
-               expanded="false"
+               expanded="true"
                headerText="Verification"
                width="auto"
                class="sapUiResponsiveMargin">
                <content>   
                   <!-- Verification Form -->
-                <f:SimpleForm>
+                <f:SimpleForm editable="true">
                 <Text  text="Assesment (Diisi team Talent dan Management)" class="titleText"/>
                 <Label text="Hasil Assessment" />
-                    <HBox class="sapUiSmallMarginBeginEnd">
-                        <RadioButtonGroup id="y" columns="3" editable="false">
-                            <buttons>
-                                <RadioButton text="Melebihi kualifikasi" />
-                                <RadioButton text="Memenuhi kualifikasi" />
-                            </buttons>
-                        </RadioButtonGroup>
-                    </HBox>
-                <Label text=""/>
-                    <HBox class="sapUiSmallMarginBeginEnd">
-                        <RadioButtonGroup id="m" columns="3" editable="false">
-                            <buttons>
-                                <RadioButton text="Hampir memenuhi kualifikasi" />
-                                <RadioButton text="Belum memenuhi kualifikasi" />
-                            </buttons>
-                        </RadioButtonGroup>
-                    </HBox>
+                <RadioButtonGroup id="rbg1" columns="2" width="100%">
+                    <RadioButton id="RB1-1" text="Melebihi kualifikasi" />
+                    <RadioButton id="RB1-2" text="Memenuhi kualifikasi" />
+                    <RadioButton id="RB1-4" text="Hampir memenuhi kualifikasi" />
+                    <RadioButton id="RB1-5" text="Belum memenuhi kualifikasi" />
+                </RadioButtonGroup>
                 <Label />
-                <Text text="Harap lampirkan hasil Assessment di bagian Upload Dokumen" class="italicText" /> 
+                <MessageStrip
+                    text="Harap lampirkan hasil Assessment di bagian Upload Dokumen"
+                    type="Information"
+                    showIcon="true">
+			    </MessageStrip>
+                
+                <!-- <Text text="Harap lampirkan hasil Assessment di bagian Upload Dokumen" class="italicText" />  -->
                 </f:SimpleForm>
-                <f:SimpleForm>              
+                <f:SimpleForm editable="true">             
                 <Text text="BI Checking (Diisi Compensation dan Benefit)" class="titleText" />
-                <Label text="Hasil BI Checking" required="false" labelFor="GroupA" />
+                <Label text="Hasil BI Checking" required="true" labelFor="GroupA" />
                 <HBox class="sapUiSmallMarginBeginEnd">
                     <Text text="Collection:" width="5rem"  class="titleText"/> 
                     <Input value="" width="2rem" editable="true"/>
@@ -353,34 +338,37 @@
                 <Label text="Catatan BI Checking"/>
                         <VBox class="sapUiTinyMarginBeginEnd">
                             <TextArea
-                                id="e"
+                                id="biChecking"
                                 width="50%"
                                 rows="4"
                                 maxLength="255"
                                 value="{/kronologi}"
                                 liveChange=".onKronologiChange"
                                 valueLiveUpdate="true"
-                                editable="true"/>
+                                editable="true"
+                                class="sapUiTinyMarginBottom"/>
                         </VBox>
                 <Label text="" />
-                        <l:Grid defaultSpan="XL12 L12 M12 S12" vSpacing="0" containerQuery="true">
-                            <Text text="Harap lampirkan hasil BI Checking di bagian Upload Dokumen" class="italicText"/> 
-                        </l:Grid>
+                <MessageStrip
+                    text="Harap lampirkan hasil BI Checking di bagian Upload Dokumen"
+                    type="Information"
+                    showIcon="true">
+                </MessageStrip>
                 </f:SimpleForm>
-                <f:SimpleForm>
-                <Text text="Disposisi (Diisi Data Management)" />
+                <f:SimpleForm editable="true">
+                <Text text="Disposisi (Diisi Data Management)"/>
                 <Label text="Download file template Disposisi (excel)" />
                     <HBox class="sapUiSmallMarginBeginEnd">
-                        <Input id="i"
+                        <Input id="downloadFile"
                             type="Number"
                             value="Download"
                             width="100%"
                             maxLength="18"
                             editable="false" />
                     </HBox>
-                <Label text="Hasil Disposisi" required="false" labelFor="GroupA" />
+                <Label text="Hasil Disposisi" required="true" labelFor="GroupA" />
                     <HBox class="sapUiSmallMarginBeginEnd">
-                        <RadioButtonGroup id="p" columns="3" editable="false"
+                        <RadioButtonGroup id="disposisi" columns="3" editable="false"
                             selectedIndex="{potensiKerugian>/selectedIndex}">
                             <buttons>
                                 <RadioButton text="Disetujui" />
@@ -391,7 +379,7 @@
                 <Label text="Penyesuaian Gaji" />
                     <HBox class="sapUiSmallMarginBeginEnd">
                         <Label text="Rp" />
-                        <Input id="cek"
+                        <Input id="penyesuaianGaji"
                             type="Number"
                             value=""
                             width="100%"
@@ -399,9 +387,21 @@
                             editable="true" />
                     </HBox>
                 <Label text=""/>
-                <Text text="Harap lampirkan hasil Disposisi di bagian Upload Dokumen" class="italicText"/>
+                <MessageStrip
+                    text="Harap lampirkan hasil Disposisi di bagian Upload Dokumen"
+                    type="Information"
+                    showIcon="true">
+                </MessageStrip>
                 </f:SimpleForm>
-                <VBox>
+                <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
+                <HBox alignItems="Center" justifyContent="End">
+                 <Button
+                    width="5rem"
+                    icon="sap-icon://add"
+                    type="Transparent"
+                    tooltip="Add Item"
+                    press=".onOpenDialog"/>
+                </HBox>
                 <Text text="Upload Dokumen" class="sapUiSmallMarginBegin" />
                 <HBox >
                 <Table>
@@ -409,13 +409,13 @@
                         <Column width="100px">
                             <Text text="Jenis Dokumen" />
                         </Column>
-                        <Column  width="100px">
+                        <Column  width="120px">
                             <Text text="PIC" />
                         </Column>
-                        <Column  width="300px">
+                        <Column  width="250px">
                             <Text text="Keterangan" />
                         </Column>
-                        <Column width="100px">
+                        <Column width="80px">
                             <Text text="Upload" />
                         </Column>
                     </columns>
@@ -521,7 +521,7 @@
                                         text="Show Document"
                                         type="Emphasized"
                                         tooltip="View Document"
-                                        press=""/>
+                                        press="onDisplayDocumentWarning"/>
                                 </VBox>
                             </cells>
                         </ColumnListItem>
@@ -542,29 +542,20 @@
                                         text="Show Document"
                                         type="Emphasized"
                                         tooltip="View Document"
-                                        press=""/>
+                                        press="onDisplayDocumentWarning"/>
                                 </VBox>
                             </cells>
                         </ColumnListItem>
                     </items>
                 </Table>
-                </HBox> 
-                <HBox
-                    class="sapUiSmallMarginTop"
-                    justifyContent="End">
-                <Button
-                    width="7rem"
-                    icon="" 
-                    text="Submit"
-                    type="Emphasized"
-                    tooltip="View Document"
-                    press=""/>
-                </HBox>
-                  
+                </HBox>                  
                 </VBox> 
                </content>
             </Panel>
          </VBox>
         </semantic:content>
+        <semantic:mainAction>
+            <semantic:MainAction id="btnSubmit" text="Submit" press="onSubmit"/>
+        </semantic:mainAction>
     </semantic:FullscreenPage>
 </mvc:View>

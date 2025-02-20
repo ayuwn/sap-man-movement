@@ -8,57 +8,58 @@
     height="100%">
     <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>orgChart}">
         <semantic:content>
-                <Graph 
-                    enableWheelZoom="false"
-                    orientation="TopBottom"
-                    nodes="{/nodes}"
-                    lines="{/lines}"
-                    searchSuggest="suggest"
-                    search="search"
-                    id="orgchart">
-                    <layoutAlgorithm>
-                        <layout:LayeredLayout
-                            mergeEdges="true"
-                            nodePlacement="Simple"
-                            nodeSpacing="40"/>
-                    </layoutAlgorithm>
-                    <nodes>
-                        <Node
-                            key="{id}"
-                            title="{title}"
-                            description="{title}"
-                            attributes="{
-                                path: 'attributes',
-                                templateShareable: false
-                            }"
-                            showDetailButton="false"
-                            descriptionLineSize="0"
-                            collapsed="{collapsed}"
-                            shape="Box">
-                            <customData>
-                                <core:CustomData key="supervisor" value="{supervisor}"/>
-                                <core:CustomData key="team" value="{team}"/>
-                                <core:CustomData key="location" value="{location}"/>
-                                <core:CustomData key="position" value="{position}"/>
-                                <core:CustomData key="email" value="{email}"/>
-                                <core:CustomData key="phone" value="{phone}"/>
-                            </customData>
-                            <attributes>
-                                <ElementAttribute label="{label}" value="{value}"/>
-                            </attributes>
-                            <image>
-                                <NodeImage src="{src}"
-                                        width="80"
-                                        height="100"/>
-                            </image>
-                        </Node>
-                    </nodes>
-                    <lines>
-                        <Line from="{from}" to="{to}" arrowOrientation="None" press="linePress"/>
-                    </lines>
-                </Graph>
+            <Graph 
+                enableWheelZoom="false"
+                orientation="TopBottom"
+                nodes="{/nodes}"
+                lines="{/lines}"
+                searchSuggest="suggest"
+                search="search"
+                id="chart">
+                <layoutAlgorithm>
+                    <layout:LayeredLayout
+                        mergeEdges="true"
+                        nodePlacement="Simple"
+                        nodeSpacing="40"/>
+                </layoutAlgorithm>
+                <nodes>
+                    <Node
+                        key="{key}"
+                        title="{title}"
+                        description="{title}"
+                        attributes="{
+                            path: 'attributes',
+                            templateShareable: false
+                        }"
+                        showDetailButton="false"
+                        descriptionLineSize="0"
+                        collapsed="{collapsed}"
+                        shape="Box">
+                        <customData>
+                            <core:CustomData key="supervisor" value="{title}"/>
+                            <core:CustomData key="team" value="{team}"/>
+                            <core:CustomData key="location" value="{location}"/>
+                            <core:CustomData key="position" value="{description}"/>
+                            <core:CustomData key="email" value="{email}"/>
+                            <core:CustomData key="phone" value="{phone}"/>
+                        </customData>
+                        <attributes>
+                            <ElementAttribute label="{label}" value="{value}"/>
+                        </attributes>
+                        <image>
+                            <NodeImage src="{icon}"
+                                    width="80"
+                                    height="100"/>
+                        </image>
+                    </Node>
+                </nodes>
+                <lines>
+                    <Line from="{from}" to="{to}" arrowOrientation="None" press="linePress"/>
+                </lines>
+            </Graph>
         </semantic:content>
         <semantic:mainAction>
+            <!-- <semantic:MainAction text="Employee" press=".onEmployee"/> -->
             <semantic:MainAction text="History" press="onHistory" />
         </semantic:mainAction>
     </semantic:FullscreenPage>

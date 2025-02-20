@@ -133,7 +133,7 @@
                 },
                 {
                     "name": "mutation",
-                    "pattern": "mutation",
+                    "pattern": "mutation/{EmployeeNumber}",
                     "titleTarget": "",
                     "greedy": false,
                     "target": [
@@ -147,6 +147,15 @@
                     "greedy": false,
                     "target": [
                         "history"
+                    ]
+                },
+                {
+                    "name": "employee",
+                    "pattern": "employee/{EmployeeNumber}",
+                    "titleTarget": "",
+                    "greedy": false,
+                    "target": [
+                        "employee"
                     ]
                 }
             ],
@@ -189,7 +198,7 @@
                     "clearAggregation": true,
                     "viewName": "Mutation",
                     "viewId": "mutation",
-                    "viewLevel": 1
+                    "viewLevel": 2
                 },
                 "history": {
                     "viewType": "XML",
@@ -198,6 +207,14 @@
                     "viewName": "History",
                     "viewId": "history",
                     "viewLevel": 1
+                },
+                "employee": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearAggregation": true,
+                    "viewName": "Employee",
+                    "viewId": "employee",
+                    "viewLevel": 2
                 }
             }
         },

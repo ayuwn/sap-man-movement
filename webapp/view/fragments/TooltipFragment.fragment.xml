@@ -15,7 +15,7 @@
                             <MenuItem text="Action Type">
                                 <items>
                                     <MenuItem text="Status Change" icon="sap-icon://business-card"/>
-                                    <MenuItem text="Mutation" icon="sap-icon://offsite-work" press=".onMutation"/>
+                                    <MenuItem text="Mutation" icon="sap-icon://offsite-work" press="onMutation"/>
                                     <MenuItem text="Promotion" icon="sap-icon://opportunities"/>
                                     <MenuItem text="Demotion" icon="sap-icon://company-view"/>
                                     <MenuItem text="Acting" icon="sap-icon://building"/>
@@ -40,7 +40,7 @@
                    <HBox>
                    <Title text="Contact Detail"/>
                    </HBox>
-                    <Label text="ID" />   
+                    <Label text="NIK" />   
                     <Text text="{/id}"/>
                     <Label text="Location" />
                     <Text text="{/location}" />
@@ -49,14 +49,14 @@
                     <Label text="Email" />
                     <Text text="{/email}" />
                     <Label text="Team" />
-                    <Text text="{/teamSize}" />
+                    <Text text="{/team}" />
                 </f:content>
             </f:SimpleForm>
             </content>
             <endButton>
             <Button 
                 text="Cancel"
-                press=".onDialogClose" />
+                press="onDialogClose" />
             </endButton>
     </Dialog>
 </core:FragmentDefinition>

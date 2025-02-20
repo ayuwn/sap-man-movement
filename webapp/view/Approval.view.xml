@@ -2,7 +2,7 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:semantic="sap.m.semantic">
-    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appDescription}">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appApproval}">
         <semantic:content>
             <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
                 <Table inset="false" alternateRowColors="true">
@@ -22,22 +22,22 @@
                             <Text text="Employee Photo" visible="false"/>
                         </Column>
                         <Column width="8rem" minScreenWidth="Tablet" demandPopin="true">
-					        <Title text="Employee"/>
+					        <Text text="Employee"/>
                         </Column>
                         <Column width="13rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Title text="Action Type and Reason for Action"/>
+                            <Text text="Action Type and Reason for Action"/>
                         </Column>
                         <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Title text="Date Action"/>
+                            <Text text="Date Action"/>
                         </Column>
                         <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Title text="Date Request"/>
+                            <Text text="Date Request"/>
                         </Column>
                         <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Title text="Status"/>
+                            <Text text="Status"/>
                         </Column>
                         <Column width="7rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Title text="Person Responsible"/>
+                            <Text text="Person Responsible"/>
                         </Column>
                     </columns>
                     <items>
@@ -47,7 +47,7 @@
                                     initials="{path: 'talentList>EmployeeName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
                                     tooltip="{talentList>EmployeeName}" class="sapMTableContentMargin"/>
                                 <VBox>
-                                    <Title text="Roy Keane (13000113)"/>
+                                    <Text text="Roy Keane (13000113)" class="boldText"/>
                                     <Text text="HR BP" />
                                 </VBox>
                                 <VBox class="sapMTableContentMargin">
@@ -57,7 +57,7 @@
                                 <Text text="" />
                                 <Text text="Verified by HROD" class="sapMTableContentMargin orangeText" />
                                 <VBox class="sapMTableContentMargin">
-                                    <Title text="Talent Team" />
+                                    <Text text="Talent Team" class="boldText" />
                                     <Text text="Talent" />
                                 </VBox>
                             </cells>

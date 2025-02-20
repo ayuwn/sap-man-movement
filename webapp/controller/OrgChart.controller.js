@@ -14,23 +14,28 @@ sap.ui.define([
 ], function (BaseController, formatter, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, LayeredLayout, ActionButton, Node, Fragment, MenuItem) {
     "use strict";
 
-    var STARTING_PROFILE = "Mann";
+    var STARTING_PROFILE = "Jovander";
 
     return BaseController.extend("bsim.hcmapp.man.movement.controller.OrgChart", {
         formatter: formatter,
 
         onInit: function () {
-            // binding data model
-            this._oModel = new JSONModel(sap.ui.require.toUrl("bsim/hcmapp/man/movement/model/orgchart.json"));
+            // Initialize the JSON model
+            this._oModel = new JSONModel();
             this._oModel.setDefaultBindingMode(sap.ui.model.BindingMode.OneWay);
 
             this._sTopSupervisor = STARTING_PROFILE;
             this._mExplored = [this._sTopSupervisor];
 
-            this._graph = this.byId("orgchart"); // Menggunakan ID yang sesuai dengan view
+            this._graph = this.byId("chart"); // Use the ID that matches the view
+            this._oModel.setSizeLimit(1000);
             this.getView().setModel(this._oModel);
 
-            this._setFilter();
+            // Initialize the employee model
+            var oEmployeeModel = new JSONModel();
+            this.getView().setModel(oEmployeeModel, "employee");
+
+            this._fetchData();
 
             this._graph.attachEvent("beforeLayouting", function (oEvent) {
                 // nodes are not rendered yet (bOutput === false) so their invalidation triggers parent (graph) invalidation
@@ -50,19 +55,19 @@ sap.ui.define([
                         if (this._mExplored.indexOf(oNode.getKey()) === -1) {
                             // managers with team but not yet expanded
                             // we create custom expand button with dynamic loading
-                            oNode.setShowExpandButton(false);
+                            oNode.setShowExpandButton(true);
 
                             // this renders icon marking collapse status
                             oNode.setCollapsed(true);
-                            oExpandButton = new ActionButton({
-                                title: "Expand",
-                                icon: "sap-icon://sys-add",
-                                press: function () {
-                                    oNode.setCollapsed(false);
-                                    this._loadMore(oNode.getKey());
-                                }.bind(this)
-                            });
-                            oNode.addActionButton(oExpandButton);
+                            // oExpandButton = new ActionButton({
+                            //     title: "Expand",
+                            //     icon: "sap-icon://sys-add",
+                            //     press: function () {
+                            //         oNode.setCollapsed(false);
+                            //         this._loadMore(oNode.getKey());
+                            //     }.bind(this)
+                            // });
+                            // oNode.addActionButton(oExpandButton);
                         } else {
                             // manager with already loaded data - default expand button
                             oNode.setShowExpandButton(true);
@@ -102,6 +107,72 @@ sap.ui.define([
                 }, this);
                 this._graph.preventInvalidation(false);
             }.bind(this));
+        },
+
+        _fetchData: function () {
+            var sEmployeeUrl = "/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/EmployeeSet?$format=json";
+            var sRelasiUrl = "/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/RelasiSet?$format=json";
+            var oModel = this._oModel;
+        
+            var aEmployeeRequest = $.ajax({
+                url: sEmployeeUrl,
+                method: "GET"
+            });
+        
+            var aRelasiRequest = $.ajax({
+                url: sRelasiUrl,
+                method: "GET"
+            });
+        
+            $.when(aEmployeeRequest, aRelasiRequest).done(function (oEmployeeData, oRelasiData) {
+                console.log("Employee Data:", oEmployeeData);
+                console.log("Relasi Data:", oRelasiData);
+        
+                if (oEmployeeData[0] && oEmployeeData[0].d && oEmployeeData[0].d.results && oRelasiData[0] && oRelasiData[0].d && oRelasiData[0].d.results) {
+                    var employees = oEmployeeData[0].d.results;
+                    var relations = oRelasiData[0].d.results;
+                    var nodes = [];
+                    var lines = [];
+                    var nodeKeys = new Set();
+        
+                    // Transform the employee data into nodes
+                    employees.forEach(function (employee) {
+                        nodes.push({
+                            key: employee.EmployeeNumber,
+                            title: employee.EmployeeName,
+                            description: employee.Position,
+                            phone: employee.Phone,
+                            email: employee.Email,
+                            location: employee.Location,
+                            team: employee.TotalTeam
+                        });
+                        nodeKeys.add(employee.EmployeeNumber);
+                    });
+        
+                    // Transform the relation data into lines
+                    relations.forEach(function (relation) {
+                        if (nodeKeys.has(relation.From) && nodeKeys.has(relation.To)) {
+                            lines.push({
+                                from: relation.From,
+                                to: relation.To
+                            });
+                        } else {
+                            console.warn("Skipping line with nonexistent node:", relation);
+                        }
+                    });
+        
+                    console.log("Nodes:", nodes);
+                    console.log("Lines:", lines);
+        
+                    oModel.setProperty("/nodes", nodes);
+                    oModel.setProperty("/lines", lines);
+                } else {
+                    console.error("Unexpected response format", oEmployeeData, oRelasiData);
+                }
+            }.bind(this)).fail(function (oError) {
+                console.error("Error fetching data", oError);
+                console.error("Error details:", oError.responseText);
+            });
         },
 
         _setFilter: function () {
@@ -144,7 +215,7 @@ sap.ui.define([
                 and: false
             }));
         },
-        
+
         _loadMore: function(sName) {
             this._graph.deselect();
             this._mExplored.push(sName);
@@ -163,43 +234,35 @@ sap.ui.define([
         _openDetail: function(oNode, oButton) {
             var sTeamSize = this._getCustomDataValue(oNode, "team");
             var sId = oNode.getKey();
-            
+
+            var oDialogModel = new JSONModel({
+                icon: oNode.getImage() && oNode.getImage().getProperty("src"),
+                title: oNode.getDescription(),
+                id: sId,
+                description: this._getCustomDataValue(oNode, "position"),
+                location: this._getCustomDataValue(oNode, "location"),
+                showTeam: !!sTeamSize,
+                team: sTeamSize,
+                email: this._getCustomDataValue(oNode, "email"),
+                phone: this._getCustomDataValue(oNode, "phone")
+            });
+
             if (!this._oDialog) {
                 Fragment.load({
                     name: "bsim.hcmapp.man.movement.view.fragments.TooltipFragment",
                     type: "XML",
+                    id: this.createId("tooltipFragment"), 
                     controller: this // Ensure the controller is passed to the fragment
                 }).then(function(oDialog) {
                     this._oDialog = oDialog;
                     this.getView().addDependent(this._oDialog); // Add the dialog as a dependent to the view
-                    this._oDialog.setModel(new JSONModel({
-                        icon: oNode.getImage() && oNode.getImage().getProperty("src"),
-                        title: oNode.getDescription(),
-                        id: sId,
-                        description: this._getCustomDataValue(oNode, "position"),
-                        location: this._getCustomDataValue(oNode, "location"),
-                        showTeam: !!sTeamSize,
-                        teamSize: sTeamSize,
-                        email: this._getCustomDataValue(oNode, "email"),
-                        phone: this._getCustomDataValue(oNode, "phone")
-                    }));
+                    this._oDialog.setModel(oDialogModel);
                     setTimeout(function () {
                         this._oDialog.open(oButton);
                     }.bind(this), 0);
                 }.bind(this));
             } else {
-                this._oDialog.setModel(new JSONModel({
-                    icon: oNode.getImage() && oNode.getImage().getProperty("src"),
-                    title: oNode.getDescription(),
-                    id: sId,
-                    description: this._getCustomDataValue(oNode, "position"),
-                    location: this._getCustomDataValue(oNode, "location"),
-                    showTeam: !!sTeamSize,
-                    teamSize: sTeamSize,
-                    email: this._getCustomDataValue(oNode, "email"),
-                    phone: this._getCustomDataValue(oNode, "phone")
-                }));
-
+                this._oDialog.setModel(oDialogModel);
                 setTimeout(function () {
                     this._oDialog.open(oButton);
                 }.bind(this), 0);
@@ -207,8 +270,19 @@ sap.ui.define([
         },
 
         onMutation: function (oEvent) {
-            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            oRouter.navTo("mutation"); // Navigate to the statusChange route without parameters
+            var oItem = oEvent.getSource();
+            var sEmployeeNumber = oItem.data("EmployeeNumber") || "00000294";
+        
+            if (!sEmployeeNumber) {
+                console.error("No Employee Number found in custom data");
+                return;
+            }
+        
+            console.log("Navigating to employee page with Employee Number:", sEmployeeNumber);
+        
+            this.getRouter().navTo("mutation", {
+                EmployeeNumber: sEmployeeNumber
+            });
         },
 
         onDialogClose: function () {
@@ -247,7 +321,23 @@ sap.ui.define([
         onHistory: function () {
             this.getRouter().navTo("history");
         },
+
+        onEmployee: function (oEvent) {
+            var oItem = oEvent.getSource();
+            var sEmployeeNumber = oItem.data("EmployeeNumber") || "00000294";
         
+            if (!sEmployeeNumber) {
+                console.error("No Employee Number found in custom data");
+                return;
+            }
+        
+            console.log("Navigating to employee page with Employee Number:", sEmployeeNumber);
+        
+            this.getRouter().navTo("employee", {
+                EmployeeNumber: sEmployeeNumber
+            });
+        },
+
         onExit: function() {
             if (this._pQuickView) {
                 this._pQuickView.then(function(oQuickView) {
