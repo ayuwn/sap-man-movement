@@ -1,0 +1,12 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="approvalDialog" title="Approval Notes" stretch="false">
+        <VBox>
+            <Text text="Please enter your notes:"/>
+            <TextArea id="approvalNotes" rows="4" width="100%"/>
+        </VBox>
+        <buttons>
+            <Button text="Submit" press="onSubmitApproval"/>
+            <Button text="Cancel" press="onCancelApproval"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

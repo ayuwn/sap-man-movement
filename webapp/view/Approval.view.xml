@@ -2,66 +2,67 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:semantic="sap.m.semantic">
-    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="false" floatingFooter="false" title="{i18n>appApproval}">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="true" floatingFooter="false" title="{i18n>appApproval}">
         <semantic:content>
             <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
-                <Table inset="false" alternateRowColors="true">
+                <Table id="approvalTable" inset="false" alternateRowColors="true" items="{approvalModel>/items}">
                     <headerToolbar>
                         <OverflowToolbar>
-                            <Title text="Employee"></Title>
+                            <Title text="{i18n>employee}"></Title>
                             <ToolbarSpacer/>
                             <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
                             <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
                             <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
                             <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
-                            <SearchField id="schFieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
+                            <SearchField id="FieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
                         </OverflowToolbar>
                     </headerToolbar>   
                     <columns>
                         <Column width="3.5rem">
-                            <Text text="Employee Photo" visible="false"/>
+                            <Text text="{i18n>employeePhoto}" visible="false"/>
                         </Column>
-                        <Column width="8rem" minScreenWidth="Tablet" demandPopin="true">
-					        <Text text="Employee"/>
+                        <Column width="14rem" minScreenWidth="Tablet" demandPopin="true">
+					        <Text text="{i18n>employee}"/>
                         </Column>
-                        <Column width="13rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Action Type and Reason for Action"/>
-                        </Column>
-                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Date Action"/>
+                        <Column width="11rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>actionReason}"/>
                         </Column>
                         <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Date Request"/>
+                            <Text text="{i18n>dateAction}"/>
                         </Column>
                         <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Status"/>
+                            <Text text="{i18n>dateReq}"/>
                         </Column>
-                        <Column width="7rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Person Responsible"/>
+                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>status}"/>
+                        </Column>
+                        <Column width="9rem" minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>personResponsible}"/>
                         </Column>
                     </columns>
                     <items>
-                        <ColumnListItem vAlign="Middle" type="Navigation" press="onEmployeePressed">
+                        <ColumnListItem vAlign="Middle" type="Navigation" press="onEmployeeApprovalPressed">
                             <cells>
-                                <Avatar src="{path: 'talentList>EmployeeNumber', formatter: '.formatter.formatEmployeePhotoUrl'}" displaySize="Custom"
-                                    initials="{path: 'talentList>EmployeeName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
-                                    tooltip="{talentList>EmployeeName}" class="sapMTableContentMargin"/>
+                                <Avatar displaySize="Custom"
+                                    initials="{path: 'approvalModel>EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
+                                    tooltip="{approvalModel>EmployeeName/FormattedName}" class="sapMTableContentMargin"/>
                                 <VBox>
-                                    <Text text="Roy Keane (13000113)" class="boldText"/>
-                                    <Text text="HR BP" />
+                                    <ObjectIdentifier title="{approvalModel>EmployeeName/FormattedName} ({approvalModel>EmployeeNumber})" />
+                                    <Text text="{approvalModel>PlansDesc_Dest}" />
                                 </VBox>
                                 <VBox class="sapMTableContentMargin">
-                                    <Text text="" />
+                                    <Text text="{approvalModel>ActionType} {approvalModel>ActionTypeDesc}" />
+                                    <Text text="{approvalModel>Massg} {approvalModel>MassgDesc}" />
                                 </VBox>
-                                <Text text="" />
-                                <Text text="" />
-                                <Text text="Verified by HROD" class="sapMTableContentMargin orangeText" />
-                                <VBox class="sapMTableContentMargin">
-                                    <Text text="Talent Team" class="boldText" />
-                                    <Text text="Talent" />
+                                <Text text="{path: 'approvalModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" />
+                                <Text text="{path: 'approvalModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}" />
+                                <Text text="{approvalModel>StatusText}" class="sapMTableContentMargin greenText" />
+                                <VBox>
+                                <ObjectIdentifier title="{approvalModel>ApproverName} ({approvalModel>ApproverId})"/>
+                                <Text text="{approvalModel>Abbreviation}" />
                                 </VBox>
                             </cells>
-                        </ColumnListItem>   
+                        </ColumnListItem>
                     </items>
                 </Table>
             </VBox>

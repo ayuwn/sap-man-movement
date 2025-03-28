@@ -1,0 +1,18 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Employee Found"
+        title="Select Employee"
+        search="handleSearchEmployeeChange"
+        confirm="handleCloseEmployeeChange"
+        cancel="handleCloseEmployeeChange"
+        items="{employeechange>/}">
+        <StandardListItem
+            title="{employeechange>Key}"
+            description="{employeechange>Value}"
+            info="{employeechange>EmployeeNumber}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

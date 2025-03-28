@@ -25,7 +25,7 @@
                 <nodes>
                     <Node
                         key="{key}"
-                        title="{title}"
+                        title="{key}"
                         description="{title}"
                         attributes="{
                             path: 'attributes',
@@ -36,7 +36,9 @@
                         collapsed="{collapsed}"
                         shape="Box">
                         <customData>
+                            <core:CustomData key="EmployeeNumber" value="{key}"/>
                             <core:CustomData key="supervisor" value="{title}"/>
+                            <core:CustomData key="picture" value="{picture}"/>
                             <core:CustomData key="team" value="{team}"/>
                             <core:CustomData key="location" value="{location}"/>
                             <core:CustomData key="position" value="{description}"/>
@@ -47,7 +49,7 @@
                             <ElementAttribute label="{label}" value="{value}"/>
                         </attributes>
                         <image>
-                            <NodeImage src="{icon}"
+                            <NodeImage src="{picture}"
                                     width="80"
                                     height="100"/>
                         </image>
@@ -58,9 +60,5 @@
                 </lines>
             </Graph>
         </semantic:content>
-        <semantic:mainAction>
-            <!-- <semantic:MainAction text="Employee" press=".onEmployee"/> -->
-            <semantic:MainAction text="History" press="onHistory" />
-        </semantic:mainAction>
     </semantic:FullscreenPage>
 </mvc:View>

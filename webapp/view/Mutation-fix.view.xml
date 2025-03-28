@@ -1,0 +1,797 @@
+<mvc:View
+   controllerName="bsim.hcmapp.man.movement.controller.Mutation-fix"
+   xmlns:mvc="sap.ui.core.mvc"
+   xmlns="sap.m"
+   xmlns:f="sap.ui.layout.form"
+   xmlns:l="sap.ui.layout"
+   xmlns:core="sap.ui.core"
+   xmlns:semantic="sap.m.semantic"
+   xmlns:vm="sap.ui.fl.variants"
+   xmlns:mdc="sap.ui.mdc"
+   xmlns:mdct="sap.ui.mdc.table"
+   xmlns:upload="sap.m.upload" 
+   xmlns:u="sap.ui.unified"
+   xmlns:c="sap.f">
+<semantic:FullscreenPage id="Movement" navButtonPress="onNavBack" showNavButton="true" title="{i18n>appMovement}">
+    <semantic:content>
+    <VBox class="sapUiMediumMargin" alignItems="Center" justifyContent="Center">
+        <HBox backgroundDesign="Solid" width="30%" id="profile" class="roundedProfile">
+            <HBox class="sapUiSmallMarginBegin sapUiTinyMarginEndBottomTop" alignItems="Center" justifyContent="Center">
+                <Avatar displaySize="Custom"
+                        initials="{path: 'employeeDetail>/EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="3rem"
+                        tooltip="{employeeDetail>/EmployeeName/FormattedName}" class="sapMTableContentMargin sapUiSmallMarginTop"/>
+                <VBox class="sapUiSmallMarginBegin">
+                    <ObjectIdentifier title="{employeeDetail>/EmployeeName/FormattedName} ({employee>/EmployeeNumber})" class="sapUiTinyMarginBottom"/>
+                    <Text text="{employeeDetail>/EmployeePositionText}" />
+                </VBox>
+            </HBox>
+        </HBox>
+     </VBox>       
+
+        <!-- Employee Data Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="true"
+        headerText="Employee Data" 
+        width="auto">
+            <content>
+                <f:SimpleForm 
+                id="employeeMutationForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>entryDate}"/>
+                            <HBox>
+                                <Input id="entryDateMutation" value="{path: 'employeeDetail>/HiringDate', formatter: '.formatter.formatDateDisplay'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA1}"/>
+                            <HBox>
+                                <Input id="ratingPA1Mutation" value="{employeeDetail>/Rat01}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA2}"/>
+                            <HBox>
+                                <Input id="ratingPA2Mutation" value="{employeeDetail>/Rat02}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA3}"/>
+                            <HBox>
+                                <Input id="ratingPA3Mutation" value="{employeeDetail>/Rat03}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>marketingAvg}"/>
+                            <HBox>
+                                <Input id="marketingAvgMutation" value="{path: 'employeeDetail>/Avg', formatter: '.formatter.formatAvg'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Sanksi Aktif Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="true"
+        headerText="Sanksi Aktif" 
+        width="auto">
+            <content>
+                <f:SimpleForm 
+                id="sanksiMutationForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>sanctionType}"/>
+                            <l:Grid vSpacing="0" containerQuery="true">
+                            <Input id="sanctionTypeMutation" value="{employeeDetail>/SanksiAktif}" width="auto" editable="false" >
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <VBox>
+                            <Text id="sanctionDescriptionMutation" text="Surat Teguran" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                                <Button
+                                    icon="sap-icon://document-text" 
+                                    text="Show Document"
+                                    type="Emphasized"
+                                    tooltip="View Document"
+                                    press="onDisplayDocumentWarning" class="sapUiTinyMarginBegin"/>
+                            </VBox>
+                            </l:Grid>
+                        <Label text="Jenis Pelanggaran" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel1Mutation" value="{employeeDetail>/JenPel1}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel1Mutation" text="{path: 'employeeDetail>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel2Mutation" value="{employeeDetail>/JenPel2}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel2Mutation" text="{path: 'employeeDetail>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel3Mutation" value="{employeeDetail>/JenPel3}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel3Mutation" text="{path: 'employeeDetail>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel4Mutation" value="{employeeDetail>/JenPel4}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel4Mutation" text="{path: 'employeeDetail>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="{i18n>actDate}" required="false"/>
+                            <HBox class="sapUiTinyMarginBeginEnd">
+                                <DatePicker id="actDateStartMutation" value="{employeeDetail>/StartDate}" width="87%" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                                <Text text="-" class="sapUiTinyMarginEnd"/>
+                                <DatePicker id="actDateEndMutation" value="{employeeDetail>/EndDate}" width="87%" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="information" visible="false"/>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="57%">
+                        <MessageStrip
+                            text="Yang bersangkutan sedang dalam proses pengajuan [ST/TP] yang diajukan padaa tanggal dd.mm.yyyy"
+                            type="Warning"
+                            showIcon="true"
+                            showCloseButton="false"
+                            class="sapUiMediumMarginBottom">
+                        </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Action Request Panel -->
+        <Panel 
+            expandable="true" 
+            expanded="true"
+            headerText="Action Request" 
+            width="auto">
+            <content>
+                <f:SimpleForm 
+                    id="actionMutationForm"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>actionType}" />
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <Input id="actionTypeMutation" value="{employeeDetail>/ActionType}" fieldWidth="110%" width="110%" class="sapUiTinyMarginBegin" editable="false"/>
+                            <Text text="{employeeDetail>/ActionTypeDesc}" class="sapUiMediumMarginBegin"/>
+                        </HBox>
+                        <Label text="{i18n>reason}" required="true"/>
+                        <HBox>
+                            <Input 
+                                id="reasonMutation" 
+                                value="{reason>/selectedReason/Key}" 
+                                description="{reason>/selectedReason/Value}"
+                                width="auto"
+                                fieldWidth="auto" 
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiSmallMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpReason" 
+                                required="true"/>
+                        </HBox>
+                        <Label text="{i18n>effectiveDate}" required="true" />
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <DatePicker id="effectiveDateStartMutation" value="" width="92%" class="sapUiTinyMarginBeginEnd" required="true"/>
+                            <Text text="-" class="sapUiSmallMarginBeginEnd"/>
+                            <DatePicker id="effectiveDateEndMutation" value="" width="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>mutation}" visible="false"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Text text="Dari" class="sapUiLargeMarginEnd"/>
+                            <Text id="mutationFromMutation" text="" class="sapUiLargeMarginBegin sapUiLargeMarginEnd" />
+                            <Text id="mutationToMutation" text="" class="sapUiMediumMarginBegin sapUiTinyMarginEnd" />
+                            <Text text="Menjadi" class="sapUiLargeMarginBegin"/>
+                        </HBox>
+                        <Label text="{i18n>positionId}" required="true" />
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <!-- <Table>
+                            <Input id="currentPositionIdMutation" value="{employeeDetail>/EmployeePositionId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="currentPositionIdMutation1" value="{employee>/EmployeePositionId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            </Table> -->
+                            <!-- <MultiInput>
+                                <tokens>
+                                    <Token text="{employee>/EmployeePositionId}" />
+                                    <Token text="{employee>/EmployeePositionId}" />
+                                </tokens>
+                            </MultiInput> -->
+
+                            <VBox class="customBox">
+                                <Text text="{employeeDetail>/EmployeePositionId}" class="sapUiSmallMarginBegin" />
+                                <Text text="{employeeDetail>/EmployeePositionText}" class="sapUiSmallMarginBegin" />
+                            </VBox>
+
+
+                            <!-- <HBox class="customBox">
+                                <VBox>
+                                    <Text text="{employee>/EmployeePositionId}" />
+                                </VBox>
+                                <VBox class="sapUiSmallMarginBegin">
+                                    <Text text="{employee>/EmployeePositionText}" />
+                                </VBox>
+                            </HBox> -->
+
+                            <!-- <c:Card headerText="Position" width="12em" height="4rem" class="sapUiSmallMarginBottom noRoundedCard">
+                                <c:content>
+                                    <VBox class="sapUiSmallMarginBegin">
+                                        <ObjectAttribute
+                                            text="{employee>/EmployeePositionId}" />
+                                        <ObjectAttribute
+                                            text="{employee>/EmployeePositionText}" />
+                                    </VBox>
+                                </c:content>
+                            </c:Card> -->
+
+                            <Input 
+                                id="newPositionIdMutation" 
+                                value="{position>/selectedPosition/Key}" 
+                                width="auto"
+                                fieldWidth="auto" 
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiLargeMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpPosition" 
+                                required="true"/>
+                            <!-- <Input id="newPositionIdMutation" value="" width="91%" class="sapUiLargeMarginBegin" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>positionText}" required="true" />
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionTextMutation" value="{employeeDetail>/EmployeePositionText}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newPositionTextMutation" value="{position>/selectedPosition/Value}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>employeeGroupId}" required="true" />
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentEmployeeGroupIdMutation" value="{employeeDetail>/StatusAsal}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input 
+                                id="newEmployeeGroupIdMutation" 
+                                value="{group>/selectedGroup/Key}"
+                                width="auto"
+                                fieldWidth="auto"
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiLargeMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpGroup" 
+                                required="true"/>
+                            <!-- <Input id="newEmployeeGroupIdMutation" value="" width="91%" class="sapUiLargeMarginBegin" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>employeeGroupText}" required="true" visible="false"/>
+                            <l:Grid defaultSpan="XL6 L6 M6 S12" vSpacing="0" hSpacing="1" containerQuery="true">
+                            <l:content>
+                            <!-- <HBox class="sapUiSmallMarginBeginEnd"> -->
+                                <Text id="currentEmployeeGroupTextMutation" text="{employeeDetail>/EmployeeGrpDesc}">
+                                <layoutData>
+                                    <l:GridData span="L6 M6 S12" />
+                                </layoutData>
+                                </Text>
+                            <!-- <Input id="currentEmployeeGroupTextMutation" value="{employeeDetail>/EmployeeGrpDesc}" width="97%" class="sapUiMediumMarginEnd" editable="false"/> -->
+                                <Text id="newEmployeeGroupTextMutation" text="{group>/selectedGroup/Value}">
+                                <layoutData>
+                                    <l:GridData span="L6 M6 S12"/>
+                                </layoutData>
+                                </Text>
+                            <!-- </HBox> -->
+                            </l:content>
+                            </l:Grid>
+                        <Label text="{i18n>employeeSubgroupId}" required="true" />
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentEmployeeSubgroupIdMutation" value="{employeeDetail>/JbtnAsl}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input 
+                                id="newEmployeeSubgroupIdMutation" 
+                                value="{subGroup>/selectedSubGroup/Key2}"
+                                width="auto"
+                                fieldWidth="auto"
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiLargeMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpSubGroup" 
+                                required="true"/>
+                            <!-- <Input id="newEmployeeSubgroupIdMutation" value="" width="91%" class="sapUiLargeMarginBegin" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>employeeSubgroupText}" required="true" />
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentEmployeeSubgroupTextMutation" value="{employeeDetail>/EmployeeSubgrpDesc}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newEmployeeSubgroupTextMutation" value="{subGroup>/selectedSubGroup/Value}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>perAreaId}" required="true"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerAreaIdMutation" value="{employeeDetail>/PersonnelAreaId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input 
+                                id="newPerAreaIdMutation" 
+                                value="{area>/selectedArea/Key}"
+                                width="auto"
+                                fieldWidth="auto" 
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiLargeMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpArea" 
+                                required="true"/>
+                            <!-- <Input id="newPerAreaIdMutation" value="" width="91%" class="sapUiLargeMarginBegin" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>perAreaText}" required="true"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerAreaTextMutation" value="{employeeDetail>/PersonnelAreaText}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newPerAreaTextMutation" value="{area>/selectedArea/Value}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>perSubAreaId}" required="true"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerSubAreaIdMutation" value="{employeeDetail>/PersonnelSubareaId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input 
+                                id="newPerSubAreaIdMutation" 
+                                value="{subArea>/selectedSubArea/Key2}" 
+                                width="auto"
+                                fieldWidth="auto" 
+                                fieldGroupIds="grpValidation" 
+                                class="sapUiLargeMarginBegin" 
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpSubArea" 
+                                required="true"/>
+                            <!-- <Input id="newPerSubAreaIdMutation" value="" width="91%" class="sapUiLargeMarginBegin" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>perSubAreaText}" required="true"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerSubAreaTextMutation" value="{employeeDetail>/PersonnelSubareaText}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newPerSubAreaTextMutation" value="{subArea>/selectedSubArea/Value}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>unitOrgId}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentUnitOrgIdMutation" value="{employeeDetail>/EmployeeOrgunitId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newUnitOrgIdMutation" value="{employeeDetail>/EmployeeOrgunitId}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>unitOrgText}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentUnitOrgTextMutation" value="{employeeDetail>/EmployeeOrgunitText}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newUnitOrgTextMutation" value="{employeeDetail>/EmployeeOrgunitText}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>divisionId}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentDivisionIdMutation" value="{employeeDetail>/DivisionId}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newDivisionIdMutation" value="{employeeDetail>/DivisionId}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>divisionText}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentDivisionTextMutation" value="{employeeDetail>/DivisionText}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newDivisionTextMutation" value="{employeeDetail>/DivisionText}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>positionMPP}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionMPPMutation" value="{employeeDetail>/Mpp}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newPositionMPPMutation" value="{employeeDetail>/Mpp}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>grade}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentGradeMutation" value="{employeeDetail>/Grade}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                            <Input id="newGradeMutation" value="{employeeDetail>/Grade}" width="91%" class="sapUiLargeMarginBegin" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>endDateJob}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="EndDateMutation" value="{path: 'employeeDetail>/ZENDDA', formatter: '.formatter.formatDateDisplay'}" width="97%" class="sapUiMediumMarginEnd" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>salaryAdj}" required="true"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Select id="salaryAdjMutation" required="true" fieldGroupIds="grpValidation"
+                                items="{ path: 'dropdown>/salaryAdjColl', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedSalaryAdj}"
+                                width="12.5rem">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                            </Select>
+                            </HBox>
+                        <Label text="{i18n>salaryAdjValue}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input 
+                                id="salaryAdjValueMutation" 
+                                value="{
+                                path: 'create>/salaryAdj',
+                                type: 'sap.ui.model.type.Currency',
+                                formatOptions: {
+                                    showMeasure: false,
+                                    currencyCode: 'IDR',
+                                    useSymbol: false,
+                                    minFractionDigits: 0,
+                                    maxFractionDigits: 0
+                                    }
+                                }"
+                                width="auto" 
+                                placeholder="0"
+                                class="sapUiMediumMarginEnd" 
+                                editable="true"
+                                description="IDR"/>
+                            </HBox>
+                        <Label text="{i18n>as}" required="true"/>
+                            <Select id="asMutation" required="true" fieldGroupIds="grpValidation"
+                                items="{ path: 'dropdown>/asColl', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedAs}"
+                                width="12.5rem"
+                                class="sapUiSmallMarginBegin">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                            </Select>
+                        <Label text="{i18n>employeeChange}"/>
+                            <HBox class="sapUiSmallMarginBeginEnd">
+                             <Input 
+                                id="employeeChangeMutation" 
+                                value="{employeechange>/selectedEmployeeChange/Key}"  
+                                description="{employeechange>/selectedEmployeeChange/Value}" 
+                                width="auto"
+                                fieldWidth="auto" 
+                                fieldGroupIds="grpValidation"
+                                editable="true"
+                                showValueHelp="true" 
+                                liveChange=".onBlockInput"
+                                valueHelpRequest=".handleValueHelpEmployeeChange"/>
+                            <!-- <Input id="employeeChangeMutation" value="" width="97%" class="sapUiMediumMarginEnd" editable="true"/> -->
+                            </HBox>
+                        <Label text="{i18n>basicCon}"/>
+                        <VBox class="sapUiSmallMarginBeginEnd">
+                            <TextArea 
+                                id="basicConMutation"
+                                value="" 
+                                width="62%"
+                                rows="4"
+                                showExceededText="true" 
+                                maxLength="255" 
+                                liveChange="handleLiveChange" 
+                                valueLiveUpdate="true"
+                                class="sapUiMediumMarginEnd" 
+                                editable="true"/>
+                        </VBox>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="62%">
+                            <MessageStrip
+                                text="{i18n>warningEvaluation}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                            <MessageStrip
+                                text="{i18n>warningPKWT}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiMediumMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Verification Panel -->
+        <Panel 
+            expandable="true" 
+            expanded="false"
+            headerText="Verification" 
+            width="auto">
+            <content>
+                <f:SimpleForm 
+                    editable="true"
+                    id="assessmentMutationForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="AssessmentMutation">
+                            <Text text="{i18n>assessment}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>assessmentResult}"/>
+                            <HBox>
+                                <Input id="assessmentResultMutation" value="No data, harap upload hasil assessment" width="18rem" class="sapUiMediumMarginEnd" editable="false"/>
+                                
+                                <CheckBox id="verifyResultMutation" text="Verify" selected="{path: 'employeeDetail>/VerifyResult', formatter: '.formatter.formatCheckboxValue'}"/>
+                            </HBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="biCheckingMutationForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="BICheckingMutation">
+                            <Text text="{i18n>biChecking}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>biResult}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginEnd">
+                            <Text text="Collection:" class="sapUiSmallMarginEnd" />
+                            <CheckBox id="hasilMutation1" text="1" selected="{path: 'hasilMutation>/hasilMutation1', formatter: '.formatter.formatCheckboxValue'}"/>
+                            <CheckBox id="hasilMutation2" text="2" selected="{path: 'hasilMutation>/hasilMutation2', formatter: '.formatter.formatCheckboxValue'}"/>
+                            <CheckBox id="hasilMutation3" text="3" selected="{path: 'hasilMutation>/hasilMutation3', formatter: '.formatter.formatCheckboxValue'}"/>
+                            <CheckBox id="hasilMutation4" text="4" selected="{path: 'hasilMutation>/hasilMutation4', formatter: '.formatter.formatCheckboxValue'}"/>
+                            <CheckBox id="hasilMutation5" text="5" selected="{path: 'hasilMutation>/hasilMutation5', formatter: '.formatter.formatCheckboxValue'}"/>
+                        </HBox>
+                        <Label text="{i18n>biNotes}" />
+                        <TextArea 
+                            id="hasilBiCheckingMutation"
+                            value=""
+                            width="57%"
+                            rows="4"
+                            showExceededText="true" 
+                            maxLength="255" 
+                            liveChange="handleLiveChange" 
+                            valueLiveUpdate="true"
+                            editable="true"/>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningBiChecking}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="dispoMutationForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="disposisiToolbarMutation">
+                            <Text text="{i18n>disposisi}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>rekomendasiHCM}" required="true" />
+                        <TextArea 
+                            id="rekomendasiHCMMutation"
+                            value=""
+                            width="57%"
+                            rows="4"
+                            showExceededText="true" 
+                            maxLength="255" 
+                            liveChange="handleLiveChange" 
+                            fieldGroupIds="grpValidation"
+                            valueState="Warning" 
+                            valueLiveUpdate="true"
+                            editable="true"/>
+                        <Label text="{i18n>downloadDis}" />
+                        <HBox class="sapUiSmallMarginEnd">
+                            <Button
+                                icon="sap-icon://download"
+                                text="Download"
+                                type="Emphasized"
+                                press="onDownloadDisposisi"
+                                class="sapUiTinyMarginEnd"/>
+                        </HBox>
+                        <Label text="{i18n>disResult}" required="true" fieldGroupIds="grpValidation"/>
+                        <RadioButtonGroup id="disposisiMutation" columns="2" width="100%" selectedIndex="{disposisiMutation>/selectedIndex}">
+                            <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd"/>
+                            <RadioButton text="Tidak Direkomendasikan" />
+                        </RadioButtonGroup>
+                        <Label text="{i18n>dispoNote}" />
+                        <TextArea 
+                            id="dispoNoteMutation"
+                            value=""
+                            width="57%"
+                            rows="4"
+                            showExceededText="true" 
+                            maxLength="255" 
+                            liveChange="handleLiveChange" 
+                            valueLiveUpdate="true"
+                            editable="true"/>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningDisposisi}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                        <Label text="{i18n>salaryAdj}" />
+                        <HBox>
+                            <Input 
+                                id="gajiMutation"
+                                value="{
+                                path: 'create>/salaryFinal',
+                                type: 'sap.ui.model.type.Currency',
+                                formatOptions: {
+                                    showMeasure: false,
+                                    currencyCode: 'IDR',
+                                    useSymbol: false,
+                                    minFractionDigits: 0,
+                                    maxFractionDigits: 0
+                                    }
+                                }"
+                                width="auto"
+                                editable="true"
+                                description="IDR"/>
+                        </HBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="upDocMutationForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="upDocMutation">
+                            <Text text="{i18n>upDoc}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <VBox class="sapUiSmallMarginEnd">
+                            <HBox alignItems="Center" justifyContent="End">
+                                <Button
+                                    icon="sap-icon://add"
+                                    type="Transparent"
+                                    tooltip="Add Item"
+                                    press=".onOpenDialog"/>
+                            </HBox>
+                            <Table
+                                id="table-uploadSet"
+                                width="auto"
+                                mode="MultiSelect"
+                                fixedLayout="false"
+                                inset="true"
+                                autoPopinMode="true"
+                                hiddenInPopin="None"
+                                items="{path: 'docUploads>/uploads', templateShareable: false}"
+                                selectionChange="onSelectionChange">
+
+                                <columns>
+                                    <Column id="namaDokumen" importance="High">
+                                        <header>
+                                            <Label text="Nama Dokumen" />
+                                        </header>
+                                    </Column>
+                                    <Column id="jenisDokumen">
+                                        <header>
+                                            <Label text="Jenis Dokumen" />
+                                        </header>
+                                    </Column>
+                                    <Column id="pic">
+                                        <header>
+                                            <Label text="PIC" />
+                                        </header>
+                                    </Column>
+                                    <Column id="keterangan">
+                                        <header>
+                                            <Label text="Keterangan" />
+                                        </header>
+                                    </Column>
+                                    <Column id="actionButton" importance="High" />
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem
+                                        highlight="{= ${documents>uploadState} === 'Complete' ? 'Indication05' : null }"
+                                    >
+
+                                    <!-- Cells with cell template defining content for each column (cells and columns work with 1:1 mapping) -->
+                                        <cells>
+                                            <HBox>
+                                                <Image
+                                                    src="{documents>imageUrl}"
+                                                    class="sapMUSTItemImage sapMUSTItemIcon"
+                                                    visible="{= ${documents>imageUrl} !== undefined}"
+                                                />
+                                                <core:Icon
+                                                    src="sap-icon://pdf-attachment"
+                                                    color="white"
+                                                    class="sapMUSTItemImage sapMUSTItemIcon"
+                                                />
+                                                <VBox
+                                                    class="sapUiTinyMargin sapUiSmallMarginBegin">
+                                                    <Link
+                                                        text="{docUploads>fileName}"
+                                                        wrapping="true"
+                                                        press="onShowDoc"
+                                                        class="sapUiTinyMarginBottom"
+                                                    />
+                                                    <Text text="{path: 'docUploads>fileSize', formatter: '.formatter.formatFileSize'}" />
+                                                </VBox>
+                                            </HBox>
+                                            <Text text="{docUploads>docTypeText}" />
+                                            <Text text="{docUploads>pic}" />
+                                            <Text
+                                                text="{docUploads>keterangan}" 
+                                                wrapping="true"
+                                            />
+
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>                
+                        </VBox> 
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <Panel id="attCTPanel" expandable="true" expanded="true" headerText="Supporting Documents" width="auto">
+        <f:SimpleForm id="attDataForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="1" emptySpanL="-1" columnsL="1" labelSpanM="1" emptySpanM="-1" adjustLabelSpan="false" singleContainerFullSize="false">
+            <f:content>
+                <Label text="Upload Supporting Documents" />
+                <upload:UploadSet
+                    id="idUploadSet"
+                    instantUpload="false"
+                    terminationEnabled="false"
+                    maxFileSize="10"
+                    uploadUrl="/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/FileAttachmentSet"
+                    fileSizeExceeded=".onFileSizeExceed"
+                    afterItemAdded=".onAfterItemAdded"
+                    afterItemRemoved=".onAfterItemRemoved"
+                >
+                    <upload:items>
+                        <upload:UploadSetItem fileName="{fileAttachment>FileName}" mediaType="{fileAttachment>FileType}" url="{fileAttachment>Url}">
+                            <upload:customData>
+                                <core:CustomData key="RequestId" value="{fileAttachment>RequestId}" />
+                                <core:CustomData key="SequenceNo" value="{fileAttachment>SequenceNo}" />
+                            </upload:customData>
+                        </upload:UploadSetItem>
+                    </upload:items>
+                </upload:UploadSet>
+                <ObjectStatus id="objAttLimit" class="sapUiSmallMarginBottom" text="Maximum file size: 10 MB" icon="sap-icon://message-information" state="Information" />
+            </f:content>
+        </f:SimpleForm>
+    </Panel>
+        </semantic:content>
+        <semantic:mainAction>
+            <semantic:MainAction id="btnSubmitMutation" text="Submit" press="onSendRequest"/>
+        </semantic:mainAction>
+    </semantic:FullscreenPage>
+</mvc:View>

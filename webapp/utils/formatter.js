@@ -1,6 +1,101 @@
 sap.ui.define([], function () {
     "use strict";
     return {
+
+        paramCountFormatter: function (value) {
+            if (!value || isNaN(value)) {
+                return "0"; // Default to 0 if the value is undefined or not a number
+            }
+            return value.toString(); // Convert the number to a string
+        },
+
+        asTextFormatter: function (key, asColl) {
+            if (!key || !asColl) {
+                return ""; // Return an empty string if key or collection is undefined
+            }
+        
+            // Find the corresponding text for the key
+            const item = asColl.find(entry => entry.key === key);
+            return item ? item.text : ""; // Return the text or an empty string if not found
+        },
+
+        formatStatus: function (s) {
+            switch (s) {
+                case "D":
+                case "S":
+                    return sap.ui.core.ValueState.Warning;
+                case "R":
+                    return sap.ui.core.ValueState.Error;
+                default:
+                    return sap.ui.core.ValueState.Success;
+            }
+        },
+
+        getFileTypeIcon: function (sFileType) {
+            switch (sFileType) {
+                case "application/pdf":
+                    return "sap-icon://pdf-attachment";
+                case "image/png":
+                case "image/jpeg":
+                    return "sap-icon://picture";
+                case "application/vnd.ms-excel":
+                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                    return "sap-icon://excel-attachment";
+                case "application/msword":
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                    return "sap-icon://doc-attachment";
+                case "text/plain":
+                    return "sap-icon://document-text";
+                default:
+                    return "sap-icon://document";
+            }
+        },
+
+        onStatus: function (sVal) {
+            const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            switch (sVal) {
+                case "O":
+                    return oBundle.getText("labelo");
+                case "A":
+                    return oBundle.getText("labela");
+                case "X":
+                    return oBundle.getText("labelx");
+                case "W":
+                    return oBundle.getText("labelw");
+                case "P":
+                    return oBundle.getText("labelp");
+                default:
+                    return oBundle.getText("labelo");
+            }
+        },
+
+        onState(sVal) {
+            let VS = lib.ValueState;
+            switch (sVal) {
+                case "O":
+                    return VS.Information;
+                case "A":
+                    return VS.Success;
+                case "P":
+                    return VS.Success;
+                case "X":
+                    return VS.Error;
+                case "W":
+                    return VS.Warning;
+                default:
+                    return VS.Information;
+            }
+        },
+
+        salaryTextFormatter: function (key, salaryAdjColl) {
+            if (!key || !salaryAdjColl) {
+                return ""; // Return an empty string if key or collection is undefined
+            }
+        
+            // Find the corresponding text for the key
+            const item = salaryAdjColl.find(entry => entry.key === key);
+            return item ? item.text : ""; // Return the text or an empty string if not found
+        },
         getBoxStyleClass: function (e) {
             switch (e) {
                 default:
@@ -110,14 +205,138 @@ sap.ui.define([], function () {
             }
             return e;
         },
-        formatEmpName: function (e, t) {
-            if (sap.ui.Device.system.desktop && t) {
-                if (t && t !== "00000000") {
-                    return e + " (" + t + ")";
-                }
+        // formatEmpName: function (e, t) {
+        //     if (sap.ui.Device.system.desktop && t) {
+        //         if (t && t !== "00000000") {
+        //             return e + " (" + t + ")";
+        //         }
+        //     }
+        //     return e;
+        // },
+
+        formatEmpName: function(sName, sId) {
+            if (sName && sId) {
+                return sName + ' (' + sId + ')';
             }
-            return e;
+            return sName || sId || "";
         },
+
+        formatAvg: function (value) {
+            if (!value) {
+                return ""; // Return an empty string if the value is null or undefined
+            }
+            return value.slice(-3); // Extract the last three characters
+        },
+
+        // formatDescPel: function (value) {
+        //     if (!value) {
+        //         return ""; // Return an empty string if the value is null or undefined
+        //     }
+        
+        //     // List of words to keep lowercase unless they are the first word
+        //     var lowercaseWords = ["di", "tanpa", "dan", "atau", "ke", "dari", "yang", "untuk", "pada", "dengan"];
+        
+        //     // Process the string
+        //     return value
+        //         .split(" ") // Split the string into words
+        //         .map((word, index) => {
+        //             // Capitalize the first word or words not in the lowercase list
+        //             if (index === 0 || !lowercaseWords.includes(word.toLowerCase())) {
+        //                 return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        //             }
+        //             return word.toLowerCase(); // Keep lowercase words as-is
+        //         })
+        //         .join(" "); // Join the words back into a single string
+        // },
+
+        formatDescPel: function (value) {
+            if (!value) {
+                return ""; // Return an empty string if the value is null or undefined
+            }
+        
+            // List of words to keep lowercase unless they are the first word
+            var lowercaseWords = ["di", "tanpa", "dan", "atau", "ke", "dari", "yang", "untuk", "pada", "dengan"];
+        
+            // Regular expression to match text outside parentheses and handle words inside parentheses
+            var regex = /\((.*?)\)|([^\s()]+)/g;
+        
+            // Process the string
+            return value.replace(regex, function (match, insideParentheses, outsideParentheses) {
+                // If the match is inside parentheses, process all words inside
+                if (insideParentheses) {
+                    return `(${insideParentheses
+                        .split(" ") // Split the string inside parentheses into words
+                        .map(word => {
+                            // Capitalize the first letter of each word unless it's in the lowercaseWords list
+                            if (!lowercaseWords.includes(word.toLowerCase())) {
+                                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            }
+                            return word.toLowerCase(); // Keep lowercase words as-is
+                        })
+                        .join(" ") // Join the words back into a single string
+                    })`;
+                }
+        
+                // If the match is outside parentheses, process all words
+                if (outsideParentheses) {
+                    return outsideParentheses
+                        .split(" ") // Split the string outside parentheses into words
+                        .map(word => {
+                            // Capitalize the first letter of each word unless it's in the lowercaseWords list
+                            if (!lowercaseWords.includes(word.toLowerCase())) {
+                                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            }
+                            return word.toLowerCase(); // Keep lowercase words as-is
+                        })
+                        .join(" "); // Join the words back into a single string
+                }
+        
+                return match; // Return the match as-is if no processing is needed
+            });
+        },
+
+        formatDisposisi: function (value) {
+            if (value === "1") {
+                return 0; // Index for "Rekomendasi"
+            } else if (value === "2") {
+                return 1; // Index for "Tidak Direkomendasikan"
+            }
+            return -1; // Default (no selection)
+        },
+
+        formatCheckboxValue: function(value) {
+            // Handle undefined or null values
+            if (value === undefined || value === null) {
+                return false;
+            }
+            
+            // Convert the string "1" to true
+            if (value === "1") {
+                return true;
+            }
+            
+            // Convert the string "0" to false
+            if (value === "0") {
+                return false;
+            }
+            
+            // If already a boolean, return as is
+            if (typeof value === "boolean") {
+                return value;
+            }
+            
+            // For any other value, convert to boolean
+            return value === true || value === "true";
+        },
+
+        formatCheckboxBIValue: function(value, checkboxValue) {
+            if (!value) {
+                return false;
+            }
+            const selectedValues = value.split(",");
+            return selectedValues.includes(checkboxValue);
+        },
+
         formatAge: function (e) {
             var t = parseInt(e.substring(0, 2), 10),
                 r = parseInt(e.substring(2, 4), 10);
@@ -187,17 +406,28 @@ sap.ui.define([], function () {
                 );
             }
         },
-        getEmployeeInitial: function (e) {
-            var t = e.split(" ");
-            if (t.length > 1) {
-                t = t.shift().charAt(0) + t.shift().charAt(0);
-                t.toUpperCase();
-            } else {
-                t =
-                    e.substring(0, 1).toUpperCase() +
-                    e.substring(1, 2).toLowerCase();
+        // getEmployeeInitial: function (e) {
+        //     var t = e.split(" ");
+        //     if (t.length > 1) {
+        //         t = t.shift().charAt(0) + t.shift().charAt(0);
+        //         t.toUpperCase();
+        //     } else {
+        //         t =
+        //             e.substring(0, 1).toUpperCase() +
+        //             e.substring(1, 2).toLowerCase();
+        //     }
+        //     return t;
+        // },
+
+        getEmployeeInitial: function (employeeName) {
+            if (!employeeName) {
+                return ""; // Return an empty string if the input is undefined or null
             }
-            return t;
+        
+            // Split the name into parts and get the initials
+            const nameParts = employeeName.split(" ");
+            const initials = nameParts.map(part => part.charAt(0).toUpperCase()).join("");
+            return initials;
         },
         formatEmployeePhotoUrl: function (e) {
             return (
@@ -542,6 +772,17 @@ sap.ui.define([], function () {
             return B + " - " + E;
         },
 
+        formatDateDisplay: function (sDate) {
+            if (!sDate) {
+                return "";
+            }
+            var oDate = new Date(sDate);
+            var iDay = oDate.getDate();
+            var iMonth = oDate.getMonth() + 1; // Months are zero-based
+            var iYear = oDate.getFullYear();
+            return (iDay < 10 ? "0" + iDay : iDay) + "/" + (iMonth < 10 ? "0" + iMonth : iMonth) + "/" + iYear;
+        },
+
         formatDateUtc: function (date, m) {
             if (date) {
                 var oDateFormat =
@@ -560,6 +801,21 @@ sap.ui.define([], function () {
             }
         },
 
+        formatSalary: function (value) {
+            if (!value) {
+                return ""; // Return an empty string if the value is null or undefined
+            }
+        
+            // Convert the value to a number and format it as currency
+            var formattedValue = parseFloat(value).toLocaleString("id-ID", {
+                minimumFractionDigits: 0, // Remove decimal places
+                maximumFractionDigits: 0  // Remove decimal places
+            });
+        
+            // Remove the "IDR" prefix if not needed
+            return formattedValue.replace("IDR", "").trim();
+        },
+        
         typeColumnListItem: function (e) {
             if (e === true) {
                 return "Navigation";
@@ -603,6 +859,28 @@ sap.ui.define([], function () {
                 return "Good";
             } else {
                 return "Neutral";
+            }
+        },
+
+        formatFileSize: function(bytes) {
+            if (bytes === undefined || bytes === null) {
+                return "";
+            }
+            
+            // Convert bytes to number if it's a string
+            bytes = Number(bytes);
+            
+            if (isNaN(bytes)) {
+                return "0 B";
+            }
+            
+            // Use only B, KB and MB units
+            if (bytes < 1024) {
+                return bytes + ' B';
+            } else if (bytes < 1048576) { // 1024 * 1024
+                return (bytes / 1024).toFixed(2) + ' KB';
+            } else {
+                return (bytes / 1048576).toFixed(2) + ' MB'; 
             }
         }
     };

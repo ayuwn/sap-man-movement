@@ -10,9 +10,9 @@ sap.ui.define([
     "sap/ui/core/library",
 ], function (BaseController, formatter, Fragment, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, CoreLib) {
     "use strict";
-    var oBundle, ValueState = CoreLib.ValueState;
+    var ValueState = CoreLib.ValueState;
 
-    return BaseController.extend("bsim.hcmapp.man.movement.controller.Mutation", {
+    return BaseController.extend("bsim.hcmapp.man.movement.controller.Mutation-fix", {
         formatter: formatter,
 
         onInit: function () {
@@ -21,7 +21,7 @@ sap.ui.define([
             this._oView.addStyleClass(this._oComponent.getContentDensityClass());
             this._oBusy = new sap.m.BusyDialog();
             this.setModel(new JSONModel(), "create");
-            this._currentUser();
+            // this.setModel(new JSONModel({ uploads: [] }), "docUploads");
             this.getRouter().getRoute("mutation").attachPatternMatched(this._onMutationRouteMatched, this);
             
             // Set default POV to EmployeeNumber 81000038
@@ -38,9 +38,6 @@ sap.ui.define([
                 uploads: []
             });
             this.getView().setModel(oDocUploadModel, "docUploads");
-
-            const oFileAttachmentModel = new sap.ui.model.json.JSONModel({ results: [] });
-            this.getView().setModel(oFileAttachmentModel, "fileAttachment");
 
             let oDropdownModel = new JSONModel({
                 selectedPIC: "",
@@ -94,12 +91,6 @@ sap.ui.define([
 
             this.getView().byId("effectiveDateEndMutation").setValue(sFormattedEndDate);
             this.getView().byId("effectiveDateStartMutation").setValue(sFormattedDate);
-
-            let oSubGroupModel = this.getOwnerComponent().getModel("subGroup");
-            this.getView().setModel(oSubGroupModel, "subGroup");
-
-            let oSubAreaModel = this.getOwnerComponent().getModel("subArea");
-            this.getView().setModel(oSubAreaModel, "subArea");
         },
 
         _onMutationRouteMatched: function (oEvent) {
@@ -107,127 +98,43 @@ sap.ui.define([
             if (EmployeeNumber) {
                 this._getEmployeeData(EmployeeNumber);
             }
-
-             // Clear any existing files in the upload set
-             const oUploadSet = this.byId("idUploadSet");
-             if (oUploadSet) {
-                 oUploadSet.removeAllItems();
-             }
-             
-             // Reset the file attachment model
-             const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-             if (oFileAttachmentModel) {
-                 oFileAttachmentModel.setProperty("/results", []);
-             }
-             
-             // Get request ID from route parameters
-             var oArguments = oEvent.getParameter("arguments");
-             
-             if (oArguments && oArguments.requestId) {
-                 this._sRequestId = oArguments.requestId;
-                 this._getRequestData();
-             } else {
-                 // Try to get from application model if we're coming from another view
-                 var oAppModel = this.getModel("appModel");
-                 if (oAppModel && oAppModel.getProperty("/selectedRequest")) {
-                     this._sRequestId = oAppModel.getProperty("/selectedRequest/RequestId");
-                     this._getRequestData();
-                 } else {
-                     M.information("No request selected");
-                     this.onNavBack();
-                 }
-             }
- 
         },
 
         _getEmployeeData: function (EmployeeNumber) {
-            // Define paths for EmployeeSet and EmployeeDetailSet
-            const sEmployeePath = `/EmployeeSet('${EmployeeNumber}')`;
-            const sEmployeeDetailPath = `/EmployeeDetailSet('${EmployeeNumber}')`;
-        
+            const sPath = `/EmployeeDetailSet('${EmployeeNumber}')`; // Path for specific employee
+            // console.log("Loading employee data for:", EmployeeNumber);
+            
             let oEmployeeModel = this.getView().getModel("employee");
-            let oEmployeeDetailModel = this.getView().getModel("employeeDetail");
-        
             this._oBusy.open();
-        
-            // Fetch EmployeeSet data
-            this.readEntity(sEmployeePath)
-                .then((employeeResult) => {
-                    if (!employeeResult) {
-                        MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
-                            actions: ["Exit"],
-                            onClose: (sAction) => {
-                                this._navBack();
-                            },
-                        });
-                        return Promise.reject("No EmployeeSet data found.");
-                    }
-        
-                    // Set EmployeeSet data to the model
-                    oEmployeeModel.setData(employeeResult);
-                    console.log("EmployeeSet Data loaded:", employeeResult);
-        
-                    // Fetch EmployeeDetailSet data
-                    return this.readEntity(sEmployeeDetailPath);
-                })
-                .then((employeeDetailResult) => {
-                    if (employeeDetailResult) {
-                        // Set EmployeeDetailSet data to the model
-                        if (!oEmployeeDetailModel) {
-                            oEmployeeDetailModel = new sap.ui.model.json.JSONModel();
-                            this.getView().setModel(oEmployeeDetailModel, "employeeDetail");
-                        }
-                        oEmployeeDetailModel.setData(employeeDetailResult);
-                        console.log("EmployeeDetailSet Data loaded:", employeeDetailResult);
-                    } else {
-                        console.warn("EmployeeDetailSet data is missing.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading employee data:", error);
-                    MessageBox.error("Error loading employee details");
-                })
-                .finally(() => {
-                    this._oBusy.close();
-                });
+            
+            oEmployeeModel.loadData(`http://localhost:8080/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV${sPath}?$format=json`, null, true, "GET", false, false, {
+                "Content-Type": "application/json"
+            });
+            
+            this.readEntity(sPath).then((result) => {
+                if (!result) {
+                    MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
+                        actions: ["Exit"],
+                        onClose: (sAction) => {
+                            this._navBack();
+                        },
+                    });
+                } else {
+                    // Set the data to the model
+                    oEmployeeModel.setData(result);
+                    console.log("Employee Data loaded:", result);
+                }   
+                this._oBusy.close();
+            }).catch((error) => {
+                console.error("Error loading employee data:", error);
+                this._oBusy.close();
+                MessageBox.error("Error loading employee details");
+            });
         },
-
-        // _getEmployeeData: function (EmployeeNumber) {
-        //     const sPath = `/EmployeeDetailSet('${EmployeeNumber}')`; // Path for specific employee
-        //     // console.log("Loading employee data for:", EmployeeNumber);
-            
-        //     let oEmployeeModel = this.getView().getModel("employee");
-        //     this._oBusy.open();
-            
-        //     oEmployeeModel.loadData(`http://localhost:8080/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV${sPath}?$format=json`, null, true, "GET", false, false, {
-        //         "Content-Type": "application/json"
-        //     });
-            
-        //     this.readEntity(sPath).then((result) => {
-        //         if (!result) {
-        //             MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
-        //                 actions: ["Exit"],
-        //                 onClose: (sAction) => {
-        //                     this._navBack();
-        //                 },
-        //             });
-        //         } else {
-        //             // Set the data to the model
-        //             oEmployeeModel.setData(result);
-        //             console.log("Employee Data loaded:", result);
-        //         }   
-        //         this._oBusy.close();
-        //     }).catch((error) => {
-        //         console.error("Error loading employee data:", error);
-        //         this._oBusy.close();
-        //         MessageBox.error("Error loading employee details");
-        //     });
-        // },
 
         readEntity: function (sPath) {
             return new Promise((resolve, reject) => {
                 const oModel = this.getOwnerComponent().getModel();
-                
                 oModel.read(sPath, {
                     success: (oData) => {
                         resolve(oData);
@@ -492,95 +399,33 @@ sap.ui.define([
             }
         },
 
-        _currentUser: function () {
-            // Show busy indicator
-            this._oBusy.open();
-        
-            var oDataModel = this.getOwnerComponent().getModel(); // Get the default OData model
-        
-            if (!oDataModel) {
-                console.error("OData model not available");
-                this._oBusy.close();
-                MessageBox.error("System error: OData model not available");
-                return;
-            }
-        
-            // Call the EmployeeDetailSet endpoint to get logged-in user details
-            oDataModel.read("/EmployeeDetailSet", {
-                success: function (oData) {
-                    console.log("Current user data received:", oData);
-        
-                    if (!oData || !oData.results || oData.results.length === 0) {
-                        this._oBusy.close();
-                        MessageBox.error("No user data received from server");
-                        return;
-                    }
-        
-                    // Get the first user from the results
-                    var oCurrentUser = oData.results[0];
-        
-                    // Store the employee ID for later use
-                    this._sLoggedInEmployeeId = oCurrentUser.EmployeeNumber;
-        
-                    // Create a model for current user details
-                    var oCurrentUserModel = new sap.ui.model.json.JSONModel(oCurrentUser);
-                    this._oView.setModel(oCurrentUserModel, "currentUser");
-        
-                    this._oBusy.close();
-                }.bind(this),
-                error: function (oError) {
-                    this._oBusy.close();
-                    console.error("Error fetching current user data:", oError);
-                    MessageBox.error(
-                        "Failed to load user details: " +
-                        (oError.responseText ? JSON.parse(oError.responseText).error.message.value : "Unknown error")
-                    );
-                }.bind(this)
-            });
-        },
-
-        onSendRequest: function () {
+        onSendRequest: function() {
             // Get employee model
             let oEmployeeModel = this.getView().getModel("employee");
-            console.log("Employee Model Data:", oEmployeeModel.getData());
             let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
-            let oSelectedEmpSupervisor = oEmployeeModel.getProperty("/Supervisor");
-
-            // Get the logged-in user's employee number
-            let oCurrentUserModel = this.getView().getModel("currentUser");
-            let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
-        
-            console.log("Selected Employee:", oSelectedEmp);
-            console.log("Selected Employee's Supervisor:", oSelectedEmpSupervisor);
-            console.log("Logged-in User's Employee ID:", sLoggedInEmployeeId);
+          
+            let oRequestorModel = this.getView().getModel("requestor");
+            let oSelectedReq = oRequestorModel.getProperty("/EmployeeNumber");
 
             if (!oSelectedEmp) {
                 MessageBox.error("Please select an employee first.");
                 return;
             }
-        
-            if (!sLoggedInEmployeeId) {
-                MessageBox.error("Unable to retrieve logged-in user details.");
-                return;
-            }
-        
+
             // Ensure the user cannot perform actions on themselves
-            if (oSelectedEmp === sLoggedInEmployeeId) {
+            if (oSelectedEmp === oSelectedReq) {
                 MessageBox.error("You cannot perform actions on yourself.");
                 return;
             }
-            // Check if the logged-in user is a supervisor of the selected employee
-            if (oSelectedEmpSupervisor !== sLoggedInEmployeeId) {
-                MessageBox.error("You are not authorized to perform this action on the selected employee.");
+    
+             // Validate required entries
+             var oView = this.getView();
+    
+             // Validate required entries
+             if (!this._validateEntries(oView, "grpValidation")) {
                 return;
-            }
-
-            // Validate required entries
-            var oView = this.getView();
-            if (!this._validateEntries(oView, "grpValidation")) {
-                return;
-            }
-        
+             }
+            
             // Confirm with user before sending
             MessageBox.confirm("Do you want to submit this request?", {
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -596,19 +441,14 @@ sap.ui.define([
             });
         },
 
-        _postRequest: function () {
-            // Prepare mutation payload
+        _postRequest: function() {
+            // Get employee data
             let oEmployeeModel = this.getView().getModel("employee");
             let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
-        
-            let oCurrentUserModel = this.getView().getModel("currentUser");
-            let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
 
-            if (!sLoggedInEmployeeId) {
-                MessageBox.error("Unable to retrieve logged-in user details.");
-                return;
-            }
-        
+            let oRequestorModel = this.getView().getModel("requestor");
+            let oSelectedReq = oRequestorModel.getProperty("/EmployeeNumber");
+
             const getFormattedDate = (controlId) => {
                 const control = this.byId(controlId);
                 if (control && typeof control.getDateValue === "function") {
@@ -657,12 +497,13 @@ sap.ui.define([
             let oEmployeeChangeModel = this.getView().getModel("employeechange");
             let oSelectedEmployeeChange = oEmployeeChangeModel.getProperty("/selectedEmployeeChange");
             let sZexholderDesc = oSelectedEmployeeChange ? oSelectedEmployeeChange.Value : "";
-        
+
+            // Prepare the payload
             let oPayload = {
                 RequestId: "00000000-0000-0000-0000-000000000000",
                 EmployeeNumber: oSelectedEmp,
-                Status: "S",
-                PicNumber: sLoggedInEmployeeId,
+                Status: "S", 
+                PicNumber: oSelectedReq, 
                 Massg: this.byId("reasonMutation").getValue(),
                 ZbegdaEfktf: getFormattedDate("effectiveDateStartMutation"),
                 ZenddaEfktf: getFormattedDate("effectiveDateEndMutation"),
@@ -672,17 +513,17 @@ sap.ui.define([
                 WerksDest: this.byId("newPerAreaIdMutation").getValue(),
                 BtrtlDest: this.byId("newPerSubAreaIdMutation").getValue(),
                 Adjstmn: this.getView().getModel("dropdown").getProperty("/selectedSalaryAdj") || "",
-                Zsalary: this.byId("salaryAdjValueMutation").getValue() ? this.byId("salaryAdjValueMutation").getValue().replace(/\D/g, '') : "0",
+                Zsalary: this.byId("salaryAdjValueMutation").getValue() ? this.byId("salaryAdjValueMutation").getValue().replace(/\D/g,'') : "0",
                 Zdasar1: this.getView().getModel("dropdown").getProperty("/selectedAs") || "",
                 Zexholder: this.byId("employeeChangeMutation").getValue(),
                 Zdasar2: this.byId("basicConMutation").getValue(),
-                // Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
-                // Zbichecking: Zbichecking,
-                // Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
-                // ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
-                // Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(),
-                // Znotedisp: this.byId("dispoNoteMutation").getValue(),
-                // Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0",
+                Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
+                Zbichecking: Zbichecking,
+                Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
+                ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
+                Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(), 
+                Znotedisp: this.byId("dispoNoteMutation").getValue(),
+                Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g,'') : "0",
                 PlansDesc_Dest: sPlansDestDesc,
                 WerksDestDesc: sWerksDestDesc,
                 BtrtlDestDesc: sBtrtlDestDesc,
@@ -691,9 +532,10 @@ sap.ui.define([
                 ZexholderDesc: sZexholderDesc,
                 MassgDesc: sMassgDesc
             };
-        
-            console.log("Mutation Payload:", oPayload);
-        
+
+            // Log the payload to ensure PicNumber is set correctly
+            console.log("Payload to be sent:", oPayload);
+
             // Show busy dialog
             if (!this._oBusyDialog) {
                 this._oBusyDialog = new sap.m.BusyDialog();
@@ -701,14 +543,13 @@ sap.ui.define([
             this._oBusyDialog.setTitle("Please wait...");
             this._oBusyDialog.setText("Submitting request...");
             this._oBusyDialog.open();
-        
-            // Submit mutation data
+
+            // Send request to backend
             let oModel = this.getOwnerComponent().getModel();
             oModel.create("/RequestSet", oPayload, {
                 success: (oData) => {
                     this._oBusyDialog.close();
-                    this.onSubmitFiles(oData.RequestId);
-        
+                    
                     // Show success message
                     sap.m.MessageToast.show("Request submitted successfully.");
                     MessageBox.show("Request has been submitted successfully.", {
@@ -736,55 +577,6 @@ sap.ui.define([
                 }
             });
         },
-
-        // _submitDocument: function (sRequestId) {
-        //     let oView = this.getView();
-        //     let oDocUploadModel = oView.getModel("docUploads");
-        //     let aUploads = oDocUploadModel.getProperty("/uploads");
-        
-        //     if (!aUploads || aUploads.length === 0) {
-        //         this._oBusyDialog.close();
-        //         MessageToast.show("Mutation submitted successfully without documents.");
-        //         return;
-        //     }
-        
-        //     let oModel = this.getOwnerComponent().getModel();
-        //     let aPromises = aUploads.map((oDoc) => {
-        //         let oPayload = {
-        //             RequestId: sRequestId,
-        //             FileName: oDoc.fileName,
-        //             FileType: oDoc.fileType,
-        //             FileSize: oDoc.fileSize.toString(),
-        //             DocType: oDoc.docType,
-        //             DocTypeText: oDoc.docTypeText,
-        //             PIC: oDoc.pic,
-        //             Description: oDoc.keterangan
-        //         };
-        
-        //         return new Promise((resolve, reject) => {
-        //             oModel.create("/FileAttachmentSet", oPayload, {
-        //                 success: (oData) => {
-        //                     console.log("Document uploaded successfully:", oData);
-        //                     resolve(oData);
-        //                 },
-        //                 error: (oError) => {
-        //                     console.error("Error uploading document:", oError);
-        //                     reject(oError);
-        //                 }
-        //             });
-        //         });
-        //     });
-        
-        //     Promise.all(aPromises)
-        //         .then(() => {
-        //             this._oBusyDialog.close();
-        //             MessageToast.show("Mutation and documents submitted successfully.");
-        //         })
-        //         .catch((oError) => {
-        //             this._oBusyDialog.close();
-        //             MessageBox.error("Failed to upload one or more documents. Please try again.");
-        //         });
-        // },
 
         _loadEmployeeChangeData: function() {
             return new Promise((resolve, reject) => {
@@ -1031,72 +823,72 @@ sap.ui.define([
         //     oEvent.getSource().getBinding("items").filter([]);
         // },
 
-        _loadSubAreaData: function () {
+        _loadSubAreaData: function() {
             return new Promise((resolve, reject) => {
-                const oModel = this.getOwnerComponent().getModel(); // Use the global model
+                const oModel = this.getOwnerComponent().getModel();
                 oModel.read("/ValueHelpSubArea", {
                     success: (oData) => {
-                        const oSubAreaModel = this.getOwnerComponent().getModel("subArea");
-        
-                        if (oSubAreaModel) {
-                            // Update the subArea model's data
-                            oSubAreaModel.setProperty("/items", oData.results);
-                            console.log("SubArea data loaded:", oData.results); // Debugging
-                            resolve();
-                        } else {
-                            console.error("SubArea model is not initialized.");
-                            reject("SubArea model is not initialized.");
-                        }
+                        const oSubAreaModel = new JSONModel(oData.results);
+                        this.getView().setModel(oSubAreaModel, "subArea");
+                        resolve();
                     },
                     error: (oError) => {
-                        MessageBox.error("Failed to load sub-area data.");
+                        MessageBox.error("Failed to load sub area data.");
                         reject(oError);
                     }
                 });
             });
         },
 
-        handleValueHelpSubArea: function () {
+        handleValueHelpSubArea: function() {
             if (!this._oValueHelpSubAreaDialog) {
                 Fragment.load({
                     name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpSubArea",
                     controller: this
-                }).then(function (oDialog) {
+                }).then(function(oDialog) {
                     this._oValueHelpSubAreaDialog = oDialog;
-        
-                    // Set the subArea model to the dialog
-                    const oSubAreaModel = this.getView().getModel("subArea");
-                    if (!oSubAreaModel) {
-                        console.error("SubArea model is not initialized.");
-                        return;
-                    }
-                    this._oValueHelpSubAreaDialog.setModel(oSubAreaModel, "subArea");
+                    // Bind the sub-area model to the dialog
+                    this._oValueHelpSubAreaDialog.setModel(this.getView().getModel("subArea"), "subArea");
                     this.getView().addDependent(this._oValueHelpSubAreaDialog);
-        
-                    // Load sub-area data and apply filter
+                            
                     this._loadSubAreaData().then(() => {
-                        const sSelectedAreaKey = this.getView().getModel("area").getProperty("/selectedArea/Key");
-                        if (sSelectedAreaKey) {
-                            const oBinding = this._oValueHelpSubAreaDialog.getBinding("items");
-                            if (oBinding) {
-                                oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedAreaKey));
-                            }
-                        }
+                        // Filter sub-areas based on selected area key
+                        let sSelectedAreaKey = this.getView().getModel("area").getProperty("/selectedArea/Key");
+                        let oBinding = this._oValueHelpSubAreaDialog.getBinding("items");
+                        oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedAreaKey));
                         this._oValueHelpSubAreaDialog.open();
                     });
+                    
                 }.bind(this));
             } else {
-                // Apply filter and open the dialog if it already exists
-                const sSelectedAreaKey = this.getView().getModel("area").getProperty("/selectedArea/Key");
-                if (sSelectedAreaKey) {
-                    const oBinding = this._oValueHelpSubAreaDialog.getBinding("items");
-                    if (oBinding) {
-                        oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedAreaKey));
-                    }
-                }
+                // Filter sub-areas based on selected area key
+                let sSelectedAreaKey = this.getView().getModel("area").getProperty("/selectedArea/Key");
+                let oBinding = this._oValueHelpSubAreaDialog.getBinding("items");
+                oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedAreaKey));
                 this._oValueHelpSubAreaDialog.open();
             }
         },
+
+        // handleValueHelpSubArea: function() {
+        //     if (!this._oValueHelpSubAreaDialog) {
+        //         Fragment.load({
+        //             name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpSubArea",
+        //             controller: this
+        //         }).then(function(oDialog) {
+        //             this._oValueHelpSubAreaDialog = oDialog;
+        //             // Bind the area model to the dialog
+        //             this._oValueHelpSubAreaDialog.setModel(this.getView().getModel("subArea"), "subArea");
+        //             this.getView().addDependent(this._oValueHelpSubAreaDialog);
+                            
+        //             this._loadSubAreaData().then(() => {
+        //                 this._oValueHelpSubAreaDialog.open();
+        //             });
+                    
+        //         }.bind(this));
+        //     } else {
+        //         this._oValueHelpSubAreaDialog.open();
+        //     }
+        // },
 
         handleSearchSubArea: function (oEvent) {
             var sValue = oEvent.getParameter("value");
@@ -1105,24 +897,15 @@ sap.ui.define([
             oBinding.filter([oFilter]);
         },
 
-        handleCloseSubArea: function (oEvent) {
-            const aContexts = oEvent.getParameter("selectedContexts");
+        handleCloseSubArea: function(oEvent) {
+            let aContexts = oEvent.getParameter("selectedContexts");
             if (aContexts && aContexts.length) {
-                const oSelectedItem = aContexts[0].getObject();
-                const oSubAreaModel = this.getView().getModel("subArea");
-        
-                if (oSubAreaModel) {
-                    // Update the selectedSubArea property
-                    oSubAreaModel.setProperty("/selectedSubArea", oSelectedItem);
-        
-                    // Update the input field with the selected sub-area's Key2
-                    this.byId("newPerSubAreaIdMutation").setValue(oSelectedItem.Key2);
-                } else {
-                    console.error("SubArea model is not initialized.");
-                }
+                let oSelectedItem = aContexts[0].getObject();
+                let oSubAreaModel = this.getView().getModel("subArea");
+                
+                oSubAreaModel.setProperty("/selectedSubArea", oSelectedItem);
+                this.byId("newPerSubAreaIdMutation").setValue(oSelectedItem.Key2);
             }
-        
-            // Clear the filter after closing the dialog
             oEvent.getSource().getBinding("items").filter([]);
         },
 
@@ -1171,55 +954,31 @@ sap.ui.define([
             oBinding.filter([oFilter]);
         },
 
-        handleCloseGroup: function (oEvent) {
+        handleCloseGroup: function(oEvent) {
             let aContexts = oEvent.getParameter("selectedContexts");
             if (aContexts && aContexts.length) {
                 let oSelectedItem = aContexts[0].getObject();
                 let oGroupModel = this.getView().getModel("group");
-        
-                if (oGroupModel) {
-                    // Update the selected group
-                    oGroupModel.setData({
-                        ...oGroupModel.getData(),
-                        selectedGroup: oSelectedItem
-                    });
-                    this.byId("newEmployeeGroupIdMutation").setValue(oSelectedItem.Key);
-                } else {
-                    console.error("Group model is not initialized.");
-                }
-        
-                // Clear the selected sub-group by directly modifying the subGroup model's data
+                
+                oGroupModel.setProperty("/selectedGroup", oSelectedItem);
+                this.byId("newEmployeeGroupIdMutation").setValue(oSelectedItem.Key);
+                
+                // Clear the selected sub-area when a new area is selected
                 let oSubGroupModel = this.getView().getModel("subGroup");
-                if (oSubGroupModel) {
-                    let oSubGroupData = oSubGroupModel.getData();
-                    if (oSubGroupData) {
-                        oSubGroupData.selectedSubGroup = {}; // Clear the selected sub-group
-                        this.byId("newEmployeeSubgroupIdMutation").setValue(""); // Clear the input field
-                        oSubGroupModel.setData(oSubGroupData); // Update the model
-                    }
-                } else {
-                    console.error("SubGroup model is not initialized.");
-                }
+                oSubGroupModel.setProperty("/selectedSubGroup", {});
+                this.byId("newEmployeeSubgroupIdMutation").setValue("");
             }
             oEvent.getSource().getBinding("items").filter([]);
         },
 
-        _loadSubGroupData: function () {
+        _loadSubGroupData: function() {
             return new Promise((resolve, reject) => {
-                const oModel = this.getOwnerComponent().getModel(); // Use the global model
+                const oModel = this.getOwnerComponent().getModel();
                 oModel.read("/ValueHelpSubGrupSet", {
                     success: (oData) => {
-                        const oSubGroupModel = this.getOwnerComponent().getModel("subGroup");
-        
-                        if (oSubGroupModel) {
-                            // Update the subGroup model's data
-                            oSubGroupModel.setProperty("/items", oData.results);
-                            console.log("SubGroup data loaded:", oData.results); // Debugging
-                            resolve();
-                        } else {
-                            console.error("SubGroup model is not initialized.");
-                            reject("SubGroup model is not initialized.");
-                        }
+                        const oSubGroupModel = new JSONModel(oData.results);
+                        this.getView().setModel(oSubGroupModel, "subGroup");
+                        resolve();
                     },
                     error: (oError) => {
                         MessageBox.error("Failed to load sub group data.");
@@ -1228,45 +987,32 @@ sap.ui.define([
                 });
             });
         },
-    
-        handleValueHelpSubGroup: function () {
+
+        handleValueHelpSubGroup: function() {
             if (!this._oValueHelpSubGroupDialog) {
                 Fragment.load({
                     name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpSubGroup",
                     controller: this
-                }).then(function (oDialog) {
+                }).then(function(oDialog) {
                     this._oValueHelpSubGroupDialog = oDialog;
-        
-                    // Set the subGroup model to the dialog
-                    const oSubGroupModel = this.getView().getModel("subGroup");
-                    if (!oSubGroupModel) {
-                        console.error("SubGroup model is not initialized.");
-                        return;
-                    }
-                    this._oValueHelpSubGroupDialog.setModel(oSubGroupModel, "subGroup");
+                    // Bind the area model to the dialog
+                    this._oValueHelpSubGroupDialog.setModel(this.getView().getModel("subGroup"), "subGroup");
                     this.getView().addDependent(this._oValueHelpSubGroupDialog);
-        
-                    // Load sub-group data and open the dialog
+                     
                     this._loadSubGroupData().then(() => {
-                        const sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
-                        if (sSelectedGroupKey) {
-                            const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
-                            if (oBinding) {
-                                oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
-                            }
-                        }
+                        // Filter sub-areas based on selected area key
+                        let sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
+                        let oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
+                        oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
                         this._oValueHelpSubGroupDialog.open();
                     });
+                    
                 }.bind(this));
             } else {
-                // Apply filter and open the dialog if it already exists
-                const sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
-                if (sSelectedGroupKey) {
-                    const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
-                    if (oBinding) {
-                        oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
-                    }
-                }
+                // Filter sub-areas based on selected area key
+                let sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
+                let oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
+                oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
                 this._oValueHelpSubGroupDialog.open();
             }
         },
@@ -1278,259 +1024,20 @@ sap.ui.define([
             oBinding.filter([oFilter]);
         },
 
-        handleCloseSubGroup: function (oEvent) {
-            const aContexts = oEvent.getParameter("selectedContexts");
+        handleCloseSubGroup: function(oEvent) {
+            let aContexts = oEvent.getParameter("selectedContexts");
             if (aContexts && aContexts.length) {
-                const oSelectedItem = aContexts[0].getObject();
-                const oSubGroupModel = this.getView().getModel("subGroup");
-
-                if (oSubGroupModel) {
-                    // Update the selectedSubGroup property
-                    oSubGroupModel.setProperty("/selectedSubGroup", oSelectedItem);
-
-                    // Update the input field with the selected sub-group's Key2
-                    this.byId("newEmployeeSubgroupIdMutation").setValue(oSelectedItem.Key2);
-                } else {
-                    console.error("SubGroup model is not initialized.");
-                }
+                let oSelectedItem = aContexts[0].getObject();
+                let oSubGroupModel = this.getView().getModel("subGroup");
+                
+                oSubGroupModel.setProperty("/selectedSubGroup", oSelectedItem);
+                this.byId("newEmployeeSubgroupIdMutation").setValue(oSelectedItem.Key2);
             }
-
-            // Clear the filter after closing the dialog
             oEvent.getSource().getBinding("items").filter([]);
         },
 
         onDisplayDocumentWarning: function () {
             MessageToast.show("Display Document button pressed");
-        },
-
-        onAfterItemAdded: function (oEvent) {
-            const oItem = oEvent.getParameter("item");
-            const oFile = oItem.getFileObject();
-            const oModel = this.getView().getModel("fileAttachment");
-            const aUploadedFiles = oModel ? oModel.getProperty("/results") : [];
-        
-            if (oFile) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const sBase64 = e.target.result.split(",")[1]; // Remove data:image/... prefix
-                    const sFileType = oFile.type || this._getMimeTypeFromExtension(oFile.name); // Detect MIME type
-        
-                    aUploadedFiles.push({
-                        FileName: oFile.name,
-                        FileType: sFileType,
-                        FileSize: oFile.size.toString(),
-                        Attachment: sBase64
-                    });
-        
-                    if (!oModel) {
-                        const oNewModel = new sap.ui.model.json.JSONModel({ results: aUploadedFiles });
-                        this.getView().setModel(oNewModel, "fileAttachment");
-                    } else {
-                        oModel.setProperty("/results", aUploadedFiles);
-                    }
-                }.bind(this);
-                reader.readAsDataURL(oFile);
-            }
-        
-            // Optional: Reset UploadSet value state
-            oItem.setUploadState("Complete");
-            oItem.setVisibleEdit(false);
-        },
-        
-        _getMimeTypeFromExtension: function (sFileName) {
-            const sExtension = sFileName.split(".").pop().toLowerCase();
-            const oFileTypes = {
-                "pdf": "application/pdf",
-                "doc": "application/msword",
-                "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "xls": "application/vnd.ms-excel",
-                "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "png": "image/png",
-                "jpg": "image/jpeg",
-                "jpeg": "image/jpeg",
-                "txt": "text/plain"
-            };
-            return oFileTypes[sExtension] || "application/octet-stream"; // Default to binary if unknown
-        },
-
-        onAfterItemRemoved: function (oEvent) {
-            const oItem = oEvent.getParameter("item");
-            const sFileName = oItem.getFileName();
-            const oModel = this.getView().getModel("fileAttachment");
-            const aData = oModel.getProperty("/results");
-        
-            // Filter out the removed file
-            const aFilteredData = aData.filter(function (item) {
-                return item.FileName !== sFileName;
-            });
-        
-            oModel.setProperty("/results", aFilteredData);
-        },
-
-        onSubmitFiles: function (sRequestId) {
-            if (!sRequestId) {
-                MessageBox.error("No request ID found. Cannot upload files.");
-                return;
-            }
-        
-            const oModel = this.getOwnerComponent().getModel();
-            const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-            const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
-        
-            if (!aFiles || aFiles.length === 0) {
-                MessageBox.warning("No files to upload. Do you want to continue with submission?", {
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.YES,
-                    onClose: function (sAction) {
-                        if (sAction === MessageBox.Action.YES) {
-                            MessageBox.success("Submission completed without file uploads.");
-                        }
-                    }.bind(this)
-                });
-                return;
-            }
-
-            // Prepare batch group ID
-            const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            const sBatchGroupId = oBundle.getText("batchcratt");
-            oModel.setDeferredGroups([sBatchGroupId]);
-        
-            // Show busy indicator
-            this._oBusy.open();
-        
-            // Function to process one file at a time
-            const processNextFile = (index) => {
-                if (index >= aFiles.length) {
-                    // All files processed
-                    this._oBusy.close();
-                    MessageBox.success("All files uploaded successfully.", {
-                        onClose: () => {
-                            console.log("File upload process completed.");
-                        }
-                    });
-                    return;
-                }
-        
-                const oFile = aFiles[index];
-        
-                // Prepare the payload for the current file
-                const oPayload = {
-                    Reqid: sRequestId,
-                    Seqnr: index.toString(),
-                    FileName: oFile.FileName,
-                    FileType: oFile.FileType,
-                    // FileType: oFile.FileType.split('/')[1] || oFile.FileType, // Extract file extension if MIME type
-                    FileSize: oFile.FileSize.toString(),
-                    Attachment: oFile.Attachment,
-                    CreatedOn: new Date().toISOString().split('.')[0], // Format as ISO without milliseconds
-                    TypeDoc: "BI Checking",
-                    PicPosition: "Compensation & Benefit",
-                    PicName: "Roy",
-                    PicId: "81000061",
-                    Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [sRequestId, index, 'Mdt'])
-                };
-        
-                // Debugging output
-                console.log("Uploading file:", oFile.FileName);
-                console.log("Payload:", JSON.stringify(oPayload));
-        
-                // Upload the current file
-                oModel.create("/FileAttachmentSet", oPayload, {
-                    success: function () {
-                        console.log("File uploaded successfully:", oFile.FileName);
-                        // Process the next file
-                        processNextFile(index + 1);
-                    },
-                    error: function (oError) {
-                        this._oBusy.close();
-
-                        // Log the full error response for debugging
-                        console.error("Error response:", oError);
-        
-                        // Extract detailed error information
-                        let errorDetails = "Unknown error";
-                        try {
-                            if (oError.responseText) {
-                                const oErrorResponse = JSON.parse(oError.responseText);
-                                if (oErrorResponse.error && oErrorResponse.error.message) {
-                                    errorDetails = oErrorResponse.error.message.value || oErrorResponse.error.message;
-                                } else if (oErrorResponse.error && oErrorResponse.error.innererror) {
-                                    errorDetails = oErrorResponse.error.innererror.message;
-                                }
-                            }
-                        } catch (e) {
-                            errorDetails = oError.message || "Parsing error response failed";
-                        }
-        
-                        console.error("File upload error:", errorDetails);
-                        MessageBox.error("Failed to upload file '" + oFile.FileName + "': " + errorDetails);
-                    }.bind(this)
-                });
-            };
-        
-            // Start processing files
-            processNextFile(0);
-        },
-
-        onFileSizeExceed: function (oEvent) {
-            MessageBox.show(oBundle.getText("sizelimit"));
-        },
-        
-        // onSubmitFiles: function (sRequestId) {
-        //     const oModel = this.getOwnerComponent().getModel();
-        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-        //     const aFiles = oFileAttachmentModel.getProperty("/results");
-        
-        //     if (!aFiles || aFiles.length === 0) {
-        //         MessageToast.show("No files to upload.");
-        //         return;
-        //     }
-
-        //     const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle(); // Get the i18n resource bundle
-        //     const sBatchGroupId = oBundle.getText("batchcratt"); // Batch group ID
-        //     oModel.setDeferredGroups([sBatchGroupId]); // Set the batch group ID
-        
-        //     const aPromises = aFiles.map((oFile, i) => {
-        //         const oPayload = {
-        //             RequestId: sRequestId,
-        //             SequenceNo: i.toString(),
-        //             FileName: oFile.FileName,
-        //             FileType: oFile.FileType,
-        //             FileSize: oFile.FileSize,
-        //             Attachment: oFile.Attachment, // Use the Base64 string directly
-        //             CreatedOn: new Date(),
-        //             TypeDoc: "BI Checking",
-        //             PicPosition: "Compensation & Benefit",
-        //             PicName: "Roy",
-        //             PicId: "81000061",
-        //             Url: oBundle.getText("urlpath", [sRequestId, i, "110"])
-        //         };
-        
-        //         return new Promise((resolve, reject) => {
-        //             oModel.create("/FileAttachmentSet", oPayload, {
-        //                 // groupId: sBatchGroupId,
-        //                 // method: "POST",
-        //                 success: resolve,
-        //                 error: reject
-        //             });
-        //         });
-        //     });
-        
-        //     Promise.all(aPromises)
-        //     .then(() => {
-        //         oModel.submitChanges({
-        //             groupId: sBatchGroupId,
-        //             success: () => {
-        //                 MessageToast.show("All files uploaded successfully.");
-        //             },
-        //             error: () => {
-        //                 MessageBox.error("Failed to upload one or more files.");
-        //             }
-        //         });
-        //     })
-        //     .catch(() => {
-        //         MessageBox.error("Failed to upload one or more files.");
-        //     });
-        // },
+        }
     });
 });

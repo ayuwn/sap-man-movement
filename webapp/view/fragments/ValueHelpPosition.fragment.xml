@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Position Found"
+        title="Select Position"
+        search="handleSearchPosition"
+        confirm="handleClosePosition"
+        cancel="handleClosePosition"
+        items="{position>/}">
+        <StandardListItem
+            title="{position>Key}"
+            description="{position>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

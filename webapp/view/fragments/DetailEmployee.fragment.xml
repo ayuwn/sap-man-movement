@@ -24,7 +24,7 @@
                    <HBox>
                    <Title text="Contact Detail"/>
                    </HBox>
-                    <Label text="NIK" />   
+                    <Label text="Employee Number" />   
                     <Text text="{/id}"/>
                     <Label text="Location" />
                     <Text text="{/location}" />

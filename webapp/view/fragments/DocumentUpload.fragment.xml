@@ -4,15 +4,10 @@
     xmlns:f="sap.ui.layout.form"
     xmlns:u="sap.ui.unified">
     
-    <Dialog class="sapUiResponsiveMargin">
-        
-        <!-- Custom Header with Title and Menu Button -->
-        <customHeader>
-            <Toolbar>
-                <Title text="Upload Document" />
-                <ToolbarSpacer />
-            </Toolbar>
-        </customHeader>
+    <Dialog
+        title="Upload Dokumen"
+        class="sapUiResponsiveMargin"
+        id="documentUploadDialog">
 
         <f:SimpleForm
             editable="true"
@@ -25,48 +20,44 @@
             <f:content>
                 <Label text="Jenis Dokumen" />
                 <Select
-                    id="jenisDokumenSelect"
-                    forceSelection="true"
-                    items="{
-                        path: '/JenisDokumenCollection',
-                        sorter: { path: 'text' }
-                    }">
-                    <core:Item key="{key}" text="{text}" />
+                    id="docTypeSelect"
+                    required="true"
+                    fieldGroupIds="grpValidation"
+                    forceSelection="false"
+                    items="{path: 'dropdown>/jenisDokumenColl', sorter: { path: 'text' }}">
+                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
                 </Select>
                 
                 <Label text="PIC" />
                 <Select
                     id="picSelect"
-                    forceSelection="true"
-                    items="{
-                        path: '/PICCollection',
-                        sorter: { path: 'text' }
-                    }">
-                    <core:Item key="{key}" text="{text}" />
+                    required="true"
+                    fieldGroupIds="grpValidation"
+                    forceSelection="false"
+                    items="{path: 'dropdown>/PICColl', sorter: { path: 'text' }}">
+                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
                 </Select>
                 
-                <Label text="Keterangan" />
-                <Input id="keteranganInput" />
+                <Label text="Keterangan" required="true" />
+                <Input id="keteranganInput" required="true" fieldGroupIds="grpValidation"/>
 
-                <Label text="Upload Document" />
-                <u:FileUploader
+                <Label text="Upload Dokumen" required="true" fieldGroupIds="grpValidation"/>
+                <u:FileUploader 
                     id="fileUploader"
                     name="myFileUpload"
-                    uploadUrl="upload/"
+                    uploadUrl="/upload"
                     tooltip="Upload your file"
-                    placeholder="Choose a file"
-                    style="Emphasized"
+                    placeholder="Pilih Dokumen"
                     fileType="pdf,doc,docx"
                     multiple="false"
                     change=".onFileChange">
                 </u:FileUploader>
-                <Text id="selectedFileName" text="" />
             </f:content>
         </f:SimpleForm>
         
         <beginButton>
             <Button 
-                text="Submit"
+                text="Add"
                 type="Emphasized"
                 press=".onDialogSubmit" />
         </beginButton>

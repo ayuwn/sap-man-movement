@@ -10,9 +10,9 @@ sap.ui.define([
     "sap/ui/core/library",
 ], function (BaseController, formatter, Fragment, JSONModel, MessageBox, MessageToast, Filter, FilterOperator, CoreLib) {
     "use strict";
-    var oBundle, ValueState = CoreLib.ValueState;
+    var ValueState = CoreLib.ValueState;
 
-    return BaseController.extend("bsim.hcmapp.man.movement.controller.Mutation", {
+    return BaseController.extend("bsim.hcmapp.man.movement.controller.Mutation-fix", {
         formatter: formatter,
 
         onInit: function () {
@@ -38,9 +38,6 @@ sap.ui.define([
                 uploads: []
             });
             this.getView().setModel(oDocUploadModel, "docUploads");
-
-            const oFileAttachmentModel = new sap.ui.model.json.JSONModel({ results: [] });
-            this.getView().setModel(oFileAttachmentModel, "fileAttachment");
 
             let oDropdownModel = new JSONModel({
                 selectedPIC: "",
@@ -107,37 +104,6 @@ sap.ui.define([
             if (EmployeeNumber) {
                 this._getEmployeeData(EmployeeNumber);
             }
-
-             // Clear any existing files in the upload set
-             const oUploadSet = this.byId("idUploadSet");
-             if (oUploadSet) {
-                 oUploadSet.removeAllItems();
-             }
-             
-             // Reset the file attachment model
-             const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-             if (oFileAttachmentModel) {
-                 oFileAttachmentModel.setProperty("/results", []);
-             }
-             
-             // Get request ID from route parameters
-             var oArguments = oEvent.getParameter("arguments");
-             
-             if (oArguments && oArguments.requestId) {
-                 this._sRequestId = oArguments.requestId;
-                 this._getRequestData();
-             } else {
-                 // Try to get from application model if we're coming from another view
-                 var oAppModel = this.getModel("appModel");
-                 if (oAppModel && oAppModel.getProperty("/selectedRequest")) {
-                     this._sRequestId = oAppModel.getProperty("/selectedRequest/RequestId");
-                     this._getRequestData();
-                 } else {
-                     M.information("No request selected");
-                     this.onNavBack();
-                 }
-             }
- 
         },
 
         _getEmployeeData: function (EmployeeNumber) {
@@ -676,13 +642,13 @@ sap.ui.define([
                 Zdasar1: this.getView().getModel("dropdown").getProperty("/selectedAs") || "",
                 Zexholder: this.byId("employeeChangeMutation").getValue(),
                 Zdasar2: this.byId("basicConMutation").getValue(),
-                // Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
-                // Zbichecking: Zbichecking,
-                // Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
-                // ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
-                // Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(),
-                // Znotedisp: this.byId("dispoNoteMutation").getValue(),
-                // Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0",
+                Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
+                Zbichecking: Zbichecking,
+                Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
+                ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
+                Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(),
+                Znotedisp: this.byId("dispoNoteMutation").getValue(),
+                Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0",
                 PlansDesc_Dest: sPlansDestDesc,
                 WerksDestDesc: sWerksDestDesc,
                 BtrtlDestDesc: sBtrtlDestDesc,
@@ -707,7 +673,6 @@ sap.ui.define([
             oModel.create("/RequestSet", oPayload, {
                 success: (oData) => {
                     this._oBusyDialog.close();
-                    this.onSubmitFiles(oData.RequestId);
         
                     // Show success message
                     sap.m.MessageToast.show("Request submitted successfully.");
@@ -1301,236 +1266,6 @@ sap.ui.define([
 
         onDisplayDocumentWarning: function () {
             MessageToast.show("Display Document button pressed");
-        },
-
-        onAfterItemAdded: function (oEvent) {
-            const oItem = oEvent.getParameter("item");
-            const oFile = oItem.getFileObject();
-            const oModel = this.getView().getModel("fileAttachment");
-            const aUploadedFiles = oModel ? oModel.getProperty("/results") : [];
-        
-            if (oFile) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const sBase64 = e.target.result.split(",")[1]; // Remove data:image/... prefix
-                    const sFileType = oFile.type || this._getMimeTypeFromExtension(oFile.name); // Detect MIME type
-        
-                    aUploadedFiles.push({
-                        FileName: oFile.name,
-                        FileType: sFileType,
-                        FileSize: oFile.size.toString(),
-                        Attachment: sBase64
-                    });
-        
-                    if (!oModel) {
-                        const oNewModel = new sap.ui.model.json.JSONModel({ results: aUploadedFiles });
-                        this.getView().setModel(oNewModel, "fileAttachment");
-                    } else {
-                        oModel.setProperty("/results", aUploadedFiles);
-                    }
-                }.bind(this);
-                reader.readAsDataURL(oFile);
-            }
-        
-            // Optional: Reset UploadSet value state
-            oItem.setUploadState("Complete");
-            oItem.setVisibleEdit(false);
-        },
-        
-        _getMimeTypeFromExtension: function (sFileName) {
-            const sExtension = sFileName.split(".").pop().toLowerCase();
-            const oFileTypes = {
-                "pdf": "application/pdf",
-                "doc": "application/msword",
-                "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "xls": "application/vnd.ms-excel",
-                "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "png": "image/png",
-                "jpg": "image/jpeg",
-                "jpeg": "image/jpeg",
-                "txt": "text/plain"
-            };
-            return oFileTypes[sExtension] || "application/octet-stream"; // Default to binary if unknown
-        },
-
-        onAfterItemRemoved: function (oEvent) {
-            const oItem = oEvent.getParameter("item");
-            const sFileName = oItem.getFileName();
-            const oModel = this.getView().getModel("fileAttachment");
-            const aData = oModel.getProperty("/results");
-        
-            // Filter out the removed file
-            const aFilteredData = aData.filter(function (item) {
-                return item.FileName !== sFileName;
-            });
-        
-            oModel.setProperty("/results", aFilteredData);
-        },
-
-        onSubmitFiles: function (sRequestId) {
-            if (!sRequestId) {
-                MessageBox.error("No request ID found. Cannot upload files.");
-                return;
-            }
-        
-            const oModel = this.getOwnerComponent().getModel();
-            const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-            const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
-        
-            if (!aFiles || aFiles.length === 0) {
-                MessageBox.warning("No files to upload. Do you want to continue with submission?", {
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.YES,
-                    onClose: function (sAction) {
-                        if (sAction === MessageBox.Action.YES) {
-                            MessageBox.success("Submission completed without file uploads.");
-                        }
-                    }.bind(this)
-                });
-                return;
-            }
-
-            // Prepare batch group ID
-            const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            const sBatchGroupId = oBundle.getText("batchcratt");
-            oModel.setDeferredGroups([sBatchGroupId]);
-        
-            // Show busy indicator
-            this._oBusy.open();
-        
-            // Function to process one file at a time
-            const processNextFile = (index) => {
-                if (index >= aFiles.length) {
-                    // All files processed
-                    this._oBusy.close();
-                    MessageBox.success("All files uploaded successfully.", {
-                        onClose: () => {
-                            console.log("File upload process completed.");
-                        }
-                    });
-                    return;
-                }
-        
-                const oFile = aFiles[index];
-        
-                // Prepare the payload for the current file
-                const oPayload = {
-                    Reqid: sRequestId,
-                    Seqnr: index.toString(),
-                    FileName: oFile.FileName,
-                    FileType: oFile.FileType,
-                    // FileType: oFile.FileType.split('/')[1] || oFile.FileType, // Extract file extension if MIME type
-                    FileSize: oFile.FileSize.toString(),
-                    Attachment: oFile.Attachment,
-                    CreatedOn: new Date().toISOString().split('.')[0], // Format as ISO without milliseconds
-                    TypeDoc: "BI Checking",
-                    PicPosition: "Compensation & Benefit",
-                    PicName: "Roy",
-                    PicId: "81000061",
-                    Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [sRequestId, index, 'Mdt'])
-                };
-        
-                // Debugging output
-                console.log("Uploading file:", oFile.FileName);
-                console.log("Payload:", JSON.stringify(oPayload));
-        
-                // Upload the current file
-                oModel.create("/FileAttachmentSet", oPayload, {
-                    success: function () {
-                        console.log("File uploaded successfully:", oFile.FileName);
-                        // Process the next file
-                        processNextFile(index + 1);
-                    },
-                    error: function (oError) {
-                        this._oBusy.close();
-
-                        // Log the full error response for debugging
-                        console.error("Error response:", oError);
-        
-                        // Extract detailed error information
-                        let errorDetails = "Unknown error";
-                        try {
-                            if (oError.responseText) {
-                                const oErrorResponse = JSON.parse(oError.responseText);
-                                if (oErrorResponse.error && oErrorResponse.error.message) {
-                                    errorDetails = oErrorResponse.error.message.value || oErrorResponse.error.message;
-                                } else if (oErrorResponse.error && oErrorResponse.error.innererror) {
-                                    errorDetails = oErrorResponse.error.innererror.message;
-                                }
-                            }
-                        } catch (e) {
-                            errorDetails = oError.message || "Parsing error response failed";
-                        }
-        
-                        console.error("File upload error:", errorDetails);
-                        MessageBox.error("Failed to upload file '" + oFile.FileName + "': " + errorDetails);
-                    }.bind(this)
-                });
-            };
-        
-            // Start processing files
-            processNextFile(0);
-        },
-
-        onFileSizeExceed: function (oEvent) {
-            MessageBox.show(oBundle.getText("sizelimit"));
-        },
-        
-        // onSubmitFiles: function (sRequestId) {
-        //     const oModel = this.getOwnerComponent().getModel();
-        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-        //     const aFiles = oFileAttachmentModel.getProperty("/results");
-        
-        //     if (!aFiles || aFiles.length === 0) {
-        //         MessageToast.show("No files to upload.");
-        //         return;
-        //     }
-
-        //     const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle(); // Get the i18n resource bundle
-        //     const sBatchGroupId = oBundle.getText("batchcratt"); // Batch group ID
-        //     oModel.setDeferredGroups([sBatchGroupId]); // Set the batch group ID
-        
-        //     const aPromises = aFiles.map((oFile, i) => {
-        //         const oPayload = {
-        //             RequestId: sRequestId,
-        //             SequenceNo: i.toString(),
-        //             FileName: oFile.FileName,
-        //             FileType: oFile.FileType,
-        //             FileSize: oFile.FileSize,
-        //             Attachment: oFile.Attachment, // Use the Base64 string directly
-        //             CreatedOn: new Date(),
-        //             TypeDoc: "BI Checking",
-        //             PicPosition: "Compensation & Benefit",
-        //             PicName: "Roy",
-        //             PicId: "81000061",
-        //             Url: oBundle.getText("urlpath", [sRequestId, i, "110"])
-        //         };
-        
-        //         return new Promise((resolve, reject) => {
-        //             oModel.create("/FileAttachmentSet", oPayload, {
-        //                 // groupId: sBatchGroupId,
-        //                 // method: "POST",
-        //                 success: resolve,
-        //                 error: reject
-        //             });
-        //         });
-        //     });
-        
-        //     Promise.all(aPromises)
-        //     .then(() => {
-        //         oModel.submitChanges({
-        //             groupId: sBatchGroupId,
-        //             success: () => {
-        //                 MessageToast.show("All files uploaded successfully.");
-        //             },
-        //             error: () => {
-        //                 MessageBox.error("Failed to upload one or more files.");
-        //             }
-        //         });
-        //     })
-        //     .catch(() => {
-        //         MessageBox.error("Failed to upload one or more files.");
-        //     });
-        // },
+        }
     });
 });

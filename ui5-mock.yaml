@@ -36,7 +36,7 @@ server:
         mountPath: /
         services:
           - urlPath: /sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV
-            metadataPath: ./webapp/localService/metadata.xml
-            mockdataPath: ./webapp/localService/data
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
         annotations: []

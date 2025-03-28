@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Area Found"
+        title="Select Area"
+        search="handleSearchArea"
+        confirm="handleCloseArea"
+        cancel="handleCloseArea"
+        items="{area>/}">
+        <StandardListItem
+            title="{area>Key}"
+            description="{area>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

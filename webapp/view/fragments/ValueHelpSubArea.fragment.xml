@@ -1,0 +1,20 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Sub Area Found"
+        title="Select Sub Area"
+        search="handleSearchSubArea"
+        confirm="handleCloseSubArea"
+        cancel="handleCloseSubArea"
+        items="{subArea>/items}">
+        <StandardListItem
+            title="{parts:[
+                {path:'subArea>Key'},
+                {path:'subArea>Key2'}
+            ], formatter:'.formatter.formatEmpName'}"
+            description="{subArea>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

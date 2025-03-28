@@ -1,0 +1,20 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Sub Group Found"
+        title="Select Sub Group"
+        search="handleSearchSubGroup"
+        confirm="handleCloseSubGroup"
+        cancel="handleCloseSubGroup"
+        items="{subGroup>/items}">
+        <StandardListItem
+            title="{parts:[
+                {path:'subGroup>Key'},
+                {path:'subGroup>Key2'}
+            ], formatter:'.formatter.formatEmpName'}"
+            description="{subGroup>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

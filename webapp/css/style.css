@@ -58,6 +58,29 @@
     font-weight: bold;
 }
 
+.nodeKey {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.nodeTitle {
+    font-size: 1em;
+    color: gray;
+}
+
+.customBox {
+    border: 1px solid #eaeef0;
+    border-radius: 0;         /* Persegi */
+    background-color: #eaeef0;
+    padding: 0rem;
+    width: 12.5rem;
+}
+
+.roundedProfile {
+    border-radius: 5px;
+}
+
+
 /* .greyBackground {
     background-color: #69696b;
 } */

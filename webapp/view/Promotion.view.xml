@@ -1,0 +1,583 @@
+<mvc:View
+   controllerName="bsim.hcmapp.man.movement.controller.Promotion"
+   xmlns:mvc="sap.ui.core.mvc"
+   xmlns="sap.m"
+   xmlns:f="sap.ui.layout.form"
+   xmlns:l="sap.ui.layout"
+   xmlns:core="sap.ui.core"
+   xmlns:semantic="sap.m.semantic">
+<semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>employeePromotion}">
+    <semantic:content>
+    <VBox class="sapUiSmallMargin">
+        <!-- Employee Data Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="true"
+        headerText="Employee Data" 
+        width="auto" 
+        class="sapUiResponsiveMargin">
+            <content>
+                <f:SimpleForm 
+                id="employeePromotionForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>name}"/>
+                            <HBox>
+                                <Input value="{Promotion>employee>/EmployeeName/FormattedName}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>entryDate}"/>
+                            <HBox>
+                                <Input value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA1}"/>
+                            <HBox>
+                                <Input value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA2}"/>
+                            <HBox>
+                                <Input value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>ratingPA3}"/>
+                            <HBox>
+                                <Input value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>marketingAvg}"/>
+                            <HBox>
+                                <Input value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Sanksi Aktif Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="true"
+        headerText="Sanksi Aktif" 
+        width="auto" 
+        class="sapUiResponsiveMargin">
+            <content>
+                <f:SimpleForm 
+                id="sanksiPromotionForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>sanctionType}"/>
+                            <l:Grid vSpacing="0" containerQuery="true">
+                            <Input id="sanctionTypePromotion" value="" width="auto" editable="false" >
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <VBox>
+                            <Text id="sanctionDescriptionPromotion" text="Surat Teguran Surat" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                                <Button
+                                    icon="sap-icon://document-text" 
+                                    text="Show Document"
+                                    type="Emphasized"
+                                    tooltip="View Document"
+                                    press="onDisplayDocumentWarning" class="sapUiTinyMarginBegin"/>
+                            </VBox>
+                            </l:Grid>
+                        <Label text="Jenis Pelanggaran" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel1Promotion" value="{Promotion>employee>/JenPel1}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel1Promotion" text="{Promotion>employee>/DescPel1}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel2Promotion" value="{Promotion>employee>/JenPel2}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel2Promotion" text="{Promotion>employee>/DescPel2}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel3Promotion" value="{Promotion>employee>/JenPel3}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel3Promotion" text="{Promotion>employee>/DescPel3}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPel4Promotion" value="{Promotion>employee>/JenPel4}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPel4Promotion" text="{Promotion>employee>/DescPel4}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="{i18n>actDate}" required="false"/>
+                            <HBox class="sapUiTinyMarginBeginEnd">
+                                <DatePicker id="actDateStartPromotion" value="" width="87%" class="sapUiTinyMarginBeginEnd"/>
+                                <Text text="-" class="sapUiTinyMarginEnd"/>
+                                <DatePicker id="actDateEndPromotion" value="" width="87%" class="sapUiTinyMarginBeginEnd"/>
+                            </HBox>
+                        <Label text="information" visible="false"/>
+                        <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="57%">
+                        <MessageStrip
+                            text="Yang bersangkutan sedang dalam proses pengajuan [ST/TP] yang diajukan padaa tanggal dd.mm.yyyy"
+                            type="Warning"
+                            showIcon="true"
+                            showCloseButton="false"
+                            class="sapUiMediumMarginBottom">
+                        </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Action Request Panel -->
+        <Panel 
+            expandable="true" 
+            expanded="true"
+            headerText="Action Request" 
+            width="auto" 
+            class="sapUiResponsiveMargin">
+            <content>
+                <f:SimpleForm 
+                    id="actionPromotionForm"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Label text="{i18n>actionType}" />
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <Input id="actionTypePromotion" value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>reason}" />
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <Input id="reasonPromotion" value="" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>effectiveDate}" />
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <DatePicker id="effectiveDateStartPromotion" value="" width="87%" class="sapUiTinyMarginBeginEnd"/>
+                            <Text text="-" class="sapUiTinyMarginEnd"/>
+                            <DatePicker id="effectiveDateEndPromotion" value="" width="87%" class="sapUiTinyMarginBeginEnd"/>
+                        </HBox>
+                        <Label text="{i18n>mutation}" visible="false"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Text text="Dari" class="sapUiLargeMarginEnd"/>
+                            <Text id="mutationFromPromotion" text="" class="sapUiLargeMarginBeginEnd" />
+                            <Text id="mutationToPromotion" text="" class="sapUiTinyMarginBeginEnd" />
+                            <Text text="Menjadi" class="sapUiLargeMarginBegin"/>
+                        </HBox>
+                        <Label text="{i18n>position}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionPromotion" value="{Promotion>employee>/EmployeePositionText}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPositionPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>perArea}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerAreaPromotion" value="{Promotion>employee>/PersonnelAreaText}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPerAreaPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>perSubArea}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPerSubAreaPromotion" value="{Promotion>employee>/PersonnelSubareaText}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPerSubAreaPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>status}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentStatusPromotion" value="{Promotion>employee>/EmployeeOrgunitText}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newStatusPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>contractType}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentContractTypePromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newContractTypePromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>jobtitle}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentJobTitlePromotion" value="{Promotion>employee>/EmployeeJobtitleLongtext}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newJobTitlePromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>homebase}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentHomeBasePromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newHomeBasePromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="true"/>
+                        </HBox>
+                        <Label text="{i18n>level}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentLevelPromotion" value="{Promotion>employee>/PayScaleLevel}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newLevelPromotion" value="{Promotion>employee>/PayScaleLevel}" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>unitOrg}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentUnitOrgPromotion" value="{Promotion>employee>/EmployeeOrgunitText}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newUnitOrgPromotion" value="{Promotion>employee>/EmployeeOrgunitText}" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>directManager}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentDirectManagerPromotion" value="{Promotion>employee>/ManagerName}" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newDirectManagerPromotion" value="{Promotion>employee>/ManagerName}" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>positionMPP}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionMPPPromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPositionMPPPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>existingEmployee}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentExistingEmployeePromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newExistingEmployeePromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>positionVacant}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionVacantPromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPositionVacantPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>positionExisting}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentPositionExistingPromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newPositionExistingPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>directStaff}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentDirectStaffPromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newDirectStaffPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>jobtitleStatus}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="currentJobTitleStatusPromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                            <Input id="newJobTitleStatusPromotion" value="" width="85%" class="sapUiLargeMarginBegin" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>endDateJob}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Input id="EndDatePromotion" value="" width="100%" class="sapUiTinyMarginEnd" editable="false"/>
+                        </HBox>
+                        <Label text="{i18n>salaryAdj}"/>
+                        <HBox class="sapUiSmallMarginBeginEnd">
+                            <Select id="salaryAdjPromotion" required="true" fieldGroupIds="grpValidation"
+                                items="{ path: 'dropdown>/salaryAdjColl', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedSalaryAdj}"
+                                width="11.5rem">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                            </Select>
+                            <Text text="Rp" class="sapUiMediumMarginBegin" />
+                            <Input id="salaryAdjValuePromotion" value="" width="85%" class="sapUiLargeMarginEnd" editable="true" required="false"/>
+                        </HBox>
+                        <Label text="{i18n>as}" required="true"/>
+                            <Select id="asPromotion" required="true" fieldGroupIds="grpValidation"
+                                items="{ path: 'dropdown>/asColl', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedAs}"
+                                width="11.5rem"
+                                class="sapUiSmallMarginBegin">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                            </Select>
+                        <Label text="{i18n>basicCon}" required="true"/>
+                        <VBox class="sapUiSmallMarginBeginEnd">
+                            <TextArea 
+                                id="basicConPromotion"
+                                value="" 
+                                width="57%"
+                                rows="4"
+                                showExceededText="true" 
+                                maxLength="255" 
+                                liveChange="handleLiveChange" 
+                                valueState="Warning" 
+                                valueLiveUpdate="true"
+                                required="true" 
+                                fieldGroupIds="grpValidation"
+                                class="sapUiTinyMarginEnd" 
+                                editable="true"/>
+                        </VBox>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningEvaluation}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                            <MessageStrip
+                                text="{i18n>warningPKWT}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiMediumMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Verification Panel -->
+        <Panel 
+            expandable="true" 
+            expanded="false"
+            headerText="Verification" 
+            width="auto" 
+            class="sapUiResponsiveMargin">
+            <content>
+                <f:SimpleForm 
+                    editable="true"
+                    id="assessmentPromotionForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="AssessmentPromotion">
+                            <Text text="{i18n>assessment}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>assessmentResult}" required="true" fieldGroupIds="grpValidation"/>
+                        <RadioButtonGroup id="RBPromotionGroup" columns="2" width="100%" selectedIndex="{assessmentStatus>/selectedIndex}">
+                            <buttons>
+                                <RadioButton text="{i18n>overQualified}" />
+                                <RadioButton text="{i18n>qualified}" />
+                                <RadioButton text="{i18n>almostQualified}" />
+                                <RadioButton text="{i18n>notQualified}" />
+                            </buttons>
+                        </RadioButtonGroup>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningAssessment}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="biCheckingPromotionForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="BICheckingPromotion">
+                            <Text text="{i18n>biChecking}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>biResult}" required="true" fieldGroupIds="grpValidation"/>
+                        <HBox class="sapUiSmallMarginEnd">
+                            <Text text="Collection:" class="sapUiSmallMarginEnd" />
+                            <CheckBox id="hasilPromotion1" text="1" selected="{hasilPromotion>/hasilPromotion1}"/>
+                            <CheckBox id="hasilPromotion2" text="2" selected="{hasilPromotion>/hasilPromotion2}"/>
+                            <CheckBox id="hasilPromotion3" text="3" selected="{hasilPromotion>/hasilPromotion3}"/>
+                            <CheckBox id="hasilPromotion4" text="4" selected="{hasilPromotion>/hasilPromotion4}"/>
+                            <CheckBox id="hasilPromotion5" text="5" selected="{hasilPromotion>/hasilPromotion5}"/>
+                        </HBox>
+                        <Label text="{i18n>biNotes}" />
+                        <TextArea 
+                            id="hasilBiCheckingPromotion"
+                            value=""
+                            width="57%"
+                            rows="4"
+                            showExceededText="true" 
+                            maxLength="255" 
+                            liveChange="handleLiveChange" 
+                            valueState="Warning" 
+                            valueLiveUpdate="true"
+                            editable="true"/>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningBiChecking}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="dispoPromotionForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="disposisiToolbarPromotion">
+                            <Text text="{i18n>disposisi}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>downloadDis}" />
+                        <HBox class="sapUiSmallMarginEnd">
+                            <Button
+                                icon="sap-icon://download"
+                                text="Download"
+                                type="Emphasized"
+                                press="onDownloadDisposisi"
+                                class="sapUiTinyMarginEnd"/>
+                        </HBox>
+                        <Label text="{i18n>disResult}" required="true" fieldGroupIds="grpValidation"/>
+                        <RadioButtonGroup id="disposisiPromotion" columns="2" width="100%" selectedIndex="{disposisiStatus>/selectedIndex}">
+                            <RadioButton text="Disetujui" class="sapUiSmallMarginEnd"/>
+                            <RadioButton text="Tidak Disetujui" />
+                        </RadioButtonGroup>
+                        <Label text="{i18n>salaryAdj}" />
+                        <HBox>
+                            <Text text="Rp" />
+                            <Input 
+                                id="gajiPromotion"
+                                type="Number"
+                                value=""
+                                width="85%"
+                                maxLength="50"
+                                editable="true"/>
+                        </HBox>
+                        <Label text="informasi" visible="false"/>
+                        <VBox class="sapUiSmallMarginTop" width="57%">
+                            <MessageStrip
+                                text="{i18n>warningDisposisi}"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                            </MessageStrip>
+                        </VBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="upDocForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="upDocPromotion">
+                            <Text text="{i18n>upDoc}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <VBox class="sapUiSmallMarginEnd">
+                            <HBox alignItems="Center" justifyContent="End">
+                                <Button
+                                    width="5rem"
+                                    icon="sap-icon://add"
+                                    type="Transparent"
+                                    tooltip="Add Item"
+                                    press=".onOpenDialog"/>
+                            </HBox>
+                            <HBox>
+                                <Table
+                                    id="table-uploadSet"
+                                    width="70rem"
+                                    mode="MultiSelect"
+                                    fixedLayout="false"
+                                    inset="true"
+                                    autoPopinMode="true"
+                                    hiddenInPopin="None"
+                                    items="{path: 'docUploads>/uploads', templateShareable: false}"                                
+                                    selectionChange="onSelectionChange">
+                                    <columns>
+                                        <Column id="namaDokumen" importance="High">
+                                            <header>
+                                                <Label text="Nama Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="jenisDokumen">
+                                            <header>
+                                                <Label text="Jenis Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="pic">
+                                            <header>
+                                                <Label text="PIC" />
+                                            </header>
+                                        </Column>
+                                        <Column id="keterangan">
+                                            <header>
+                                                <Label text="Keterangan" />
+                                            </header>
+                                        </Column>
+                                        <Column id="actionButton" importance="High" />
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem
+                                            highlight="{= ${documents>uploadState} === 'Complete' ? 'Indication05' : null }">
+
+                                            <!-- Cells with cell template defining content for each column (cells and columns work with 1:1 mapping) -->
+                                            <cells>
+                                                <HBox>
+                                                    <Image
+                                                        src="{documents>imageUrl}"
+                                                        class="sapMUSTItemImage sapMUSTItemIcon"
+                                                        visible="{= ${documents>imageUrl} !== undefined}"/>
+                                                    <core:Icon
+                                                        src="sap-icon://pdf-attachment"
+                                                        color="white"
+                                                        class="sapMUSTItemImage sapMUSTItemIcon"/>
+                                                    <VBox
+                                                        class="sapUiTinyMargin sapUiSmallMarginBegin">
+                                                        <Link
+                                                            text="{docUploads>fileName}"
+                                                            press="onShowDoc"
+                                                            class="sapUiTinyMarginBottom"/>
+                                                        <Text text="{path: 'docUploads>fileSize', formatter: '.formatter.formatFileSize'}" />
+                                                    </VBox>
+                                                </HBox>
+                                                <Text text="{docUploads>docTypeText}" />
+                                                <Text text="{docUploads>pic}" />
+                                                <Text
+                                                    text="{docUploads>keterangan}" 
+                                                    wrapping="true"/>
+
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </HBox>                  
+                        </VBox> 
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        </VBox>
+            </semantic:content>
+            <semantic:mainAction>
+                <semantic:MainAction id="btnSubmitPromotion" text="Submit" press="onSendRequest"/>
+            </semantic:mainAction>
+        </semantic:FullscreenPage>
+        </mvc:View>

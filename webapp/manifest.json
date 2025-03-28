@@ -1,226 +1,407 @@
 {
-    "_version": "1.60.0",
-    "sap.app": {
-        "id": "bsim.hcmapp.man.movement",
-        "type": "application",
-        "i18n": "i18n/i18n.properties",
-        "applicationVersion": {
-            "version": "0.0.1"
-        },
-        "title": "{{appTitle}}",
-        "description": "{{appDescription}}",
-        "resources": "resources.json",
-        "sourceTemplate": {
-            "id": "@sap/generator-fiori:basic",
-            "version": "1.16.3",
-            "toolsId": "95e7d961-84e2-43fa-aae8-1ae8379f8baf"
-        },
-        "dataSources": {
-            "mainService": {
-                "uri": "/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/",
-                "type": "OData",
-                "settings": {
-                    "annotations": [],
-                    "localUri": "localService/metadata.xml",
-                    "odataVersion": "2.0"
-                }
-            }
-        }
+  "_version": "1.60.0",
+  "sap.app": {
+    "id": "bsim.hcmapp.man.movement",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
     },
-    "sap.ui": {
-        "technology": "UI5",
-        "icons": {
-            "icon": "",
-            "favIcon": "",
-            "phone": "",
-            "phone@2": "",
-            "tablet": "",
-            "tablet@2": ""
-        },
-        "deviceTypes": {
-            "desktop": true,
-            "tablet": true,
-            "phone": true
-        }
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.16.3",
+      "toolsId": "95e7d961-84e2-43fa-aae8-1ae8379f8baf"
     },
-    "sap.ui5": {
-        "flexEnabled": false,
-        "dependencies": {
-            "minUI5Version": "1.120.21",
-            "libs": {
-                "sap.m": {},
-                "sap.ui.core": {}
-            }
-        },
-        "contentDensities": {
-            "compact": true,
-            "cozy": true
-        },
-        "models": {
-            "i18n": {
-                "type": "sap.ui.model.resource.ResourceModel",
-                "settings": {
-                    "bundleName": "bsim.hcmapp.man.movement.i18n.i18n"
-                }
-            },
-            "": {
-                "dataSource": "mainService",
-                "preload": true,
-                "settings": {}
-            }
-        },
-        "resources": {
-            "css": [
-                {
-                    "uri": "css/style.css"
-                }
-            ]
-        },
-        "routing": {
-            "config": {
-                "routerClass": "sap.m.routing.Router",
-                "controlAggregation": "pages",
-                "controlId": "App",
-                "transition": "slide",
-                "type": "View",
-                "viewType": "XML",
-                "path": "bsim.hcmapp.man.movement.view",
-                "async": true,
-                "viewPath": "bsim.hcmapp.man.movement.view",
-                "bypassed": {
-                    "target": [
-                        "overview"
-                    ]
-                },
-                "clearControlAggregation": false
-            },
-            "routes": [
-                {
-                    "name": "overview",
-                    "pattern": "",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "overview"
-                    ]
-                },
-                {
-                    "name": "orgchart",
-                    "pattern": "orgchart",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "orgchart"
-                    ]
-                },
-                {
-                    "name": "approval",
-                    "pattern": "approval",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "approval"
-                    ]
-                },
-                {
-                    "name": "detailapproval",
-                    "pattern": "detailapproval",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "detailapproval"
-                    ]
-                },
-                {
-                    "name": "mutation",
-                    "pattern": "mutation/{EmployeeNumber}",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "mutation"
-                    ]
-                },
-                {
-                    "name": "history",
-                    "pattern": "history",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "history"
-                    ]
-                },
-                {
-                    "name": "employee",
-                    "pattern": "employee/{EmployeeNumber}",
-                    "titleTarget": "",
-                    "greedy": false,
-                    "target": [
-                        "employee"
-                    ]
-                }
-            ],
-            "targets": {
-                "overview": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "Overview",
-                    "viewId": "overviewPage",
-                    "viewLevel": 1
-                },
-                "orgchart": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "OrgChart",
-                    "viewId": "orgchart",
-                    "viewLevel": 1
-                },
-                "approval": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "Approval",
-                    "viewId": "approval",
-                    "viewLevel": 1
-                },
-                "detailapproval": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "DetailApproval",
-                    "viewId": "detailapproval",
-                    "viewLevel": 1
-                },
-                "mutation": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "Mutation",
-                    "viewId": "mutation",
-                    "viewLevel": 2
-                },
-                "history": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "History",
-                    "viewId": "history",
-                    "viewLevel": 1
-                },
-                "employee": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearAggregation": true,
-                    "viewName": "Employee",
-                    "viewId": "employee",
-                    "viewLevel": 2
-                }
-            }
-        },
-        "rootView": {
-            "viewName": "bsim.hcmapp.man.movement.view.App",
-            "type": "XML"
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "2.0"
         }
+      },
+      "ZHR_STAT_CHANGE_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_STAT_CHANGE_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZHR_ACTING_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_ACTING_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZHR_PROMOTION_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_PROMOTION_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZHR_DEMOTION_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_DEMOTION_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZHR_ASSIGNMENT_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_ASSIGNMENT_MAN_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
     }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.120.21",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.f": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "bsim.hcmapp.man.movement.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {}
+      },
+      "StatusChange": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_STAT_CHANGE_MAN_SRV",
+        "preload": true
+      },
+      "Acting": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_ACTING_MAN_SRV",
+        "preload": true
+      },
+      "Promotion": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_PROMOTION_MAN_SRV",
+        "preload": true
+      },
+      "Demotion": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_DEMOTION_MAN_SRV",
+        "preload": true
+      },
+      "Assignment": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_ASSIGNMENT_MAN_SRV",
+        "preload": true
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "App",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "bsim.hcmapp.man.movement.view",
+        "async": true,
+        "viewPath": "bsim.hcmapp.man.movement.view",
+        "bypassed": {
+          "target": [
+            "overview"
+          ]
+        },
+        "clearControlAggregation": false
+      },
+      "routes": [
+        {
+          "name": "overview",
+          "pattern": "",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "overview"
+          ]
+        },
+        {
+          "name": "orgchart",
+          "pattern": "orgchart",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "orgchart"
+          ]
+        },
+        {
+          "name": "approval",
+          "pattern": "approval",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "approval"
+          ]
+        },
+        {
+          "name": "detailapproval",
+          "pattern": "detailapproval/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapproval"
+          ]
+        },
+        {
+          "name": "mutation",
+          "pattern": "mutation/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "mutation"
+          ]
+        },
+        {
+          "name": "acting",
+          "pattern": "acting/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+              "acting"
+          ]
+        },
+        {
+          "name": "statuschange",
+          "pattern": "statuschange/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+              "statuschange"
+          ]
+        },
+        {
+          "name": "promotion",
+          "pattern": "promotion/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+              "promotion"
+          ]
+        },
+        {
+          "name": "demotion",
+          "pattern": "demotion/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+              "demotion"
+          ]
+        },
+        {
+          "name": "assignment",
+          "pattern": "assignment/{EmployeeNumber}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+              "assignment"
+          ]
+        },
+        {
+          "name": "history",
+          "pattern": "history",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "history"
+          ]
+        },
+        {
+          "name": "detailhistory",
+          "pattern": "detailhistory/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistory"
+          ]
+        }
+      ],
+      "targets": {
+        "overview": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Overview",
+          "viewId": "overviewPage",
+          "viewLevel": 1
+        },
+        "orgchart": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "OrgChart",
+          "viewId": "orgchart",
+          "viewLevel": 1
+        },
+        "approval": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Approval",
+          "viewId": "approval",
+          "viewLevel": 1
+        },
+        "detailapproval": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApproval",
+          "viewId": "detailapproval",
+          "viewLevel": 1
+        },
+        "mutation": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Mutation",
+          "viewId": "mutation",
+          "viewLevel": 2
+        },
+        "acting": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Acting",
+          "viewId": "acting",
+          "viewLevel": 2
+        },  
+        "statuschange": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "StatusChange",
+          "viewId": "statuschange",
+          "viewLevel": 2
+        },
+        "promotion": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Promotion",
+          "viewId": "promotion",
+          "viewLevel": 2
+        },
+        "demotion": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Demotion",
+          "viewId": "demotion",
+          "viewLevel": 2
+        },
+        "assignment": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "Assignment",
+          "viewId": "assignment",
+          "viewLevel": 2
+        },
+        "history": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "History",
+          "viewId": "history",
+          "viewLevel": 1
+        },
+        "detailhistory": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistory",
+          "viewId": "detailhistory",
+          "viewLevel": 1
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "bsim.hcmapp.man.movement.view.App",
+      "type": "XML"
+    }
+  }
 }
