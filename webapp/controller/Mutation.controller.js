@@ -136,8 +136,7 @@ sap.ui.define([
                      M.information("No request selected");
                      this.onNavBack();
                  }
-             }
- 
+            }
         },
 
         _getEmployeeData: function (EmployeeNumber) {

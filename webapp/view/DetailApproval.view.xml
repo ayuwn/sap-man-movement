@@ -723,7 +723,7 @@
                                 <Label text="{i18n>assessmentResult}" required="true" fieldGroupIds="grpValidation"/>
                                 <HBox>
                                     <Input id="assessmentResultApproval" value="No data, harap upload hasil assessment" width="18rem" class="sapUiMediumMarginEnd" editable="false"/>
-                                    <CheckBox id="verifyResultApproval" text="Verify" selected="{path: 'detailApprovalModel>/Zverify', formatter: '.formatter.formatCheckboxValue'}" editable="false"/>
+                                    <CheckBox id="verifyResultApproval" text="Verify" selected="{path: 'detailApprovalModel>/Zverify', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isAssessmentEnabled}"/>
                                 </HBox>
                             </f:content>
                         </f:SimpleForm>
@@ -742,11 +742,16 @@
                                 <Label text="{i18n>biResult}" required="true" fieldGroupIds="grpValidation"/>
                                 <HBox class="sapUiSmallMarginEnd">
                                     <Text text="Collection:" class="sapUiSmallMarginEnd" />
-                                    <CheckBox id="hasilApproval1" text="1" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '1'}], formatter: '.formatter.formatCheckboxBIValue'}" editable="false"/>
-                                    <CheckBox id="hasilApproval2" text="2" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '2'}], formatter: '.formatter.formatCheckboxBIValue'}" editable="false"/>
-                                    <CheckBox id="hasilApproval3" text="3" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '3'}], formatter: '.formatter.formatCheckboxBIValue'}" editable="false"/>
-                                    <CheckBox id="hasilApproval4" text="4" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '4'}], formatter: '.formatter.formatCheckboxBIValue'}" editable="false"/>
-                                    <CheckBox id="hasilApproval5" text="5" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '5'}], formatter: '.formatter.formatCheckboxBIValue'}" editable="false"/>
+                                    <CheckBox id="hasilApproval1" text="1" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '1'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval2" text="2" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '2'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval3" text="3" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '3'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval4" text="4" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '4'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval5" text="5" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '5'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
                                 </HBox>
                                 <Label text="{i18n>biNotes}" />
                                 <TextArea 
@@ -754,7 +759,7 @@
                                     value="{detailApprovalModel>/Znotebicheck}"
                                     width="57%"
                                     rows="4"
-                                    editable="false"/>
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
                                 <Label text="informasi" visible="false"/>
                                 <VBox class="sapUiSmallMarginTop" width="57%">
                                     <MessageStrip
@@ -785,7 +790,7 @@
                                     width="57%"
                                     rows="4"
                                     class="sapUiSmallMarginBottom"
-                                    editable="false"/>
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
                                 <Label text="{i18n>downloadDis}" />
                                 <HBox class="sapUiSmallMarginEnd">
                                     <Button
@@ -796,7 +801,7 @@
                                         class="sapUiTinyMarginEnd"/>
                                 </HBox>
                                 <Label text="{i18n>disResult}" required="true" fieldGroupIds="grpValidation"/>
-                                <RadioButtonGroup enabled="false" id="disposisiApproval" columns="2" width="100%" selectedIndex="{path: 'detailApprovalModel>/Zdisposisi', formatter: '.formatter.formatDisposisi'}">
+                                <RadioButtonGroup id="disposisiApproval" columns="2" width="100%" selectedIndex="{path: 'detailApprovalModel>/Zdisposisi', formatter: '.formatter.formatDisposisi'}" enabled="{verificationModel>/isDisposisiEnabled}">
                                     <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd" />
                                     <RadioButton text="Tidak Direkomendasikan" />
                                 </RadioButtonGroup>
@@ -806,7 +811,7 @@
                                     value="{detailApprovalModel>/Znotedisp}"
                                     width="57%"
                                     rows="4"
-                                    editable="false"/>
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
                                 <Label text="informasi" visible="false"/>
                                 <VBox class="sapUiSmallMarginTop" width="57%">
                                     <MessageStrip
@@ -825,7 +830,7 @@
                                         description="IDR"
                                         width="auto"
                                         maxLength="50"
-                                        editable="false"/>
+                                        enabled="{verificationModel>/isDisposisiEnabled}"/>
                                 </HBox>
                             </f:content>
                         </f:SimpleForm>
@@ -908,6 +913,14 @@
                                 </VBox> 
                             </f:content>
                         </f:SimpleForm>
+                        <HBox justifyContent="Center" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                            <Button
+                                text="Submit"
+                                press="onSubmitVerification"
+                                type="Emphasized"
+                                visible="{verificationModel>/isSubmitVisible}">
+                            </Button>
+                        </HBox>
                     </content>
                 </Panel>
             <HBox justifyContent="Center" class="sapUiSmallMarginTop sapUiSmallMarginBottom" visible="true">

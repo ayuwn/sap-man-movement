@@ -34,6 +34,18 @@ sap.ui.define([
                 ]
             });
             this.getView().setModel(oDropdownModel, "dropdown");
+
+            // Initialize verification model
+            var oVerificationModel = new sap.ui.model.json.JSONModel({
+                isAssessmentEnabled: false,
+                isBiCheckingEnabled: false,
+                isDisposisiEnabled: false,
+                isSubmitVisible: false
+            });
+            this.getView().setModel(oVerificationModel, "verificationModel");
+
+            // Get logged-in user's employee number and update the model
+            this._setVerificationAccess();
         },
 
         _onDetailApprovalRouteMatched: function (oEvent) {
@@ -656,368 +668,161 @@ sap.ui.define([
                 });
         },
 
-        // error -> create new entry
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action"); // "approve" or "reject"
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue(); // Notes from the dialog
-        //     var sRequestId = this._oDetailApprovalModel.getProperty("/RequestId"); // Request ID
-        
-        //     // Retrieve the logged-in user's ID
-        //     this._currentUser()
-        //         .then((oCurrentUser) => {
-        //             var sLoggedInUserId = oCurrentUser.EmployeeNumber;
-        
-        //             // Fetch data from /toApproval for the specific RequestId
-        //             var oModel = this.getView().getModel();
-        //             var sToApprovalPath = `/RequestSet(guid'${sRequestId}')/toApproval`;
-        
-        //             oModel.read(sToApprovalPath, {
-        //                 success: function (oData) {
-        //                     console.log("toApproval data retrieved successfully:", oData);
-        
-        //                     // Find the entry where ApproverId matches the logged-in user's ID
-        //                     var oMatchedApproval = oData.results.find(entry => entry.ApproverId === sLoggedInUserId);
-        
-        //                     if (!oMatchedApproval) {
-        //                         MessageBox.error("You are not authorized to approve this request.");
-        //                         return;
-        //                     }
-        
-        //                     // Prepare the payload for the update
-        //                     var oApprovalData = {
-        //                         SequenceNumber: oMatchedApproval.SequenceNumber,
-        //                         ObjectType: oMatchedApproval.ObjectType,
-        //                         ApproverId: oMatchedApproval.ApproverId,
-        //                         Abbreviation: oMatchedApproval.Abbreviation,
-        //                         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //                         StatusText: sAction === "approve" ? "Approved" : "Rejected",
-        //                         ApprovalUser: sLoggedInUserId, // Logged-in user's ID
-        //                         Notes: sNotes // Notes from the dialog
-        //                     };
-        
-        //                     console.log("Payload for update:", oApprovalData);
-        
-        //                     // Path to the specific RequestSet entity
-        //                     var sPath = `/RequestSet(guid'${sRequestId}')`;
-        
-        //                     // Use the update method to modify the existing entity
-        //                     oModel.update(sPath, oApprovalData, {
-        //                         method: "MERGE", // Use MERGE for partial updates
-        //                         success: function () {
-        //                             MessageBox.success("Approval status updated successfully");
-        //                             this._oApprovalDialog.close();
-        //                         }.bind(this),
-        //                         error: function (oError) {
-        //                             console.error("Error updating approval status:", oError);
-        //                             MessageBox.error("Failed to update approval status");
-        //                         }
-        //                     });
-        //                 }.bind(this),
-        //                 error: function (oError) {
-        //                     console.error("Error retrieving toApproval data:", oError);
-        //                     MessageBox.error("Failed to load approval data");
-        //                 }
-        //             });
-        //         })
-        //         .catch((error) => {
-        //             console.error("Error retrieving current user:", error);
-        //             MessageBox.error("Failed to retrieve logged-in user details.");
-        //         });
-        // },
+        onSendRequest: function () {
+            let oCurrentUserModel = this.getView().getModel("currentUser");
+            let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var sRequestId = this._oDetailApprovalModel.getProperty("/RequestId");
-        //     var sApproverId = "81000090"; // Replace with actual approver ID
-        
-        //     // Prepare the payload for the RequestSet entity
-        //     var oApprovalData = {
-        //         SequenceNumber: "001", // Fixed value
-        //         ObjectType: "P", // Fixed value
-        //         ApproverId: sApproverId,
-        //         Abbreviation: "GRP", // Fixed value
-        //         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected", 
-        //         ApprovalUser: sApproverId, // Use existing ApproverId
-        //         Notes: sNotes // Notes from the dialog
-        //     };
-            
-        //     console.log("Payload for update:", oApprovalData);
-        //     // Path to the specific RequestSet entity
-            // var sPath = `/RequestSet(guid'${sRequestId}')`;
-        
-            // // Use the update method to modify the existing entity
-            // var oModel = this.getView().getModel();
-            // oModel.update(sPath, oApprovalData, {
-            //     method: "MERGE", // Use MERGE for partial updates
-            //     success: function () {
-            //         MessageBox.success("Approval status updated successfully");
-            //         this._oApprovalDialog.close();
-            //     }.bind(this),
-            //     error: function (oError) {
-            //         console.error("Error updating approval status:", oError);
-            //         MessageBox.error("Failed to update approval status");
-            //     }
-        //     });
-        // },
+            if (!sLoggedInEmployeeId) {
+                MessageBox.error("Unable to retrieve logged-in user details.");
+                return;
+            }
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var sRequestId = this._oDetailApprovalModel.getProperty("/RequestId");
-        //     var sApproverId = "81000090"; // Replace with actual approver ID
-        
-        //     // Prepare the payload for the toApproval entity
-        //     var oApprovalData = {
-        //         RequestId: sRequestId,
-        //         SequenceNumber: "001",
-        //         ObjectType: "P",
-        //         ApproverId: sApproverId,
-        //         Abbreviation: "GRP",
-        //         Status: sAction === "approve" ? "A" : "R",
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected",
-        //         ApprovalDate: "1970-01-01T12:00:00",
-        //         ApprovalUser: sApproverId,
-        //         Notes: sNotes
-        //     };
-        
-        //     var oModel = this.getView().getModel();
-        //     var sPath = `/RequestSet(guid'${sRequestId}')`; // Path to the toApproval navigation property
-        
-        //     // Use the create method to insert the data into the toApproval entity
-        //     oModel.create(sPath, oApprovalData, {
-        //         success: function () {
-        //             MessageBox.success("Approval status saved successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error saving approval status:", oError);
-        //             MessageBox.error("Failed to save approval status");
-        //         }
-        //     });
-        // },
+            if (!this._validateEntries(this.getView(), "grpValidation")) {
+                return;
+            }
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var oModel = this.getView().getModel();
-        //     var oDetailApprovalData = this._oDetailApprovalModel.getData(); // Get the existing data from the model
-        //     var sRequestId = oDetailApprovalData.RequestId; // Use the existing RequestId
-        //     var sApproverId = oDetailApprovalData.ApproverId || "81000090"; // Use existing ApproverId or fallback
-            
+            MessageBox.confirm("Do you want to submit this request?", {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.YES,
+                onClose: (sAction) => {
+                    if (sAction === MessageBox.Action.YES) {
+                        this._postRequest(sLoggedInEmployeeId);
+                    }
+                }
+            });
+        },
+
+        // onSendRequest: function () {
+        //     // Get the logged-in user's employee number
+        //     let oCurrentUserModel = this.getView().getModel("currentUser");
+        //     let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
         
-        //     // Retrieve the SAP login user
-        //     var sApprovalUser = "";
-        //     if (sap.ushell && sap.ushell.Container) {
-        //         var oUserInfo = sap.ushell.Container.getService("UserInfo");
-        //         sApprovalUser = oUserInfo.getId(); // Get the SAP login user
+        //     if (!sLoggedInEmployeeId) {
+        //         MessageBox.error("Unable to retrieve logged-in user details.");
+        //         return;
         //     }
         
-           
-        //     // Prepare the payload for the RequestSet entity
-        //     var oRequestData = {
-        //         RequestId: sRequestId, // Use existing RequestId
-        //         SequenceNumber: "001", // Fixed value
-        //         ObjectType: "P", // Fixed value
-        //         ApproverId: sApproverId, // Use existing ApproverId
-        //         Abbreviation: "GRP", // Fixed value
-        //         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected", // Set based on action
-                
-        //         ApprovalUser: sApprovalUser, // SAP login user
-        //         Notes: sNotes // Notes from the dialog
-        //     };
+        //     // Validate required entries
+        //     if (!this._validateEntries(this.getView(), "grpValidation")) {
+        //         return;
+        //     }
         
-        //     // Path to the specific RequestSet entity
-        //     var sPath = `/RequestSet(guid'${sRequestId}')`;
-        
-        //     // Use the update method to modify the existing entity
-        //     oModel.update(sPath, oRequestData, {
-        //         method: "MERGE", // Use MERGE for partial updates
-        //         success: function () {
-        //             MessageBox.success("Request updated successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error updating request:", oError);
-        //             MessageBox.error("Failed to update request");
+        //     // Confirm with the user before submission
+        //     MessageBox.confirm("Do you want to submit this request?", {
+        //         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        //         emphasizedAction: MessageBox.Action.YES,
+        //         onClose: (sAction) => {
+        //             if (sAction === MessageBox.Action.YES) {
+        //                 this._postRequest(sLoggedInEmployeeId);
+        //             }
         //         }
         //     });
         // },
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var oModel = this.getView().getModel();
-        //     var oDetailApprovalData = this._oDetailApprovalModel.getData(); // Get the existing data from the model
-        //     var sRequestId = oDetailApprovalData.RequestId; // Use the existing RequestId
-        //     var sApproverId = oDetailApprovalData.ApproverId || "81000090"; // Use existing ApproverId or fallback
-        //     var sApproverName = oDetailApprovalData.ApproverName || "Hendro"; // Use existing ApproverName or fallback
+        _postRequest: function (sLoggedInEmployeeId) {
+            // Determine the role of the logged-in user
+            let oPayload = {
+                RequestId: "00000000-0000-0000-0000-000000000000",
+                EmployeeNumber: this.getView().getModel("employee").getProperty("/EmployeeNumber"),
+                Status: "S",
+                PicNumber: sLoggedInEmployeeId
+            };
         
-        //     // Format the current date and time in the correct format
-        //     var oDate = new Date();
-        //     var sApprovalDate = oDate.toISOString().split(".")[0]; // Remove milliseconds
+            if (sLoggedInEmployeeId === "81000081") {
+                // Verificator 1 (Talent Management)
+                oPayload.Zverify = this.byId("verifyResultMutation").getSelected() ? "1" : "";
+                oPayload.ZrekomHcm = this.byId("rekomendasiHCMMutation").getValue();
+            } else if (sLoggedInEmployeeId === "81000061") {
+                // Verificator 2 (Compensation Benefit)
+                const checkboxIds = ["hasilMutation1", "hasilMutation2", "hasilMutation3", "hasilMutation4", "hasilMutation5"];
+                oPayload.Zbichecking = checkboxIds
+                    .map(id => this.byId(id))
+                    .filter(checkbox => checkbox && checkbox.getSelected())
+                    .map(checkbox => checkbox.getText())
+                    .join(",");
+                oPayload.Znotebicheck = this.byId("hasilBiCheckingMutation").getValue();
+            }
         
-        //     // Prepare the payload for the toApproval entity
-        //     var oApprovalData = {
-        //         RequestId: sRequestId, // Use existing RequestId
-        //         SequenceNumber: oDetailApprovalData.SequenceNumber || "001", // Use existing SequenceNumber or fallback
-        //         ObjectType: oDetailApprovalData.ObjectType || "P", // Use existing ObjectType or fallback
-        //         ApproverId: sApproverId, // Use existing ApproverId
-        //         ApproverName: sApproverName, // Use existing ApproverName
-        //         Abbreviation: oDetailApprovalData.Abbreviation || "GRP", // Use existing Abbreviation or fallback
-        //         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected", // Set based on action
-        //         ApprovalDate: sApprovalDate, // Current date
-        //         ApprovalUser: sApproverId, // Use existing ApproverId
-        //         ApprovalTime: "PT00H00M00S", // Default time
-        //         Notes: sNotes // Notes from the dialog
-        //     };
+            // Common fields for both roles
+            oPayload.Zdisposisi = (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString();
+            oPayload.Znotedisp = this.byId("dispoNoteMutation").getValue();
+            oPayload.Zsalaryfnl = this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0";
         
-        //     var sPath = `/RequestSet(guid'${sRequestId}')`; // Path to the toApproval navigation property
+            console.log("Payload for submission:", oPayload);
         
-        //     // Use the create method to insert the data into the toApproval entity
-        //     oModel.create(sPath, oApprovalData, {
-        //         success: function () {
-        //             MessageBox.success("Approval status saved successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error saving approval status:", oError);
-        //             MessageBox.error("Failed to save approval status");
-        //         }
-        //     });
-        // },
+            // Submit the data
+            let oModel = this.getOwnerComponent().getModel();
+            oModel.create("/RequestSet", oPayload, {
+                success: (oData) => {
+                    MessageBox.success("Request submitted successfully.");
+                    this.onSubmitFiles(oData.RequestId);
+                },
+                error: (oError) => {
+                    console.error("Error submitting request:", oError);
+                    MessageBox.error("Failed to submit the request.");
+                }
+            });
+        },
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var oModel = this.getView().getModel();
-        //     var oDetailApprovalData = this._oDetailApprovalModel.getData(); // Get the existing data from the model
-        //     var sRequestId = oDetailApprovalData.RequestId; // Use the existing RequestId
-        //     var sSequenceNumber = oDetailApprovalData.SequenceNumber || "001"; // Use existing SequenceNumber or fallback
-        //     var sApproverId = oDetailApprovalData.ApproverId || "81000090"; // Use existing ApproverId or fallback
-        //     var sApproverName = oDetailApprovalData.ApproverName || "Hendro"; // Use existing ApproverName or fallback
+        onSubmitFiles: function (sRequestId) {
+            const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+            const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
         
-        //     // Format the current date and time in the correct format
-        //     var oDate = new Date();
-        //     var sApprovalDate = oDate.toISOString().split(".")[0]; // Remove milliseconds
+            if (!aFiles || aFiles.length === 0) {
+                MessageBox.warning("No files to upload.");
+                return;
+            }
         
-        //     // Prepare the payload for the ApprovalListSet entity
-        //     var oApprovalData = {
-        //         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected", // Set based on action
-        //         ApprovalDate: sApprovalDate, // Current date
-        //         ApprovalUser: sApproverId, // Use existing ApproverId
-        //         ApprovalTime: "PT00H00M00S", // Default time
-        //         Notes: sNotes // Notes from the dialog
-        //     };
+            const oModel = this.getOwnerComponent().getModel();
+            aFiles.forEach((oFile, index) => {
+                const oPayload = {
+                    Reqid: sRequestId,
+                    Seqnr: index.toString(),
+                    FileName: oFile.FileName,
+                    FileType: oFile.FileType,
+                    FileSize: oFile.FileSize,
+                    Attachment: oFile.Attachment
+                };
         
-        //     // Path to the specific ApprovalListSet entity
-        //     var sPath = `/ApprovalListSet(RequestId=guid'${sRequestId}',SequenceNumber='${sSequenceNumber}')`;
-        
-        //     // Use the update method to modify the existing entity
-        //     oModel.update(sPath, oApprovalData, {
-        //         method: "MERGE", // Use MERGE for partial updates
-        //         success: function () {
-        //             MessageBox.success("Approval status updated successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error updating approval status:", oError);
-        //             MessageBox.error("Failed to update approval status");
-        //         }
-        //     });
-        // },
+                oModel.create("/FileAttachmentSet", oPayload, {
+                    success: () => {
+                        console.log("File uploaded successfully:", oFile.FileName);
+                    },
+                    error: (oError) => {
+                        console.error("Error uploading file:", oError);
+                        MessageBox.error("Failed to upload file: " + oFile.FileName);
+                    }
+                });
+            });
+        },
 
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var oModel = this.getView().getModel();
-        //     var oDetailApprovalData = this._oDetailApprovalModel.getData(); // Get the existing data from the model
-        //     var sRequestId = oDetailApprovalData.RequestId; // Use the existing RequestId
-        //     var sSequenceNumber = oDetailApprovalData.SequenceNumber || "001"; // Use existing SequenceNumber or fallback
-        //     var sApproverId = oDetailApprovalData.ApproverId || "81000090"; // Use existing ApproverId or fallback
-        //     var sApproverName = oDetailApprovalData.ApproverName || "Hendro"; // Use existing ApproverName or fallback
+        _setVerificationAccess: function () {
+            var oUserInfoService = sap.ushell.Container.getService("UserInfo");
+            var sLoggedInEmployeeNumber = oUserInfoService.getUser().getId(); // Get logged-in user's employee number
         
-        //     // Format the current date and time in the correct format
-        //     var oDate = new Date();
-        //     var sApprovalDate = oDate.toISOString().split(".")[0]; // Remove milliseconds
+            var oVerificationModel = this.getView().getModel("verificationModel");
         
-        //     // Prepare the payload for the ApprovalListSet entity
-        //     var oApprovalData = {
-        //         RequestId: sRequestId, // Use existing RequestId
-        //         SequenceNumber: sSequenceNumber, // Use existing SequenceNumber
-        //         Status: sAction === "approve" ? "A" : "R", // Set based on action
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected", // Set based on action
-        //         ApprovalDate: sApprovalDate, // Current date
-        //         ApprovalUser: sApproverId, // Use existing ApproverId
-        //         ApprovalTime: "PT00H00M00S", // Default time
-        //         Notes: sNotes // Notes from the dialog
-        //     };
-        
-        //     // Use the create method to insert the data into the ApprovalListSet entity
-        //     oModel.create("/ApprovalListSet", oApprovalData, {
-        //         success: function () {
-        //             MessageBox.success("Approval status created successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error creating approval status:", oError);
-        //             MessageBox.error("Failed to create approval status");
-        //         }
-        //     });
-        // },
-
-        // onSubmitApproval: function () {
-        //     var sAction = this._oApprovalDialog.data("action");
-        //     var sNotes = sap.ui.getCore().byId("approvalNotes").getValue();
-        //     var sRequestId = this._oDetailApprovalModel.getProperty("/RequestId");
-        //     var sApproverId = "81000090"; // Replace with actual approver ID
-        //     var sApproverName = "Hendro"; // Replace with actual approver name
-
-        //     // Utility function to format date
-        //     const getFormattedDate = (controlId) => {
-        //         const control = this.byId(controlId);
-        //         if (control && typeof control.getDateValue === "function") {
-        //             const dateValue = control.getDateValue();
-        //             return dateValue ? this.formatter.formatDateUtc(dateValue) : null;
-        //         }
-        //         return null;
-        //     };
-
-        //     // Format the current date and time in the correct format
-        //     var oDate = new Date();
-        //     var sApprovalDate = oDate.toISOString().split(".")[0]; // Remove milliseconds
-
-        //     var oApprovalData = {
-        //         RequestId: sRequestId,
-        //         SequenceNumber: "001",
-        //         ObjectType: "P",
-        //         ApproverId: sApproverId,
-        //         ApproverName: sApproverName,
-        //         Abbreviation: "GRP",
-        //         Status: sAction === "approve" ? "A" : "R",
-        //         StatusText: sAction === "approve" ? "Approved" : "Rejected",
-        //         ApprovalDate: sApprovalDate,
-        //         ApprovalUser: sApproverId,
-        //         ApprovalTime: "PT00H00M00S",
-        //         Notes: sNotes
-        //     };
-
-        //     var oModel = this.getView().getModel();
-        //     oModel.create("/ApprovalListSet", oApprovalData, {
-        //         success: function () {
-        //             MessageBox.success("Approval status saved successfully");
-        //             this._oApprovalDialog.close();
-        //         }.bind(this),
-        //         error: function (oError) {
-        //             console.error("Error saving approval status:", oError);
-        //             MessageBox.error("Failed to save approval status");
-        //         }
-        //     });
-        // },
+            // Set access based on employee number
+            if (sLoggedInEmployeeNumber === "81000081") {
+                // Verificator 1 (Talent Management)
+                oVerificationModel.setProperty("/isAssessmentEnabled", true);
+                oVerificationModel.setProperty("/isBiCheckingEnabled", false);
+                oVerificationModel.setProperty("/isDisposisiEnabled", false);
+                oVerificationModel.setProperty("/isSubmitVisible", true);
+            } else if (sLoggedInEmployeeNumber === "81000061") {
+                // Verificator 2 (Compensation Benefit)
+                oVerificationModel.setProperty("/isAssessmentEnabled", false);
+                oVerificationModel.setProperty("/isBiCheckingEnabled", true);
+                oVerificationModel.setProperty("/isDisposisiEnabled", false);
+                oVerificationModel.setProperty("/isSubmitVisible", true);
+            } else {
+                // Approval roles (Approval 1, 2, 3)
+                oVerificationModel.setProperty("/isAssessmentEnabled", false);
+                oVerificationModel.setProperty("/isBiCheckingEnabled", false);
+                oVerificationModel.setProperty("/isDisposisiEnabled", false);
+                oVerificationModel.setProperty("/isSubmitVisible", false);
+            }
+        },
 
         onCancelApproval: function () {
             this._oApprovalDialog.close();
