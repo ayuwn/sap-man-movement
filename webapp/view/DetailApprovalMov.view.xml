@@ -1,0 +1,977 @@
+<mvc:View
+    controllerName="bsim.hcmapp.man.movement.controller.DetailApprovalMov"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:semantic="sap.m.semantic"
+    xmlns:upload="sap.m.upload">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>appApproval}">
+        <semantic:content>
+
+            <!-- Profile -->
+            <VBox class="sapUiMediumMargin" alignItems="Center" justifyContent="Center">
+                <HBox backgroundDesign="Solid" width="30%" id="profile" class="roundedProfile">
+                    <HBox class="sapUiSmallMarginBegin sapUiTinyMarginEndBottomTop" alignItems="Center" justifyContent="Center">
+                        <Avatar displaySize="Custom"
+                                initials="{path: 'detailApprovalMovModel>/EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="3rem"
+                                tooltip="{detailApprovalMovModel>/EmployeeName/FormattedName}" class="sapMTableContentMargin sapUiSmallMarginTop"/>
+                        <VBox class="sapUiSmallMarginBegin">
+                            <ObjectIdentifier title="{detailApprovalMovModel>/EmployeeName/FormattedName} ({detailApprovalMovModel>/EmployeeNumber})" class="sapUiTinyMarginBottom"/>
+                            <Text text="{detailApprovalMovModel>/PositionName}" />
+                        </VBox>
+                    </HBox>
+                </HBox>
+            </VBox> 
+                <!-- Employee Data Panel -->
+                <Panel
+                    expandable="true"
+                    expanded="false"
+                    headerText="Employee Data"
+                    width="auto">
+                    <content>
+                        <f:SimpleForm
+                            id="employeeApprovalMovForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Label text="{i18n>entryDate}" />
+                                <HBox>
+                                    <Input id="entryDateApprovalMov" value="{path: 'detailApprovalMovModel>/HiringDate', formatter: '.formatter.formatDateDisplay'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA1}" />
+                                <HBox>
+                                    <Input id="ratingPA1ApprovalMov" value="{detailApprovalMovModel>/Rat01}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA2}" />
+                                <HBox>
+                                    <Input id="ratingPA2ApprovalMov" value="{detailApprovalMovModel>/Rat02}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA3}" />
+                                <HBox>
+                                    <Input id="ratingPA3ApprovalMov" value="{detailApprovalMovModel>/Rat03}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>marketingAvg}" />
+                                <HBox>
+                                    <Input id="marketingAvgApprovalMov" value="{path: 'detailApprovalMovModel>/Avg', formatter: '.formatter.removeLeadingZeros'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>pendterakhir}" />
+                                <HBox>
+                                    <Input id="pendidikanApprovalMov" value="{detailApprovalMovModel>/PendidikanTrkhr}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>jenispekerjaan}" />
+                                <HBox>
+                                    <Input id="pekerjaanApprovalMov" value="{detailApprovalMovModel>/JnsPkrjaan}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- Sanksi Aktif Panel -->
+                <Panel
+                    expandable="true"
+                    expanded="false"
+                    headerText="Sanksi Aktif"
+                    width="auto">
+                    <content>
+                        <f:SimpleForm
+                            id="sanksiApprovalMovForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Label text="{i18n>sanctionType}" />
+                                <l:Grid vSpacing="0" containerQuery="true">
+                                    <Input id="sanctionTypeApprovalMov" value="{detailApprovalMovModel>/SanksiAktif}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <VBox>
+                                        <Text id="sanctionDescriptionApprovalMov" text="{detailApprovalMovModel>/SanksiAktifDesc}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                            <layoutData>
+                                                <l:GridData span="L11 M11 S12" />
+                                            </layoutData>
+                                        </Text>
+                                        <Button
+                                        icon="sap-icon://document-text" 
+                                        id="DocumentApprovalMov"
+                                        text="Show Document"
+                                        type="Emphasized"
+                                        tooltip="View Document"
+                                        press=".onDisplayDocumentWarning"
+                                        class="sapUiTinyMarginBegin"
+                                        visible="{FilteredAttachments>/hasRequest}" />
+                                        <!-- <Button
+                                            icon="sap-icon://document-text"
+                                            text="Show Document"
+                                            type="Emphasized"
+                                            tooltip="View Document"
+                                            press="onDisplayDocumentWarning"
+                                            class="sapUiTinyMarginBegin" /> -->
+                                    </VBox>
+                                </l:Grid>
+                                <Label text="Jenis Pelanggaran" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel1ApprovalMov" value="{detailApprovalMovModel>/JenPel1}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel1ApprovalMov" text="{path: 'detailApprovalMovModel>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel2ApprovalMov" value="{detailApprovalMovModel>/JenPel2}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel2ApprovalMov" text="{path: 'detailApprovalMovModel>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel3ApprovalMov" value="{detailApprovalMovModel>/JenPel3}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel3ApprovalMov" text="{path: 'detailApprovalMovModel>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel4ApprovalMov" value="{detailApprovalMovModel>/JenPel4}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel4ApprovalMov" text="{path: 'detailApprovalMovModel>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="{i18n>actDate}" required="false" />
+                                <HBox class="sapUiTinyMarginBeginEnd">
+                                    <DatePicker id="actDateStartApprovalMov" value="{detailApprovalMovModel>/StartDate}" width="92%" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                    <Text text="-" class="sapUiTinyMarginEnd" />
+                                    <DatePicker id="actDateEndApprovalMov" value="{detailApprovalMovModel>/EndDate}" width="92%" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <!-- <Label text="information" visible="false" />
+                                <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="Yang bersangkutan sedang dalam proses pengajuan [ST/TP] yang diajukan padaa tanggal dd.mm.yyyy"
+                                        type="Warning"
+                                        showIcon="true"
+                                        showCloseButton="false"
+                                        class="sapUiMediumMarginBottom">
+                                    </MessageStrip>
+                                </VBox> -->
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- sanksi berjalan panel -->
+                <Panel
+                expandable="true"
+                expanded="false"
+                headerText="Sanksi Berjalan"
+                width="auto">
+                <content>
+                    <f:SimpleForm 
+                        id="sanksiBerjalanAppMovForm"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="4"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12">
+                        <f:content>
+                        <Label text="{i18n>sanctionProgress}"/>
+                                    <l:Grid vSpacing="0" containerQuery="true">
+                                    <Input id="sanctionProgressAppMov" value="{detailApprovalMovModel>/SanksiAktif}" width="auto" editable="false" >
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text 
+                                        id="sanctionProgressDescAppMov1" 
+                                        text="{detailApprovalMovModel>/SanksiAktifDesc}" 
+                                        wrapping="true" 
+                                        width="100%" 
+                                        class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="Jenis Pelanggaran" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress1AppMov" value="{detailApprovalMovModel>/JenPel1}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress1AppMov" text="{path: 'detailApprovalMovModel>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress2AppMov" value="{detailApprovalMovModel>/JenPel2}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress2AppMov" text="{path: 'detailApprovalMovModel>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress3AppMov" value="{detailApprovalMovModel>/JenPel3}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress3AppMov" text="{path: 'detailApprovalMovModel>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress4AppMov" value="{detailApprovalMovModel>/JenPel4}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress4AppMov" text="{path: 'detailApprovalMovModel>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>    
+                        </f:content>
+                    </f:SimpleForm>
+                </content>
+                </Panel>
+                <!-- Action Request Panel -->
+                <Panel 
+                    expandable="true" 
+                    expanded="false"
+                    headerText="Action Request" 
+                    width="auto">
+                    <content>
+                        <f:SimpleForm 
+                            id="actionApprovalMovForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="3"
+                            labelSpanL="3"
+                            labelSpanM="3"
+                            labelSpanS="12"
+                            emptySpanXL="1"
+                            emptySpanL="1"
+                            emptySpanM="1"
+                            emptySpanS="1">
+                            <f:content>
+                                <Label text="{i18n>actionType}" />
+                                    <Input id="actionTypeApprovalMov" value="{detailApprovalMovModel>/ActionType}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/ActionTypeDesc}">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>reason}" required="true"/>
+                                    <Input 
+                                        id="reasonApprovalMov" 
+                                        value="{detailApprovalMovModel>/Massg}" 
+                                        editable="false" 
+                                        required="true">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/MassgDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>effectiveDate}" required="true" />
+                                <HBox class="sapUiSmallMarginBottom">
+                                    <DatePicker id="effectiveDateStartApprovalMov" value="{path: 'detailApprovalMovModel>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" required="true" width="95%" editable="false"/>
+                                    <Text text="-" class="sapUiSmallMarginBegin sapUiTinyMarginEnd"/>
+                                    <DatePicker id="effectiveDateEndApprovalMov" value="{path: 'detailApprovalMovModel>/ZenddaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" width="95%" class="sapUiSmallMarginBegin" editable="false"/>
+                                </HBox>
+                                    
+                                <Label text="{i18n>mutation}" visible="false"/>
+                                    <Text text="Asal"/>
+                                    <Text text="Tujuan"/>
+                                <Label text="{i18n>positionId}" required="true" />
+                                    <Input id="currentPositionIdApprovalMov" value="{detailApprovalMovModel>/EmployeePositionId}" editable="false">
+                                    <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                    </layoutData>
+                                    </Input> 
+                                    <Text text="{detailApprovalMovModel>/PositionName}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>                       
+                                    <Input 
+                                        id="newPositionIdApprovalMov" 
+                                        value="{detailApprovalMovModel>/PlansDest}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/PlansDesc_Dest}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>employeeGroupId}" required="true" />
+                                    <Input id="currentEmployeeGroupIdApprovalMov" value="{detailApprovalMovModel>/StatusAsal}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/EmployeeGrpDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newEmployeeGroupIdApprovalMov" 
+                                        value="{detailApprovalMovModel>/PersgDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/PersgDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>employeeSubgroupId}" required="true" />
+                                    <Input id="currentEmployeeSubgroupIdMutationMov" value="{detailApprovalMovModel>/JbtnAsl}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/EmployeeSubgrpDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newEmployeeSubgroupIdApprovalMov" 
+                                        value="{detailApprovalMovModel>/PerskDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/PerskDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>perAreaId}" required="true"/>
+                                    <Input id="currentPerAreaIdMutationMov" value="{detailApprovalMovModel>/PersonnelAreaId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/PersonnelAreaText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newPerAreaIdApprovalMov" 
+                                        value="{detailApprovalMovModel>/WerksDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/WerksDestDesc}" wrapping="true" width="100%"> 
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>perSubAreaId}" required="true"/>
+                                    <Input id="currentPerSubAreaIdApprovalMov" value="{detailApprovalMovModel>/PersonnelSubareaId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/PersonnelSubareaText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newPerSubAreaIdApprovalMov" 
+                                        value="{detailApprovalMovModel>/BtrtlDest}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/BtrtlDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>unitOrgId}"/>
+                                    <Input id="currentUnitOrgIdApprovalMov" value="{detailApprovalMovModel>/OuAsl}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/OuDecAsl}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newUnitOrgIdApprovalMov" value="{detailApprovalMovModel>/OuDest}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/OuDescDest}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>divisionId}"/>
+                                    <Input id="currentDivisionIdApprovalMov" value="{detailApprovalMovModel>/DivisiAsl}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/DivisiDescAsl}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newDivisionIdApprovalMov" value="{detailApprovalMovModel>/DivisiDest}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/DivisiDescDest}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>careerBand}"/>
+                                    <Input id="careerAsalMutationA" value="{detailApprovalMovModel>/CareerBandAsl}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="careerAsalTextMutationA" text="{detailApprovalMovModel>/CareerBandDescAsl}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="careerTujuanMutationA" value="{detailApprovalMovModel>/CareerBandDest}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="careerTujuanTextMutationA" text="{detailApprovalMovModel>/CareerBandDescDest}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>tanggalBerakhirStatus}"/>
+                                    <DatePicker id="tanggalBerakhirMovA" value="{path: 'detailApprovalMovModel>/TanggalJabatanDest', formatter: '.formatter.formatDateDisplay'}" width="12rem" editable="false" >
+                                        <layoutData>
+                                            <l:GridData span="L4 M4 S12" />
+                                        </layoutData>
+                                    </DatePicker>
+                                <Label text="{i18n>salaryAdj}" required="true"/>
+                                    <Input id="salaryAdjApprovalMov"
+                                    value="{parts: [
+                                                { path: 'detailApprovalMovModel>/Adjstmn' }, 
+                                                { path: 'dropdown>/salaryAdjColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}"  
+                                            editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>salaryAdjValue}"/>
+                                    <Input 
+                                        id="salaryAdjValueApprovalMov" 
+                                        value="{path: 'detailApprovalMovModel>/Zsalary', formatter: '.formatter.formatSalary'}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="IDR">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>as}" required="true"/>
+                                    <Input id="asApprovalMov" 
+                                    value="{parts: [
+                                                { path: 'detailApprovalMovModel>/Zdasar1' }, 
+                                                { path: 'dropdown>/asColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}" 
+                                            editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>employeeChange}"/>
+                                    <Input 
+                                        id="employeeChangeApprovalMov" 
+                                        value="{detailApprovalMovModel>/Zexholder}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalMovModel>/ZexholderDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    
+                                <Label text="{i18n>basicCon}"/>
+                                    <TextArea 
+                                        id="basicConApprovalMov"
+                                        value="{detailApprovalMovModel>/Zdasar2}" 
+                                        rows="4"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L6 M6 S12" />
+                                        </layoutData>
+                                    </TextArea>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- Verification Panel -->
+                <Panel 
+                    expandable="true" 
+                    expanded="false"
+                    headerText="Verification" 
+                    width="auto" >
+                    <content>
+                        <f:SimpleForm 
+                            editable="true"
+                            id="assessmentApprovalMovForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="AssessmentApprovalMov">
+                                    <Text text="{i18n>assessment}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>assessmentResult}" required="true" fieldGroupIds="grpValidation"/>
+                                <HBox>
+                                    <Input 
+                                        id="assessmentResultApprovalMov" 
+                                        value="{detailApprovalMovModel>/HasilAssesment2}" 
+                                        width="22rem" 
+                                        class="sapUiMediumMarginEnd" 
+                                        editable="false"/>
+                                    <CheckBox 
+                                        id="verifyResultApprovalMov" 
+                                        text="Verify" 
+                                        selected="{path: 'detailApprovalMovModel>/Zverify', formatter: '.formatter.formatCheckboxValue'}" 
+                                        enabled="{verificationModel>/isAssessmentEnabled}"
+                                        fieldGroupIds="grpValidation"/>
+                                    <!-- <CheckBox id="verifyResultMutation" text="Verify" selected="{path: 'employeeDetail>/VerifyResult', formatter: '.formatter.formatCheckboxValue'}"/> -->
+                                </HBox>
+                                <Label text="Tanggal Assessment" fieldGroupIds="grpValidation"/>
+                                <HBox>
+                                    <Input id="dateAssessResultApprovalMov" value="{path: 'detailApprovalMovModel>/HasilAssesment', formatter: '.formatter.formatDateDisplay'}" width="22rem" class="sapUiMediumMarginEnd" editable="false"/>
+                                </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="biCheckingApprovalMovForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="BICheckingApprovalMov">
+                                    <Text text="{i18n>biChecking}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>biResult}" required="true" fieldGroupIds="grpValidation"/>
+                                <HBox class="sapUiSmallMarginEnd">
+                                    <Text text="Collection:" class="sapUiSmallMarginEnd" />
+                                    <RadioButtonGroup
+                                        id="hasilApprovalMovRadioGroup"
+                                        columns="5"
+                                        selectedIndex="{= ${detailApprovalMovModel>/Zbichecking} - 1 }"
+                                        enabled="{verificationModel>/isBiCheckingEnabled}"
+                                        select=".onZbicheckingSelect">
+                                        <buttons>
+                                            <RadioButton text="1" />
+                                            <RadioButton text="2" />
+                                            <RadioButton text="3" />
+                                            <RadioButton text="4" />
+                                            <RadioButton text="5" />
+                                        </buttons>
+                                    </RadioButtonGroup>
+                                </HBox>
+                                <Label text="{i18n>biNotes}" />
+                                <TextArea 
+                                    id="hasilBiCheckingApprovalMov"
+                                    value="{detailApprovalMovModel>/Znotebicheck}"
+                                    width="57%"
+                                    rows="4"
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="{i18n>warningBiChecking}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="dispoApprovalFormMov"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="disposisiToolbarApprovalMov">
+                                    <Text text="{i18n>disposisi}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>revise}" fieldGroupIds="grpValidation"/>
+                                <HBox>
+                                    <CheckBox 
+                                        id="revisiVTApprovalMov" 
+                                        text="Talent dan Management" 
+                                        selected="{path: 'detailApprovalMovModel>/RevisiTalent', formatter: '.formatter.formatCheckboxValue'}" 
+                                        select=".onReviseVTChange"
+                                        enabled="{verificationModel>/isDisposisiVTEnabled}"
+                                        fieldGroupIds="grpValidation"/>
+                                    <CheckBox 
+                                        id="reviseVCApprovalMov" 
+                                        text="Compensation dan Benefit" 
+                                        selected="{path: 'detailApprovalMovModel>/RevisiCombine', formatter: '.formatter.formatCheckboxValue'}" 
+                                        select=".onReviseVCChange"
+                                        enabled="{verificationModel>/isDisposisiVCEnabled}"
+                                        fieldGroupIds="grpValidation"/>
+                                </HBox>
+                                <Label text="{i18n>rekomendasiHCM}" />
+                                <TextArea 
+                                    id="rekomendasiHCMApprovalMov"
+                                    value="{detailApprovalMovModel>/ZrekomHcm}"
+                                    width="57%"
+                                    rows="4"
+                                    class="sapUiSmallMarginBottom"
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
+                                <Label text="{i18n>downloadDis}" />
+                                <HBox class="sapUiSmallMarginEnd">
+                                    <Button
+                                        id="downloadDisposisiMov"
+                                        icon="sap-icon://download"
+                                        text="Download"
+                                        type="Emphasized"
+                                        press="onDownloadDisposisi"
+                                        enabled="{verificationModel>/isDownloadEnabled}"
+                                        class="sapUiTinyMarginEnd"/>
+                                </HBox>
+                                <Label text="{i18n>disResult}" fieldGroupIds="grpValidation"/>
+                                <RadioButtonGroup 
+                                id="disposisiApprovalMov1" 
+                                columns="2" 
+                                width="100%" 
+                                selectedIndex="{= ${detailApprovalMovModel>/Zdisposisi} - 1 }" 
+                                enabled="{verificationModel>/isDisposisiEnabled}"
+                                select=".onDisposisiSelect">
+                                    <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd"/>
+                                    <RadioButton text="Tidak Direkomendasikan" />
+                                </RadioButtonGroup>
+                                <Label text="{i18n>dispoNote}" />
+                                <TextArea 
+                                    id="dispoNoteApprovalMov"
+                                    value="{detailApprovalMovModel>/Znotedisp}"
+                                    width="57%"
+                                    rows="4"
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="{i18n>warningDisposisi}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                                <Label text="{i18n>salaryAdj}" />
+                                <HBox>
+                                <!-- Input for editing: shows currency format -->
+                                <Input 
+                                    id="gajiApprovalMov"
+                                    value="{
+                                        path: 'detailApprovalMovModel>/Zsalaryfnl',
+                                        type: 'sap.ui.model.type.Currency',
+                                        formatOptions: {
+                                            showMeasure: false,
+                                            currencyCode: 'IDR',
+                                            useSymbol: false,
+                                            minFractionDigits: 0,
+                                            maxFractionDigits: 0
+                                        },
+                                        targetType: 'any'
+                                    }"
+                                    placeholder="0"
+                                    enabled="{verificationModel>/isSalaryFinalEditable}"
+                                    visible="{= ${verificationModel>/isSalaryFinalEditable} === true }"
+                                />
+
+                                <!-- Input for display: shows formatted text -->
+                                <Input 
+                                    id="gajiApprovalMovDisplay"
+                                    value="{path: 'detailApprovalMovModel>/Zsalaryfnl', formatter: '.formatter.formatSalary'}"
+                                    editable="false"
+                                    visible="{= ${verificationModel>/isSalaryFinalEditable} === false }"
+                                />
+                            </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="upDocApprovalMovForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="2"
+                            labelSpanL="2"
+                            labelSpanM="2"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="upDocApprovalMov">
+                                    <Text text="Dokumen" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <VBox class="sapUiNoMargin">
+                                <Table
+                                    id="table-uploadSet"
+                                    width="100%"
+                                    mode="None"
+                                    fixedLayout="false"
+                                    inset="false"
+                                    autoPopinMode="true"
+                                    items="{path: 'fileAttachmentView>/results', templateShareable: false}">
+                                    <columns>
+                                        <Column id="namaDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Nama Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="jenisDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Jenis Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="pic" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="PIC" />
+                                            </header>
+                                        </Column>
+                                        <Column id="action" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Action" />
+                                            </header>
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem vAlign="Middle">
+                                            <cells>
+                                                <HBox class="sapUiNoMargin">
+                                                    <core:Icon
+                                                        src="{path: 'fileAttachmentView>FileType', formatter: '.formatter.getFileTypeIcon'}"
+                                                        color="red"
+                                                        class="sapUiTinyMarginEnd"
+                                                    />
+                                                    <Link
+                                                        text="{fileAttachmentView>FileName}"
+                                                        wrapping="true"
+                                                        href="{fileAttachmentView>Url}"
+                                                        target="_blank"
+                                                        class="sapUiTinyMarginBottom"
+                                                    />
+                                                </HBox>
+                                                <Text text="{fileAttachmentView>TypeDoc}" />
+                                                <VBox>
+                                                    <ObjectIdentifier title="{fileAttachmentView>PicName} ({fileAttachmentView>PicId})" />
+                                                    <Text text="{fileAttachmentView>PicPosition}" />
+                                                </VBox>
+                                                <Button
+                                                    icon="sap-icon://document-text" 
+                                                    text="Show Document"
+                                                    type="Emphasized"
+                                                    tooltip="View Document"
+                                                    press="onShowDocument"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                                </VBox> 
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <Panel id="attCTPanel" expandable="true" expanded="false" headerText="{i18n>upDoc}" width="auto" visible="{verificationModel>/isUploadVisible}">
+                    <f:SimpleForm id="attDataForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="1" emptySpanL="-1" columnsL="1" labelSpanM="1" emptySpanM="-1" adjustLabelSpan="false" singleContainerFullSize="false">
+                        <f:content>
+                        <Label />
+                            <upload:UploadSet
+                                id="idUploadSet"
+                                instantUpload="false"
+                                terminationEnabled="false"
+                                maxFileSize="10"
+                                uploadUrl="/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/FileAttachmentSet"
+                                visible="{verificationModel>/isUploadVisible}"
+                                fileSizeExceeded=".onFileSizeExceed"
+                                afterItemAdded=".onAfterItemAdded"
+                                afterItemRemoved=".onAfterItemRemoved"
+                            >
+                                <upload:items>
+                                    <upload:UploadSetItem fileName="{fileAttachment>FileName}" mediaType="{fileAttachment>FileType}" url="{fileAttachment>Url}">
+                                        <upload:customData>
+                                            <core:CustomData key="RequestId" value="{fileAttachment>Reqid}" />
+                                            <core:CustomData key="Seqnr" value="{fileAttachment>Seqnr}" />
+                                        </upload:customData>
+                                    </upload:UploadSetItem>
+                                </upload:items>
+                            </upload:UploadSet>
+                            <MessageStrip
+                                text="Maksimal upload dokumen adalah 5 MB dan hanya format PDF yang diperbolehkan."
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBottom">
+                                <layoutData>
+                                    <l:GridData span="L12 M12 S12" />
+                                </layoutData>
+                            </MessageStrip>
+                            <Label />
+                            <!-- <ObjectStatus id="objAttLimit" class="sapUiSmallMarginBottom" text="{i18n>attFileSizeLimitMsg}" icon="sap-icon://message-information" state="Information" /> -->
+                        </f:content>
+                    </f:SimpleForm>
+                </Panel> 
+            <HBox justifyContent="Center" class="sapUiSmallMarginTop sapUiSmallMarginBottom" visible="true">
+                <Button
+                    text="Approve"
+                    press="onApprovePress"
+                    enabled="{buttonState>/isApproveEnabled}"
+                    type="Accept"
+                    class="sapUiSmallMarginEnd"
+                    width="7rem"
+                    ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+                </Button>
+                <Button
+                    text="Reject"
+                    press="onRejectPress"
+                    enabled="{buttonState>/isRejectEnabled}"
+                    type="Reject"
+                    class="sapUiSmallMarginEnd sapUiSmallMarginBegin"
+                    width="7rem"
+                    ariaDescribedBy="acceptButtonDescription genericButtonDescription">
+                </Button>
+                <Button
+                    text="Revise"
+                    press="onRevisePress"
+                    enabled="{buttonState>/isReviseEnabled}"
+                    visible="{buttonState>/isReviseVisible}"
+                    type="Attention"
+                    class="sapUiSmallMarginEnd sapUiSmallMarginBegin"
+                    width="7rem"
+                    ariaDescribedBy="acceptButtonDescription genericButtonDescription">
+                </Button>
+            </HBox>
+            <Panel id="apprPanel" expandable="true" expanded="true" headerText="History" width="auto">
+                <Table id="idApprMovTable" items="{appr>/results}" inset="false" alternateRowColors="true">
+                    <columns>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="PIC" class="sapUiSmallMarginBegin"/>
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Status" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Date" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Time" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Comment" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <ObjectIdentifier title="{appr>ApproverId}" text="{appr>ApproverName}" class="sapUiSmallMarginBegin"/>
+                                <ObjectStatus text="{path: 'appr>Status', formatter: '.formatter.statusText'}" state="{path: 'appr>Status', formatter: '.formatter.statusState'}" />
+                                <Text text="{path:'appr>ApprovalDate',type:'sap.ui.model.odata.type.Date',formatOptions:{pattern:'yyyy-MM-dd'}}" />
+                                <Text text="{path:'appr>ApprovalTime', formatter:'.formatApprovalTime'}" />
+                                <Text text="{path:'appr>Notes',type:'sap.ui.model.odata.type.Date',formatOptions:{style:'medium'}}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </Panel>
+        </semantic:content>
+    </semantic:FullscreenPage>
+</mvc:View>
+
+                

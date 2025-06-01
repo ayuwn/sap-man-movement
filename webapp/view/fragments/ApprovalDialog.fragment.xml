@@ -1,8 +1,7 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog id="approvalDialog" title="Approval Notes" stretch="false">
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+    <Dialog id="approvalDialog" title="Confirm" stretch="false" titleAlignment="Center">
         <VBox>
-            <Text text="Please enter your notes:"/>
-            <TextArea id="approvalNotes" rows="4" width="100%"/>
+            <TextArea id="approvalNotes" rows="5" width="90%" height="auto" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
         </VBox>
         <buttons>
             <Button text="Submit" press="onSubmitApproval"/>

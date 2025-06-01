@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Performance Found"
+        title="Select Performance"
+        search="handleSearchPerformance"
+        confirm="handleClosePerformance"
+        cancel="handleClosePerformance"
+        items="{performance>/}">
+        <StandardListItem
+            title="{performance>Key}"
+            description="{performance>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Homebase Found"
+        title="Select Homebase"
+        search="handleSearchHomebase"
+        confirm="handleCloseHomebase"
+        cancel="handleCloseHomebase"
+        items="{homebase>/}">
+        <StandardListItem
+            title="{homebase>Key}"
+            description="{homebase>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

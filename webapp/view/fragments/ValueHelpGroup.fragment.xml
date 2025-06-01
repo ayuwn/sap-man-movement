@@ -8,10 +8,10 @@
         search="handleSearchGroup"
         confirm="handleCloseGroup"
         cancel="handleCloseGroup"
-        items="{group>/}">
+        items="{group>/items}">
         <StandardListItem
             title="{group>Key}"
-            description="{group>Value}"
+            info="{group>Value}"
             type="Active" />
     </SelectDialog>
 </core:FragmentDefinition>

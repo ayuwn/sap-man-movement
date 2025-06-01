@@ -24,7 +24,7 @@
                             tooltip="{employeeDetail>/EmployeeName/FormattedName}" class="sapMTableContentMargin sapUiSmallMarginTop"/>
                     <VBox class="sapUiSmallMarginBegin">
                         <ObjectIdentifier title="{employeeDetail>/EmployeeName/FormattedName} ({employee>/EmployeeNumber})" class="sapUiTinyMarginBottom"/>
-                        <Text text="{employeeDetail>/EmployeePositionText}" />
+                        <Text text="{employeeDetail>/PositionName}" />
                     </VBox>
                 </HBox>
             </HBox>
@@ -64,7 +64,15 @@
                             </HBox>
                         <Label text="{i18n>marketingAvg}"/>
                             <HBox>
-                                <Input id="marketingAvgMutation" value="{path: 'employeeDetail>/Avg', formatter: '.formatter.formatAvg'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                                <Input id="marketingAvgMutation" value="{path: 'employeeDetail>/Avg', formatter: '.formatter.removeLeadingZeros'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>pendterakhir}"/>
+                            <HBox>
+                                <Input id="pendidikanMutation" value="{employeeDetail>/PendidikanTrkhr}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            </HBox>
+                        <Label text="{i18n>jenispekerjaan}"/>
+                            <HBox>
+                                <Input id="pekerjaanMutation" value="{employeeDetail>/JnsPkrjaan}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
                             </HBox>
                     </f:content>
                 </f:SimpleForm>
@@ -94,17 +102,32 @@
                                 </layoutData>
                             </Input>
                             <VBox>
-                            <Text id="sanctionDescriptionMutation" text="Surat Teguran" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <Text 
+                                id="sanctionDescriptionMutation1" 
+                                text="{employeeDetail>/SanksiAktifDesc}" 
+                                wrapping="true" 
+                                width="100%" 
+                                class="sapUiTinyMarginBegin">
                                 <layoutData>
-                                <l:GridData span="L11 M11 S12" />
+                                    <l:GridData span="L11 M11 S12" />
                                 </layoutData>
                             </Text>
-                                <Button
+                            <Button
+                            icon="sap-icon://document-text" 
+                            id="DocumentMutation"
+                            text="Show Document"
+                            type="Emphasized"
+                            tooltip="View Document"
+                            press=".onDisplayDocumentWarning"
+                            class="sapUiTinyMarginBegin"
+                            visible="{FilteredAttachments>/hasRequest}" />
+                                <!-- <Button
                                     icon="sap-icon://document-text" 
+                                    id="DocumentMutation"
                                     text="Show Document"
                                     type="Emphasized"
                                     tooltip="View Document"
-                                    press="onDisplayDocumentWarning" class="sapUiTinyMarginBegin"/>
+                                    press=".onDisplayDocumentWarning" class="sapUiTinyMarginBegin"/> -->
                             </VBox>
                             </l:Grid>
                         <Label text="Jenis Pelanggaran" />
@@ -167,20 +190,108 @@
                             </HBox>
                         <Label text="information" visible="false"/>
                         <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="57%">
-                        <MessageStrip
+                        <!-- <MessageStrip
                             text="Yang bersangkutan sedang dalam proses pengajuan [ST/TP] yang diajukan padaa tanggal dd.mm.yyyy"
                             type="Warning"
                             showIcon="true"
                             showCloseButton="false"
                             class="sapUiMediumMarginBottom">
-                        </MessageStrip>
+                        </MessageStrip> -->
                         </VBox>
                     </f:content>
                 </f:SimpleForm>
             </content>
-        </Panel>    
-        
-
+        </Panel> 
+        <!-- sanksi berjalan panel -->
+        <Panel
+        expandable="true"
+        expanded="false"
+        headerText="Sanksi Berjalan"
+        width="auto">
+        <content>
+            <f:SimpleForm 
+                id="sanksiBerjalanMutationForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                <f:content>
+                <Label text="{i18n>sanctionProgress}"/>
+                            <l:Grid vSpacing="0" containerQuery="true">
+                            <Input id="sanctionProgressMutation" value="{employeeDetail>/SanksiAktif}" width="auto" editable="false" >
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text 
+                                id="sanctionProgressDescMutation1" 
+                                text="{employeeDetail>/SanksiAktifDesc}" 
+                                wrapping="true" 
+                                width="100%" 
+                                class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                    <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="Jenis Pelanggaran" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress1Mutation" value="{employeeDetail>/JenPel1}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress1Mutation" text="{path: 'employeeDetail>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress2Mutation" value="{employeeDetail>/JenPel2}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress2Mutation" text="{path: 'employeeDetail>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress3Mutation" value="{employeeDetail>/JenPel3}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress3Mutation" text="{path: 'employeeDetail>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress4Mutation" value="{employeeDetail>/JenPel4}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress4Mutation" text="{path: 'employeeDetail>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>    
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        </Panel>
         <!-- Action Request Panel -->
         <Panel 
             expandable="true" 
@@ -202,7 +313,7 @@
                     emptySpanS="1">
                     <f:content>
                         <Label text="{i18n>actionType}" />
-                            <Input id="actionTypeMutation" value="{employeeDetail>/ActionType}">
+                            <Input id="actionTypeMutation" value="{employeeDetail>/ActionType}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
@@ -225,14 +336,14 @@
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{reason>/selectedReason/Value}" wrapping="true" width="100%">
+                            <Text id="reasonTextMutation" text="{reason>/selectedReason/Value}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>effectiveDate}" required="true" />
                         <HBox class="sapUiSmallMarginBottom">
-                            <DatePicker id="effectiveDateStartMutation" value="" required="true" width="95%"/>
+                            <DatePicker id="effectiveDateStartMutation" value="" required="true" width="95%" change=".onEffectiveDateStartChange"/>
                             <Text text="-" class="sapUiSmallMarginBegin sapUiTinyMarginEnd"/>
                             <DatePicker id="effectiveDateEndMutation" value="" width="95%" class="sapUiSmallMarginBegin" editable="false"/>
                         </HBox>
@@ -246,7 +357,7 @@
                                 <l:GridData span="L1 M1 S12" />
                             </layoutData>
                             </Input> 
-                            <Text text="{employeeDetail>/EmployeePositionLongtext}" wrapping="true" width="100%">
+                            <Text id="currentPositionTextMutation" text="{employeeDetail>/PositionName}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -256,14 +367,14 @@
                                 value="{position>/selectedPosition/Key}" 
                                 fieldGroupIds="grpValidation" 
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
                                 valueHelpRequest=".handleValueHelpPosition" 
+                                liveChange=".onPositionChange"
                                 required="true">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{position>/selectedPosition/Value}" wrapping="true" width="100%">
+                            <Text id="newPositionTextMutation" text="{position>/selectedPosition/Value}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -281,18 +392,32 @@
                             </Text>
                             <Input 
                                 id="newEmployeeGroupIdMutation" 
-                                value="{group>/selectedGroup/Key}"
+                                value="{
+                                    parts: [
+                                        {path: 'group>/selectedGroup/Key'},
+                                        {path: 'position>/selectedPosition/Key6'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
                                 fieldGroupIds="grpValidation"
                                 editable="true"
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
                                 valueHelpRequest=".handleValueHelpGroup" 
                                 required="true">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{group>/selectedGroup/Value}" wrapping="true" width="100%">
+                            <Text 
+                                id="newEmployeeGroupTextMutation" 
+                                text="{
+                                    parts: [
+                                        {path: 'group>/selectedGroup/Value'},
+                                        {path: 'position>/selectedPosition/KeyDesc6'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
+                                wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -310,18 +435,32 @@
                             </Text>
                             <Input 
                                 id="newEmployeeSubgroupIdMutation" 
-                                value="{subGroup>/selectedSubGroup/Key2}"
+                                value="{
+                                    parts: [
+                                        {path: 'subGroup>/selectedSubGroup/Key2'},
+                                        {path: 'position>/selectedPosition/Key7'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
                                 fieldGroupIds="grpValidation" 
                                 editable="true"
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
                                 valueHelpRequest=".handleValueHelpSubGroup" 
                                 required="true">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{subGroup>/selectedSubGroup/Value}" wrapping="true" width="100%">
+                            <Text 
+                                id="newEmployeeSubgroupTextMutation" 
+                                text="{
+                                    parts: [
+                                        {path: 'subGroup>/selectedSubGroup/Value'},
+                                        {path: 'position>/selectedPosition/KeyDesc7'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
+                                wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -332,25 +471,40 @@
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/PersonnelAreaText}" wrapping="true" width="100%">
+                            <Text id="currentPerAreaTextMutation" text="{employeeDetail>/PersonnelAreaText}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
                             </Text>
                             <Input 
                                 id="newPerAreaIdMutation" 
-                                value="{area>/selectedArea/Key}"
+                                value="{
+                                    parts: [
+                                        {path: 'area>/selectedArea/Key'},
+                                        {path: 'position>/selectedPosition/Key4'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
                                 fieldGroupIds="grpValidation"  
                                 editable="true"
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
                                 valueHelpRequest=".handleValueHelpArea" 
                                 required="true">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{area>/selectedArea/Value}" wrapping="true" width="100%"> 
+                            <Text 
+                                id="newPerAreaTextMutation" 
+                                text="{
+                                    parts: [
+                                        {path: 'area>/selectedArea/Value'},
+                                        {path: 'position>/selectedPosition/KeyDesc4'}
+                                        
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
+                                wrapping="true" width="100%"> 
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -361,25 +515,39 @@
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/PersonnelSubareaText}" wrapping="true" width="100%">
+                            <Text id="currentPerSubAreaTextMutation" text="{employeeDetail>/PersonnelSubareaText}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
                             </Text>
                             <Input 
                                 id="newPerSubAreaIdMutation" 
-                                value="{subArea>/selectedSubArea/Key2}" 
+                                value="{
+                                    parts: [
+                                        {path: 'subArea>/selectedSubArea/Key2'},
+                                        {path: 'position>/selectedPosition/Key5'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
                                 fieldGroupIds="grpValidation"
                                 editable="true"
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
                                 valueHelpRequest=".handleValueHelpSubArea" 
                                 required="true">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{subArea>/selectedSubArea/Value}" wrapping="true" width="100%">
+                            <Text 
+                                id="newPerSubAreaTextMutation" 
+                                text="{
+                                    parts: [
+                                        {path: 'subArea>/selectedSubArea/Value'},
+                                        {path: 'position>/selectedPosition/KeyDesc5'}
+                                    ],
+                                    formatter: '.formatter.fallbackValue'
+                                }"
+                                wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -390,17 +558,17 @@
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/EmployeeOrgunitLongtext}" wrapping="true" width="100%">
+                            <Text id="currentUnitOrgTextMutation" text="{employeeDetail>/EmployeeOrgunitLongtext}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
                             </Text>
-                            <Input id="newUnitOrgIdMutation" value="{employeeDetail>/EmployeeOrgunitId}" editable="false">
+                            <Input id="newUnitOrgIdMutation" value="{position>/selectedPosition/Key2}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/EmployeeOrgunitLongtext}" wrapping="true" width="100%">
+                            <Text id="newUnitOrgTextMutation" text="{position>/selectedPosition/KeyDesc2}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
@@ -411,64 +579,58 @@
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/DivisionText}" wrapping="true" width="100%">
+                            <Text id="currentDivisionTextMutation" text="{employeeDetail>/DivisionText}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
                             </Text>
-                            <Input id="newDivisionIdMutation" value="{employeeDetail>/DivisionId}" editable="false">
+                            <Input id="newDivisionIdMutation" value="{position>/selectedPosition/Key3}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L1 M1 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeeDetail>/DivisionText}" wrapping="true" width="100%">
+                            <Text id="newDivisionTextMutation" text="{position>/selectedPosition/KeyDesc3}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L3 M3 S12" />
                                 </layoutData>
                             </Text>
-                        <Label text="{i18n>positionMPP}"/>
-                            <Input id="currentPositionMPPMutation" value="{employeeDetail>/Mpp}" editable="false">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Input>
-                            <Text text="">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Text>
-                            <Input id="newPositionMPPMutation" value="{employeeDetail>/Mpp}" editable="false">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Input>
-                        <Label text="{i18n>grade}"/>
-                            <Input id="currentGradeMutation" value="{employeeDetail>/Grade}" editable="false">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Input>
-                            <Text text="">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Text>
-                            <Input id="newGradeMutation" value="{employeeDetail>/Grade}" editable="false">
-                                <layoutData>
-                                    <l:GridData span="L2 M2 S12" />
-                                </layoutData>
-                            </Input>
-                        <Label text="{i18n>endDateJob}"/>
-                            <Input id="EndDateMutation" value="{path: 'employeeDetail>/ZENDDA', formatter: '.formatter.formatDateDisplay'}" editable="false">
+                        <!-- <Label text="{i18n>mutasiberkala}" required="true" fieldGroupIds="grpValidation"/>
+                            <HBox>
+                                <CheckBox id="verifyMutation" text="Ya" select=".isVerifyMutation" selected="{viewModel>/isVerifyMutation}"/>
+                            </HBox> -->
+                        <Label text="{i18n>careerBand}"/>
+                        <Input id="careerAsalMutasi" value="{employeeDetail>/CareerBandAsl}" editable="false">
                             <layoutData>
-                                <l:GridData span="L2 M2 S12" />
+                                <l:GridData span="L1 M1 S12" />
                             </layoutData>
-                            </Input>
+                        </Input>
+                        <Text id="careerAsalTextMutasi" text="" wrapping="true" width="100%">
+                            <layoutData>
+                                <l:GridData span="L3 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <Input id="careerTujuanMutasi" value="{position>/selectedPositon/Key8}" editable="false">
+                            <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text id="careerTujuanTextMutasi" text="{position>/selectedPositon/KeyDesc8}" wrapping="true" width="100%">
+                            <layoutData>
+                                <l:GridData span="L3 M3 S12" />
+                            </layoutData>
+                        </Text>
+                        <Label text="{i18n>tanggalBerakhirStatus}"/>
+                        <DatePicker id="tanggalBerakhirMutation" value="" width="12rem" editable="false" >
+                            <layoutData>
+                                <l:GridData span="L4 M4 S12" />
+                            </layoutData>
+                        </DatePicker>
                         <Label text="{i18n>salaryAdj}" required="true"/>
                             <Select id="salaryAdjMutation" required="true" fieldGroupIds="grpValidation"
                                 items="{ path: 'dropdown>/salaryAdjColl', sorter: { path: 'text' }}"
                                 forceSelection="false"
-                                selectedKey="{dropdown>/selectedSalaryAdj}">
+                                selectedKey="{dropdown>/selectedSalaryAdj}"
+                                change=".onSalaryAdjChange">
                                 <items>
                                     <core:Item key="{dropdown>key}" text="{dropdown>text}" />
                                 </items>
@@ -479,6 +641,7 @@
                         <Label text="{i18n>salaryAdjValue}"/>
                             <Input 
                                 id="salaryAdjValueMutation" 
+                                enabled="{dropdown>/isSalaryAdjEnabled}"
                                 value="{
                                 path: 'create>/salaryAdj',
                                 type: 'sap.ui.model.type.Currency',
@@ -501,7 +664,18 @@
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>as}" required="true"/>
-                            <Select id="asMutation" required="true" fieldGroupIds="grpValidation"
+                            <Select
+                                id="asMutation"
+                                items="{dropdown>/asColl}"
+                                fieldGroupIds="grpValidation"
+                                selectedKey="{dropdown>/selectedAs}"
+                                change=".onAsFieldChange">
+                                <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Select>
+                            <!-- <Select id="asMutation" required="true" fieldGroupIds="grpValidation"
                                 items="{ path: 'dropdown>/asColl', sorter: { path: 'text' }}"
                                 forceSelection="false"
                                 selectedKey="{dropdown>/selectedAs}">
@@ -511,20 +685,21 @@
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
-                            </Select>
+                            </Select> -->
                         <Label text="{i18n>employeeChange}"/>
                             <Input 
                                 id="employeeChangeMutation" 
                                 value="{employeechange>/selectedEmployeeChange/Key}" 
                                 fieldGroupIds="grpValidation"
                                 showValueHelp="true" 
-                                liveChange=".onBlockInput"
-                                valueHelpRequest=".handleValueHelpEmployeeChange">
+                                change=".onEmployeeChangeInput"
+                                valueHelpRequest=".handleValueHelpEmployeeChange"
+                                enabled="{dropdown>/isEmployeeChangeEnabled}">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text text="{employeechange>/selectedEmployeeChange/Value}" wrapping="true" width="100%">
+                            <Text id="employeeChangeTextMutation" text="{employeechange>/selectedEmployeeChange/Value}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
@@ -545,7 +720,7 @@
                                 </layoutData>
                             </TextArea>
                         <Label text="informasi" visible="false"/>
-                        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="62%">
+                        <!-- <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="62%">
                             <MessageStrip
                                 text="{i18n>warningEvaluation}"
                                 type="Information"
@@ -558,44 +733,14 @@
                                 showIcon="true"
                                 class="sapUiMediumMarginBottom">
                             </MessageStrip>
-                        </VBox>
+                        </VBox> -->
                     </f:content>
                 </f:SimpleForm>
             </content>
-        </Panel>
-        <!-- Verification Panel -->
-        <Panel id="attCTPanel" expandable="true" expanded="true" headerText="{i18n>upDoc}" width="auto">
-                <f:SimpleForm id="attDataForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="1" emptySpanL="-1" columnsL="1" labelSpanM="1" emptySpanM="-1" adjustLabelSpan="false" singleContainerFullSize="false">
-                    <f:content>
-                    <Label />
-                        <upload:UploadSet
-                            id="idUploadSet"
-                            instantUpload="false"
-                            terminationEnabled="false"
-                            maxFileSize="10"
-                            uploadUrl="/sap/opu/odata/sap/ZHR_MOVEMENT_MAN_SRV/FileAttachmentSet"
-                            
-                            fileSizeExceeded=".onFileSizeExceed"
-                            afterItemAdded=".onAfterItemAdded"
-                            afterItemRemoved=".onAfterItemRemoved"
-                        >
-                            <upload:items>
-                                <upload:UploadSetItem fileName="{fileAttachment>FileName}" mediaType="{fileAttachment>FileType}" url="{fileAttachment>Url}">
-                                    <upload:customData>
-                                        <core:CustomData key="RequestId" value="{fileAttachment>Reqid}" />
-                                        <core:CustomData key="Seqnr" value="{fileAttachment>Seqnr}" />
-                                    </upload:customData>
-                                </upload:UploadSetItem>
-                            </upload:items>
-                        </upload:UploadSet>
-                        <Label />
-                        <ObjectStatus id="objAttLimit" class="sapUiSmallMarginBottom" text="{i18n>attFileSizeLimitMsg}" icon="sap-icon://message-information" state="Information" />
-                    </f:content>
-                </f:SimpleForm>
-        </Panel>   
+        </Panel> 
         </semantic:content>
     <semantic:mainAction>
-        <semantic:MainAction id="btnSubmitMutation" text="Submit" press="onSendRequest"/>
+        <semantic:MainAction id="btnSubmitMutation" text="Submit" press="onSendRequest" enabled="{= !${viewModel>/isSubmitDisabled}}"/>
     </semantic:mainAction>
     </semantic:FullscreenPage>
 </mvc:View>

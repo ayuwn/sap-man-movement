@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Evaluasi Found"
+        title="Select Evaluasi"
+        search="handleSearchEvaluasi"
+        confirm="handleCloseEvaluasi"
+        cancel="handleCloseEvaluasi"
+        items="{evaluasi>/}">
+        <StandardListItem
+            title="{evaluasi>Key}"
+            description="{evaluasi>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

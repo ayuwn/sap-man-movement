@@ -1,0 +1,653 @@
+<mvc:View
+   controllerName="bsim.hcmapp.man.movement.controller.DetailHistoryStatusChange"
+   xmlns:mvc="sap.ui.core.mvc"
+   xmlns="sap.m"
+   xmlns:f="sap.ui.layout.form"
+   xmlns:l="sap.ui.layout"
+   xmlns:core="sap.ui.core"
+   xmlns:semantic="sap.m.semantic">
+<semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>employeeStatusChange}">
+    <semantic:content>
+        <!-- Profile -->
+        <VBox class="sapUiMediumMargin" alignItems="Center" justifyContent="Center">
+            <HBox backgroundDesign="Solid" width="30%" id="profileStatusChange" class="roundedProfile">
+                <HBox class="sapUiSmallMarginBegin sapUiTinyMarginEndBottomTop" alignItems="Center" justifyContent="Center">
+                    <Avatar displaySize="Custom"
+                            initials="{path: 'HistoryStatusChange>/EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="3rem"
+                            tooltip="{HistoryStatusChange>/EmployeeName/FormattedName}" class="sapMTableContentMargin sapUiSmallMarginTop"/>
+                    <VBox class="sapUiSmallMarginBegin">
+                        <ObjectIdentifier title="{HistoryStatusChange>/EmployeeName/FormattedName} ({HistoryStatusChange>/EmployeeNumber})" class="sapUiTinyMarginBottom"/>
+                        <Text text="{HistoryStatusChange>/PositionName}" />
+                    </VBox>
+                </HBox>
+            </HBox>
+        </VBox> 
+        <!-- Employee Data Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="false"
+        headerText="Employee Data" 
+        width="auto">
+            <content>
+                <f:SimpleForm 
+                id="employeeStatusForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                <f:content>
+                    <Label text="{i18n>name}"/>
+                        <HBox>
+                            <Input id="NameStatusChange" value="{HistoryStatusChange>/EmployeeName/FormattedName}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>group}"/>
+                        <HBox>
+                            <Input id="GroupStatusChangeH" value="{HistoryStatusChange>/StatusAsal}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="GroupTextStatusChangeH" text="{HistoryStatusChange>/EmployeeGrpDesc}" class="sapUiSmallMarginBegin"/>
+                        </HBox>
+                    <Label text="{i18n>subgroup}"/>
+                        <HBox>
+                            <Input id="SubGroupStatusChangeH" value="{HistoryStatusChange>/JbtnAsl}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="SubGroupTextStatusChangeH" text="{HistoryStatusChange>/EmployeeSubgrpDesc}" class="sapUiSmallMarginBegin"/>
+                        </HBox>
+                    <Label text="{i18n>divisi}"/>
+                        <HBox>
+                            <Input id="DivisiStatusChangeH" value="{HistoryStatusChange>/DivisionId}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="DivisiTextStatusChangeH" text="{HistoryStatusChange>/DivisionText}" class="sapUiSmallMarginBegin"/>
+                        </HBox>
+                    <Label text="{i18n>ou}"/>
+                        <HBox>
+                            <Input id="UnitOrgStatusChangeH" value="{HistoryStatusChange>/EmployeeOrgunitId}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="UnitOrgTextStatusChangeH" text="{HistoryStatusChange>/EmployeeOrgunitLongtext}" class="sapUiSmallMarginBegin"/>
+                        </HBox>
+                    <Label text="{i18n>position}"/>
+                        <HBox>
+                            <Input id="PositionStatusChangeH" value="{HistoryStatusChange>/EmployeePositionId}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="PositionTextStatusChangeH" text="{HistoryStatusChange>/PositionName}" class="sapUiSmallMarginBegin" />
+                        </HBox>
+                    <Label text="{i18n>perarea}"/>
+                        <HBox>
+                            <Input id="PerareaStatusChangeH" value="{HistoryStatusChange>/PersonnelAreaId}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="PerareaTextStatusChangeH" text="{HistoryStatusChange>/PersonnelAreaText}" class="sapUiSmallMarginBegin" />
+                        </HBox>
+                    <Label text="{i18n>persubarea}"/>
+                        <HBox>
+                            <Input id="PersubareaStatusChangeH" value="{HistoryStatusChange>/PersonnelSubareaId}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text id="PersubareaTextStatusChangeH" text="{HistoryStatusChange>/PersonnelSubareaText}" class="sapUiSmallMarginBegin" />
+                        </HBox>
+                    <Label text="{i18n>hiringdate}"/>
+                        <HBox>
+                            <Input id="entryDateStatusChange" value="{path: 'HistoryStatusChange>/HiringDate', formatter: '.formatter.formatDateDisplay'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>ratingPA1}"/>
+                        <HBox>
+                            <Input id="ratingPA1StatusChange" value="{HistoryStatusChange>/Rat01}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>ratingPA2}"/>
+                        <HBox>
+                            <Input id="ratingPA2StatusChange" value="{HistoryStatusChange>/Rat02}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>ratingPA3}"/>
+                        <HBox>
+                            <Input id="ratingPA3StatusChange" value="{HistoryStatusChange>/Rat03}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>pendterakhir}"/>
+                        <HBox>
+                            <Input id="PenterakhirStatusChange" value="{HistoryStatusChange>/PendidikanTrkhr}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>jenispekerjaan}"/>
+                        <HBox>
+                            <Input id="JenispekerjaanStatusChange" value="{HistoryStatusChange>/JnsPkrjaan}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                    <Label text="{i18n>marketingAvg}"/>
+                        <HBox>
+                            <Input id="marketingAvgStatusChange" value="{path: 'HistoryStatusChange>/Avg', formatter: '.formatter.removeLeadingZeros'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- Status Aktif Panel -->
+        <Panel 
+        expandable="true" 
+        expanded="false"
+        headerText="Sanksi Aktif" 
+        width="auto">
+            <content>
+                <f:SimpleForm 
+                id="sanksiStatusForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                <f:content>
+                    <Label text="{i18n>sanctionType}"/>
+                        <l:Grid vSpacing="0" containerQuery="true">
+                        <Input id="sanctionTypeStatusChange" value="{HistoryStatusChange>/SanksiAktif}" width="auto" editable="false" >
+                            <layoutData>
+                            <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <VBox>
+                        <Text id="sanctionDescriptionStatusChange" text="Surat Teguran" visible="{FilteredAttachments>/hasRequest}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <layoutData>
+                            <l:GridData span="L11 M11 S12" />
+                            </layoutData>
+                        </Text>
+                            <Button
+                                icon="sap-icon://document-text" 
+                                text="Show Document"
+                                type="Emphasized"
+                                tooltip="View Document"
+                                press=".onDisplayDocumentWarning" 
+                                class="sapUiTinyMarginBegin"
+                                visible="{FilteredAttachments>/hasRequest}"/>
+                        </VBox>
+                        </l:Grid>
+                    <Label text="Jenis Pelanggaran" />
+                        <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                        <Input id="jenPel1StatusChange" value="{HistoryStatusChange>/JenPel1}" width="auto" editable="false">
+                            <layoutData>
+                            <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text id="descPel1StatusChange" text="{path: 'HistoryStatusChange>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <layoutData>
+                            <l:GridData span="L11 M11 S12" />
+                            </layoutData>
+                        </Text>
+                        </l:Grid>
+                    <Label text="" />
+                        <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                        <Input id="jenPel2StatusChange" value="{HistoryStatusChange>/JenPel2}" width="auto" editable="false">
+                            <layoutData>
+                            <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text id="descPel2StatusChange" text="{path: 'HistoryStatusChange>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <layoutData>
+                            <l:GridData span="L11 M11 S12" />
+                            </layoutData>
+                        </Text>
+                        </l:Grid>
+                    <Label text="" />
+                        <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                        <Input id="jenPel3StatusChange" value="{HistoryStatusChange>/JenPel3}" width="auto" editable="false">
+                            <layoutData>
+                            <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text id="descPel3StatusChange" text="{path: 'HistoryStatusChange>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <layoutData>
+                            <l:GridData span="L11 M11 S12" />
+                            </layoutData>
+                        </Text>
+                        </l:Grid>
+                    <Label text="" />
+                        <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                        <Input id="jenPel4StatusChange" value="{HistoryStatusChange>/JenPel4}" width="auto" editable="false">
+                            <layoutData>
+                            <l:GridData span="L1 M1 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text id="descPel4StatusChange" text="{path: 'HistoryStatusChange>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                            <layoutData>
+                            <l:GridData span="L11 M11 S12" />
+                            </layoutData>
+                        </Text>
+                        </l:Grid>
+                    <Label text="{i18n>actDate}" required="false"/>
+                        <HBox class="sapUiTinyMarginBeginEnd">
+                            <DatePicker id="actDateStartStatusChange" value="{HistoryStatusChange>/StartDate}" width="87%" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                            <Text text="-" class="sapUiTinyMarginEnd"/>
+                            <DatePicker id="actDateEndStatusChange" value="{HistoryStatusChange>/EndDate}" width="87%" class="sapUiTinyMarginBeginEnd" editable="false"/>
+                        </HBox>
+                </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <!-- sanksi berjalan panel -->
+        <Panel
+        expandable="true"
+        expanded="false"
+        headerText="Sanksi Berjalan"
+        width="auto">
+        <content>
+            <f:SimpleForm 
+                id="sanksiBerjalanStatusChangeHistory"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="4"
+                labelSpanS="12">
+                <f:content>
+                <Label text="{i18n>sanctionProgress}"/>
+                            <l:Grid vSpacing="0" containerQuery="true">
+                            <Input id="sanctionProgressStatusChange" value="{HistoryStatusChange>/SanksiAktif}" width="auto" editable="false" >
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text 
+                                id="sanctionProgressDescStatusChange1" 
+                                text="{HistoryStatusChange>/SanksiAktifDesc}" 
+                                wrapping="true" 
+                                width="100%" 
+                                class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                    <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="Jenis Pelanggaran" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress1StatusChange" value="{HistoryStatusChange>/JenPel1}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress1StatusChange" text="{path: 'HistoryStatusChange>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress2StatusChange" value="{HistoryStatusChange>/JenPel2}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress2StatusChange" text="{path: 'HistoryStatusChange>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress3StatusChange" value="{HistoryStatusChange>/JenPel3}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress3StatusChange" text="{path: 'HistoryStatusChange>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>
+                        <Label text="" />
+                            <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                            <Input id="jenPelProgress4StatusChange" value="{HistoryStatusChange>/JenPel4}" width="auto" editable="false">
+                                <layoutData>
+                                <l:GridData span="L1 M1 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="descPelProgress4StatusChange" text="{path: 'HistoryStatusChange>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                <layoutData>
+                                <l:GridData span="L11 M11 S12" />
+                                </layoutData>
+                            </Text>
+                            </l:Grid>    
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        </Panel>
+        <!-- action request panel -->
+        <Panel 
+            expandable="true" 
+            expanded="true"
+            headerText="Action Request" 
+            width="auto">
+            <content>
+                <f:SimpleForm 
+                    id="actionStatusForm"
+                    editable="true"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="3"
+                    labelSpanL="3"
+                    labelSpanM="3"
+                    labelSpanS="12"
+                    emptySpanXL="1"
+                    emptySpanL="1"
+                    emptySpanM="1"
+                    emptySpanS="1">
+                    <f:content>
+                        <Label text="{i18n>actionType}" />
+                            <Input id="actionTypeStatus" value="{HistoryStatusChange>/ActionType}" editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text text="{HistoryStatusChange>/ActionTypeDesc}">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label text="{i18n>reason}" required="true"/>
+                            <Input 
+                                id="reasonStatusChange" 
+                                value="{HistoryStatusChange>/Massg}" 
+                                editable="false" 
+                                required="true">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="reasonTextStatusChange" text="{HistoryStatusChange>/MassgDesc}" wrapping="true" width="100%">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label text="{i18n>effectiveDate}" required="true" />
+                        <HBox>
+                            <DatePicker id="effectiveDateStartStatusChange" value="{path: 'HistoryStatusChange>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" required="true" width="96%"/>
+                            <Text text="-" class="sapUiTinyMarginBegin sapUiSmallMarginEnd"/>
+                            <DatePicker id="effectiveDateEndStatusChange" value="{path: 'HistoryStatusChange>/ZenddaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" width="96%"/>
+                        </HBox>
+                        <Label text="{i18n>TipeKontrak}" />
+                            <Input id="TipeKontrakStatusChange" value="{HistoryStatusChange>/TipeKontrakAsl}" editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text text="{HistoryStatusChange>/TipeKontrakDescAsl}">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label text="{i18n>kontrakchange}"/>
+                            <Input 
+                                id="KontrakStatusChange" 
+                                value="{HistoryStatusChange>/TipeKontrakDest}" 
+                                editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="kontrakTextStatusChange" text="{HistoryStatusChange>/TipeKontrakDescDest}" wrapping="true" width="100%">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label id="validDateLabel" text="{i18n>validateDate}" />
+                        <HBox>
+                            <DatePicker id="validDateStartStatusChange" value="{path: 'HistoryStatusChange>/ValidDate', formatter: '.formatter.formatDateDisplayEfk'}" width="96%" editable="false"/>
+                            <Text id="validDateDesc" text="{i18n>datedesc}" class="italicText"/>
+                        </HBox>
+                        <Label text="{i18n>hasilperform}" />
+                        <Input 
+                            id="hasilperformStatusChange" 
+                            value="{HistoryStatusChange>/HasilPerformance}" 
+                            editable="false" >
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                        <Label text="{i18n>totalnilai}"/>
+                        <Input id="totalNilaiStatusChange" 
+                            value="{HistoryStatusChange>/TotalNilai}" 
+                            editable="false">
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                        <Label text="{i18n>kategorieval}"/>
+                        <Input 
+                            id="kategoriEvaluasiStatusChange" 
+                            value="{HistoryStatusChange>/KategoriEvaluasi}" 
+                            editable="false" >
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                        <Label text="{i18n>salaryAdj}" required="true"/>
+                            <Input id="salaryAdjStatusChange" 
+                            value="{parts: [
+                                        { path: 'HistoryStatusChange>/Adjstmn' }, 
+                                        { path: 'dropdown>/salaryAdjColl' }
+                                    ], 
+                                    formatter: '.formatter.asTextFormatter'}"  
+                                    editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                        <Label text="{i18n>salaryAdjValue}"/>
+                            <Input 
+                                id="salaryAdjValueStatusChange"
+                                value="{path: 'HistoryStatusChange>/Zsalary', formatter: '.formatter.formatSalary'}"
+                                        editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text text="IDR">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>                            
+                        <Label text="{i18n>homebaseasal}"/>
+                            <Input id="homebaseAsalStatusChange" value="{HistoryStatusChange>HmbsAsl}" editable="false">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                        <Label text="{i18n>homebasetujuan}"/>
+                            <Input 
+                                id="homebaseTujuanStatusChange" 
+                                value="{HistoryStatusChange>/HbsDest}" 
+                                editable="false" 
+                                required="true">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Text id="homebaseTujuanTextStatusChange" text="{HistoryStatusChange>/HbsDescDest}" wrapping="true" width="100%">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label text="{i18n>basicCon}"/>
+                            <TextArea 
+                                id="basicConStatusChange"
+                                value="{HistoryStatusChange>/Zdasar2}" 
+                                rows="4"
+                                editable="false">
+                                <layoutData>
+                                    <l:GridData span="L6 M6 S12" />
+                                </layoutData>
+                            </TextArea>
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <Panel 
+                    expandable="true" 
+                    expanded="true"
+                    headerText="Verification" 
+                    width="auto">
+                    <content>
+                    <f:SimpleForm
+                    editable="true"
+                    id="dispoHistoryForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="4"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="disposisiToolbarHistory">
+                            <Text text="{i18n>disposisi}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <Label text="{i18n>rekomendasiHCM}" required="true"/>
+                        <TextArea 
+                            id="rekomendasiHCMHistory"
+                            value="{HistoryStatusChange>/ZrekomHcm}"
+                            width="57%"
+                            rows="4"
+                            class="sapUiSmallMarginBottom"
+                            editable="false"/>
+                        <Label text="{i18n>downloadDis}" />
+                        <HBox class="sapUiSmallMarginEnd">
+                            <Button
+                                icon="sap-icon://download"
+                                text="Download"
+                                type="Emphasized"
+                                press="onDownloadDisposisi"
+                                class="sapUiTinyMarginEnd"/>
+                        </HBox>
+                        <Label text="{i18n>disResult}" required="true" fieldGroupIds="grpValidation" />
+                        <RadioButtonGroup 
+                            id="disposisiHistory" 
+                            enabled="false" 
+                            columns="2" 
+                            width="100%" 
+                            selectedIndex="{path: 'HistoryDemotion>/Zdisposisi', formatter: '.formatter.formatDisposisi'}">
+                            <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd"/>
+                            <RadioButton text="Tidak Direkomendasikan" />
+                        </RadioButtonGroup>
+                        <Label text="{i18n>dispoNote}" />
+                        <TextArea 
+                            id="dispoNoteHistory"
+                            value="{HistoryStatusChange>/Znotedisp}"
+                            width="57%"
+                            rows="4"
+                            maxLength="255" 
+                            editable="false"/>
+                        <Label text="{i18n>salaryAdj}" />
+                        <HBox>
+                            <Input 
+                                id="gajiHistory"
+                                type="Text"
+                                value="{path: 'HistoryStatusChange>/Zsalaryfnl', formatter: '.formatter.formatSalary'}"
+                                width="auto"
+                                maxLength="50"
+                                description="IDR"
+                                editable="false"/>
+                        </HBox>
+                    </f:content>
+                </f:SimpleForm>
+                <f:SimpleForm
+                    editable="true"
+                    id="upDocMutationForm"
+                    layout="ResponsiveGridLayout" 
+                    labelSpanXL="2"
+                    labelSpanL="2"
+                    labelSpanM="2"
+                    labelSpanS="12">
+                    <f:content>
+                        <Toolbar id="upDocMutation">
+                            <Text text="{i18n>upDoc}" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                        <VBox class="sapUiNoMargin">
+                        <Table
+                            id="table-uploadSet"
+                            width="100%"
+                            mode="None"
+                            fixedLayout="false"
+                            inset="false"
+                            autoPopinMode="true"
+                            items="{path: 'fileAttachmentView>/results', templateShareable: false}">
+                            <columns>
+                                <Column id="namaDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                    <header>
+                                        <Label text="Nama Dokumen" />
+                                    </header>
+                                </Column>
+                                <Column id="jenisDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                    <header>
+                                        <Label text="Jenis Dokumen" />
+                                    </header>
+                                </Column>
+                                <Column id="pic" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                    <header>
+                                        <Label text="PIC" />
+                                    </header>
+                                </Column>
+                                <Column id="action" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                    <header>
+                                        <Label text="Action" />
+                                    </header>
+                                </Column>
+                            </columns>
+
+                            <items>
+                                <ColumnListItem vAlign="Middle">
+                                    <cells>
+                                        <HBox class="sapUiNoMargin">
+                                            <core:Icon
+                                                src="{path: 'fileAttachmentView>FileType', formatter: '.formatter.getFileTypeIcon'}"
+                                                color="red"
+                                                class="sapUiTinyMarginEnd"
+                                            />
+                                            <Link
+                                                text="{fileAttachmentView>FileName}"
+                                                wrapping="true"
+                                                href="{fileAttachmentView>Url}"
+                                                target="_blank"
+                                                class="sapUiTinyMarginBottom"
+                                            />
+                                        </HBox>
+                                        <Text text="{fileAttachmentView>TypeDoc}" />
+                                        <VBox>
+                                            <ObjectIdentifier title="{fileAttachmentView>PicName} ({fileAttachmentView>PicId})" />
+                                            <Text text="{fileAttachmentView>PicPosition}" />
+                                        </VBox>
+                                        <Button
+                                            icon="sap-icon://document-text" 
+                                            text="Show Document"
+                                            type="Emphasized"
+                                            tooltip="View Document"
+                                            press="onShowDocument"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                        </VBox> 
+                    </f:content>
+                </f:SimpleForm>
+            </content>
+        </Panel>
+        <Panel id="apprPanel" expandable="true" expanded="true" headerText="History" width="auto">
+                <Table id="idApprTable" items="{appr>/results}" inset="false" alternateRowColors="true">
+                    <columns>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="PIC" class="sapUiSmallMarginBegin"/>
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Status" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Date" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Time" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Comment" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <ObjectIdentifier title="{appr>ApproverId}" text="{appr>ApproverName}" class="sapUiSmallMarginBegin"/>
+                                <ObjectStatus text="{appr>StatusText}" state="{path:'appr>Status', formatter:'.formatter.formatStatus'}" />
+                                <Text text="{path:'appr>ApprovalDate',type:'sap.ui.model.odata.type.Date',formatOptions:{pattern:'yyyy-MM-dd'}}" />
+                                <Text text="{path:'appr>ApprovalTime', formatter:'.formatter.formatApprovalTime'}" />
+                                <Text text="{path:'appr>Notes',type:'sap.ui.model.odata.type.Date',formatOptions:{style:'medium'}}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </Panel>
+    </semantic:content>
+</semantic:FullscreenPage>
+</mvc:View>

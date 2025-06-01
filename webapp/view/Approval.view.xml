@@ -56,9 +56,21 @@
                                 </VBox>
                                 <Text text="{path: 'approvalModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" />
                                 <Text text="{path: 'approvalModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}" />
-                                <Text text="{approvalModel>StatusText}" class="sapMTableContentMargin greenText" />
+                                <ObjectStatus
+                                        text="{
+                                            parts: [
+                                                {path: 'approvalModel>Status'},
+                                                {path: 'approvalModel>Stat'}
+                                            ],
+                                            formatter: '.formatter.formatStatusWithStat'
+                                        }"
+                                        state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}"
+                                        class="sapMTableContentMargin"
+                                    />
+                                <!-- <ObjectStatus text="{path: 'approvalModel>Status', formatter: '.formatter.formatStatusWithStat'}" state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}" class="sapMTableContentMargin" /> -->
                                 <VBox>
                                 <ObjectIdentifier title="{approvalModel>ApproverName} ({approvalModel>ApproverId})"/>
+                                
                                 <Text text="{approvalModel>Abbreviation}" />
                                 </VBox>
                             </cells>

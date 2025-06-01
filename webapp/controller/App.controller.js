@@ -9,7 +9,8 @@ sap.ui.define([
           this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
           let oParamModel = new J({
             employeeCount: 0,
-            requestCount: 0
+            requestCount: 0,
+            myRequestCount:0,
           });
           this.setModel(oParamModel, "appParam");
 
@@ -27,6 +28,11 @@ sap.ui.define([
             items: [] 
           });
           this.getOwnerComponent().setModel(oSubAreaModel, "subArea");
+
+          this.setModel(new sap.ui.model.json.JSONModel({
+            isApproveEnabled: true,
+            isRejectEnabled: true
+        }), "buttonState");
         }
     });
   });

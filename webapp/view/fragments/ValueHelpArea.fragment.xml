@@ -8,10 +8,10 @@
         search="handleSearchArea"
         confirm="handleCloseArea"
         cancel="handleCloseArea"
-        items="{area>/}">
+        items="{area>/items}">
         <StandardListItem
             title="{area>Key}"
-            description="{area>Value}"
+            info="{area>Value}"
             type="Active" />
     </SelectDialog>
 </core:FragmentDefinition>

@@ -58,12 +58,12 @@
                     </GenericTile>
                     <GenericTile header="Approval" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" press="onAppPressed">
                         <TileContent>
-                            <NumericContent value="{path: 'appParam>/requestCount', formatter: '.formatter.paramCountFormatter'}" icon="sap-icon://employee-approvals" withMargin="true"/>
+                            <NumericContent value="{path: 'appParam>/approvalCount', formatter: '.formatter.paramCountFormatter'}" icon="sap-icon://employee-approvals" withMargin="true"/>
                         </TileContent>
                     </GenericTile>
                     <GenericTile header="My Request" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout" press="onHistoryPressed">
                         <TileContent>
-                            <NumericContent value="{path: 'appParam>/requestCount', formatter: '.formatter.paramCountFormatter'}" icon="sap-icon://customer-history" withMargin="true"/>
+                            <NumericContent value="{path: 'appParam>/myRequestCount', formatter: '.formatter.paramCountFormatter'}" icon="sap-icon://customer-history" withMargin="true"/>
                         </TileContent>
                     </GenericTile>
                 </items>

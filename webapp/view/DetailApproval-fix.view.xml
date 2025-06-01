@@ -1,0 +1,980 @@
+<mvc:View
+    controllerName="bsim.hcmapp.man.movement.controller.DetailApproval-fix"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:semantic="sap.m.semantic"
+    xmlns:upload="sap.m.upload">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" title="{i18n>appApproval}">
+        <semantic:content>
+
+            <!-- Profile -->
+            <VBox class="sapUiMediumMargin" alignItems="Center" justifyContent="Center">
+                <HBox backgroundDesign="Solid" width="30%" id="profile" class="roundedProfile">
+                    <HBox class="sapUiSmallMarginBegin sapUiTinyMarginEndBottomTop" alignItems="Center" justifyContent="Center">
+                        <Avatar displaySize="Custom"
+                                initials="{path: 'detailApprovalModel>/EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="3rem"
+                                tooltip="{detailApprovalModel>/EmployeeName/FormattedName}" class="sapMTableContentMargin sapUiSmallMarginTop"/>
+                        <VBox class="sapUiSmallMarginBegin">
+                            <ObjectIdentifier title="{detailApprovalModel>/EmployeeName/FormattedName} ({detailApprovalModel>/EmployeeNumber})" class="sapUiTinyMarginBottom"/>
+                            <Text text="{detailApprovalModel>/EmployeePositionText}" />
+                        </VBox>
+                    </HBox>
+                </HBox>
+            </VBox> 
+                <!-- Employee Data Panel -->
+                <Panel
+                    expandable="true"
+                    expanded="false"
+                    headerText="Employee Data"
+                    width="auto">
+                    <content>
+                        <f:SimpleForm
+                            id="employeeApprovalForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Label text="{i18n>name}" />
+                                <HBox>
+                                    <Input id="employeeNameApproval" value="{detailApprovalModel>/EmployeeName/FormattedName}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>entryDate}" />
+                                <HBox>
+                                    <Input id="entryDateApproval" value="{path: 'detailApprovalModel>/HiringDate', formatter: '.formatter.formatDateDisplay'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA1}" />
+                                <HBox>
+                                    <Input id="ratingPA1Approval" value="{detailApprovalModel>/Rat01}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA2}" />
+                                <HBox>
+                                    <Input id="ratingPA2Approval" value="{detailApprovalModel>/Rat02}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>ratingPA3}" />
+                                <HBox>
+                                    <Input id="ratingPA3Approval" value="{detailApprovalModel>/Rat03}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>marketingAvg}" />
+                                <HBox>
+                                    <Input id="marketingAvgApproval" value="{path: 'detailApprovalModel>/Avg', formatter: '.formatter.formatAvg'}" fieldWidth="auto" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- Sanksi Aktif Panel -->
+                <Panel
+                    expandable="true"
+                    expanded="false"
+                    headerText="Sanksi Aktif"
+                    width="auto">
+                    <content>
+                        <f:SimpleForm
+                            id="sanksiApprovalForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Label text="{i18n>sanctionType}" />
+                                <l:Grid vSpacing="0" containerQuery="true">
+                                    <Input id="sanctionTypeApproval" value="{detailApprovalModel>/SanksiAktif}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <VBox>
+                                        <Text id="sanctionDescriptionApproval" text="Surat Teguran Surat" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                            <layoutData>
+                                                <l:GridData span="L11 M11 S12" />
+                                            </layoutData>
+                                        </Text>
+                                        <Button
+                                            icon="sap-icon://document-text"
+                                            text="Show Document"
+                                            type="Emphasized"
+                                            tooltip="View Document"
+                                            press="onDisplayDocumentWarning"
+                                            class="sapUiTinyMarginBegin" />
+                                    </VBox>
+                                </l:Grid>
+                                <Label text="Jenis Pelanggaran" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel1Approval" value="{detailApprovalModel>/JenPel1}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel1Approval" text="{path: 'detailApprovalModel>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel2Approval" value="{detailApprovalModel>/JenPel2}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel2Approval" text="{path: 'detailApprovalModel>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel3Approval" value="{detailApprovalModel>/JenPel3}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel3Approval" text="{path: 'detailApprovalModel>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="" />
+                                <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPel4Approval" value="{detailApprovalModel>/JenPel4}" width="auto" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPel4Approval" text="{path: 'detailApprovalModel>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                </l:Grid>
+                                <Label text="{i18n>actDate}" required="false" />
+                                <HBox class="sapUiTinyMarginBeginEnd">
+                                    <DatePicker id="actDateStartApproval" value="{detailApprovalModel>/StartDate}" width="92%" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                    <Text text="-" class="sapUiTinyMarginEnd" />
+                                    <DatePicker id="actDateEndApproval" value="{detailApprovalModel>/EndDate}" width="92%" class="sapUiTinyMarginBeginEnd" editable="false" />
+                                </HBox>
+                                <Label text="information" visible="false" />
+                                <VBox class="sapUiSmallMarginBeginEnd sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="Yang bersangkutan sedang dalam proses pengajuan [ST/TP] yang diajukan padaa tanggal dd.mm.yyyy"
+                                        type="Warning"
+                                        showIcon="true"
+                                        showCloseButton="false"
+                                        class="sapUiMediumMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- Action Request Panel -->
+                <Panel 
+                    expandable="true" 
+                    expanded="true"
+                    headerText="Action Request" 
+                    width="auto">
+                    <content>
+                        <f:SimpleForm 
+                            id="actionApprovalForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="3"
+                            labelSpanL="3"
+                            labelSpanM="3"
+                            labelSpanS="12"
+                            emptySpanXL="1"
+                            emptySpanL="1"
+                            emptySpanM="1"
+                            emptySpanS="1">
+                            <f:content>
+                                <Label text="{i18n>actionType}" />
+                                    <Input id="actionTypeApproval" value="{detailApprovalModel>/ActionType}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/ActionTypeDesc}">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>reason}" required="true"/>
+                                    <Input 
+                                        id="reasonApproval" 
+                                        value="{detailApprovalModel>/Massg}" 
+                                        editable="false" 
+                                        required="true">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/MassgDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>effectiveDate}" required="true" />
+                                <HBox class="sapUiSmallMarginBottom">
+                                    <DatePicker id="effectiveDateStartApproval" value="{path: 'detailApprovalModel>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" required="true" width="95%" editable="false"/>
+                                    <Text text="-" class="sapUiSmallMarginBegin sapUiTinyMarginEnd"/>
+                                    <DatePicker id="effectiveDateEndApproval" value="{path: 'detailApprovalModel>/ZenddaEfktf', formatter: '.formatter.formatDateDisplay'}" width="95%" class="sapUiSmallMarginBegin" editable="false"/>
+                                </HBox>
+                                    
+                                <Label text="{i18n>mutation}" visible="false"/>
+                                    <Text text="Asal"/>
+                                    <Text text="Tujuan"/>
+                                <Label text="{i18n>positionId}" required="true" />
+                                    <Input id="currentPositionIdApproval" value="{detailApprovalModel>/EmployeePositionId}" editable="false">
+                                    <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                    </layoutData>
+                                    </Input> 
+                                    <Text text="{detailApprovalModel>/EmployeePositionLongtext}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>                       
+                                    <Input 
+                                        id="newPositionIdApproval" 
+                                        value="{detailApprovalModel>/PlansDest}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/PlansDesc_Dest}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>employeeGroupId}" required="true" />
+                                    <Input id="currentEmployeeGroupIdApproval" value="{detailApprovalModel>/StatusAsal}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/EmployeeGrpDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newEmployeeGroupIdApproval" 
+                                        value="{detailApprovalModel>/PersgDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/PersgDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>employeeSubgroupId}" required="true" />
+                                    <Input id="currentEmployeeSubgroupIdMutation" value="{detailApprovalModel>/JbtnAsl}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/EmployeeSubgrpDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newEmployeeSubgroupIdApproval" 
+                                        value="{detailApprovalModel>/PerskDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/PerskDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>perAreaId}" required="true"/>
+                                    <Input id="currentPerAreaIdMutation" value="{detailApprovalModel>/PersonnelAreaId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/PersonnelAreaText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newPerAreaIdApproval" 
+                                        value="{detailApprovalModel>/WerksDest}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/WerksDestDesc}" wrapping="true" width="100%"> 
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>perSubAreaId}" required="true"/>
+                                    <Input id="currentPerSubAreaIdApproval" value="{detailApprovalModel>/PersonnelSubareaId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/PersonnelSubareaText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input 
+                                        id="newPerSubAreaIdApproval" 
+                                        value="{detailApprovalModel>/BtrtlDest}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/BtrtlDestDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>unitOrgId}"/>
+                                    <Input id="currentUnitOrgIdApproval" value="{detailApprovalModel>/EmployeeOrgunitId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/EmployeeOrgunitLongtext}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newUnitOrgIdApproval" value="{detailApprovalModel>/EmployeeOrgunitId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/EmployeeOrgunitLongtext}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>divisionId}"/>
+                                    <Input id="currentDivisionIdApproval" value="{detailApprovalModel>/DivisionId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/DivisionText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newDivisionIdApproval" value="{detailApprovalModel>/DivisionId}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/DivisionText}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L3 M3 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>positionMPP}"/>
+                                    <Input id="currentPositionMPPApproval" value="{detailApprovalModel>/Mpp}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newPositionMPPMutation" value="{detailApprovalModel>/Mpp}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>grade}"/>
+                                    <Input id="currentGradeApproval" value="{detailApprovalModel>/Grade}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    <Input id="newGradeApproval" value="{detailApprovalModel>/Grade}" editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>endDateJob}"/>
+                                    <Input id="EndDateApproval" value="{path: 'detailApprovalModel>/ZENDDA', formatter: '.formatter.formatDateDisplay'}" editable="false">
+                                    <layoutData>
+                                        <l:GridData span="L2 M2 S12" />
+                                    </layoutData>
+                                    </Input>
+                                <Label text="{i18n>salaryAdj}" required="true"/>
+                                    <Input id="salaryAdjApproval"
+                                    value="{parts: [
+                                                { path: 'detailApprovalModel>/Adjstmn' }, 
+                                                { path: 'dropdown>/salaryAdjColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}"  
+                                            editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>salaryAdjValue}"/>
+                                    <Input 
+                                        id="salaryAdjValueApproval" 
+                                        value="{path: 'detailApprovalModel>/Zsalary', formatter: '.formatter.formatSalary'}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="IDR">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                <Label text="{i18n>as}" required="true"/>
+                                    <Input id="asApproval" 
+                                    value="{parts: [
+                                                { path: 'detailApprovalModel>/Zdasar1' }, 
+                                                { path: 'dropdown>/asColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}" 
+                                            editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>employeeChange}"/>
+                                    <Input 
+                                        id="employeeChangeApproval" 
+                                        value="{detailApprovalModel>/Zexholder}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text text="{detailApprovalModel>/ZexholderDesc}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    
+                                <Label text="{i18n>basicCon}"/>
+                                    <TextArea 
+                                        id="basicConApproval"
+                                        value="{detailApprovalModel>/Zdasar2}" 
+                                        rows="4"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L6 M6 S12" />
+                                        </layoutData>
+                                    </TextArea>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="62%">
+                                    <MessageStrip
+                                        text="{i18n>warningEvaluation}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                    <MessageStrip
+                                        text="{i18n>warningPKWT}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiMediumMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+                <!-- Action Request Panel -->
+                <!-- <Panel
+                    expandable="true"
+                    expanded="true"
+                    headerText="Action Request"
+                    width="auto">
+                    <content>
+                        <f:SimpleForm
+                            id="actionApprovalForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Label text="{i18n>actionType}" />
+                                <HBox class="sapUiTinyMarginBeginEnd">
+                                    <Input id="actionTypeApproval" value="{detailApprovalModel>/ActionType}" width="auto" class="sapUiTinyMarginBegin" editable="false" />
+                                    <Text text="{detailApprovalModel>/ActionTypeDesc}" class="sapUiTinyMarginBegin"/>
+                                </HBox>
+                                <Label text="{i18n>reason}" />
+                                <HBox class="sapUiTinyMarginBeginEnd">
+                                    <Input id="reasonApproval" value="{detailApprovalModel>/Massg}" fieldWidth="110%" width="auto" class="sapUiTinyMarginBegin" editable="false" />
+                                    <Text text="{detailApprovalModel>/MassgDesc}" class="sapUiTinyMarginBegin"/>
+                                </HBox>
+                                <Label text="{i18n>effectiveDate}" />
+                                <HBox class="sapUiTinyMarginBeginEnd">
+                                    <DatePicker id="effectiveDateStartApproval" value="{path: 'detailApprovalModel>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" width="auto" class="sapUiTinyMarginBegin sapUiMediumMarginEnd" editable="false" />
+                                    <Text text="-" />
+                                    <DatePicker id="effectiveDateEndApproval" value="{path: 'detailApprovalModel>/ZenddaEfktf', formatter: '.formatter.formatDateDisplay'}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>mutation}" visible="false"/>
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Text text="Dari" class="sapUiSmallMarginEnd"/>
+                                    <Text id="mutationFromApproval" text="" class="sapUiLargeMarginBeginEnd" />
+                                    <Text id="mutationToApproval" text="" class="sapUiMediumMarginBeginEnd" />
+                                    <Text text="Menjadi" class="sapUiLargeMarginBegin"/>
+                                </HBox>
+                                <Label text="{i18n>positionId}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPositionIdApproval" value="{detailApprovalModel>/EmployeePositionId}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPositionIdApproval" value="{detailApprovalModel>/PlansDest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>positionText}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPositionTextApproval" value="{detailApprovalModel>/EmployeePositionText}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPositionTextApproval" value="{detailApprovalModel>/PlansDesc_Dest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>employeeGroupId}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentEmployeeGroupIdApproval" value="{detailApprovalModel>/StatusAsal}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newEmployeeGroupIdApproval" value="{detailApprovalModel>/PersgDest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>employeeGroupText}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentEmployeeGroupTextApproval" value="{detailApprovalModel>/EmployeeGrpDesc}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newEmployeeGroupTextApproval" value="{detailApprovalModel>/PersgDestDesc}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>employeeSubgroupId}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentEmployeeSubgroupIdApproval" value="{detailApprovalModel>/JbtnAsl}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newEmployeeSubgroupIdApproval" value="{detailApprovalModel>/PerskDest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>employeeSubgroupText}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentEmployeeSubgroupTextApproval" value="{detailApprovalModel>/EmployeeSubgrpDesc}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newEmployeeSubgroupTextApproval" value="{detailApprovalModel>/PerskDestDesc}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>perAreaId}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPerAreaIdApproval" value="{detailApprovalModel>/PersonnelAreaId}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPerAreaIdApproval" value="{detailApprovalModel>/WerksDest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>perAreaText}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPerAreaTextApproval" value="{detailApprovalModel>/PersonnelAreaText}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPerAreaTextApproval" value="{detailApprovalModel>/WerksDestDesc}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>perSubAreaId}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPerSubAreaIdApproval" value="{detailApprovalModel>/PersonnelSubareaId}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPerSubAreaIdApproval" value="{detailApprovalModel>/BtrtlDest}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>perSubAreaText}" required="true" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPerSubAreaTextApproval" value="{detailApprovalModel>/PersonnelSubareaText}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPerSubAreaTextApproval" value="{detailApprovalModel>/BtrtlDestDesc}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>unitOrgId}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentUnitOrgIdApproval" value="{detailApprovalModel>/EmployeeOrgunitId}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newUnitOrgIdApproval" value="{detailApprovalModel>/EmployeeOrgunitId}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>unitOrgText}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentUnitOrgTextApproval" value="{detailApprovalModel>/EmployeeOrgunitText}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newUnitOrgTextApproval" value="{detailApprovalModel>/EmployeeOrgunitText}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>divisionId}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentDivisionIdApproval" value="{detailApprovalModel>/DivisionId}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newDivisionIdApproval" value="{detailApprovalModel>/DivisionId}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>divisionText}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentDivisionTextApproval" value="{detailApprovalModel>/DivisionText}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newDivisionTextApproval" value="{detailApprovalModel>/DivisionText}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>positionMPP}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentPositionMPPApproval" value="{detailApprovalModel>/Mpp}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newPositionMPPApproval" value="{detailApprovalModel>/Mpp}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>grade}" />
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="currentGradeApproval" value="{detailApprovalModel>/Grade}" width="auto" class="sapUiMediumMarginEnd" editable="false" />
+                                    <Input id="newGradeApproval" value="{detailApprovalModel>/Grade}" width="auto" class="sapUiMediumMarginBegin" editable="false" />
+                                </HBox>
+                                <Label text="{i18n>endDateJob}"/>
+                                <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="EndDateApproval" value="{path: 'detailApprovalModel>/ZENDDA', formatter: '.formatter.formatDateDisplay'}" width="auto" class="sapUiMediumMarginEnd" editable="false"/>
+                                </HBox>
+                                <Label text="{i18n>salaryAdj}"/>
+                                    <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="salaryAdjApproval"
+                                    value="{parts: [
+                                                { path: 'detailApprovalModel>/Adjstmn' }, 
+                                                { path: 'dropdown>/salaryAdjColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}" 
+                                            width="auto" 
+                                            class="sapUiMediumMarginEnd" 
+                                            editable="false"/>
+                                    </HBox>
+                                <Label text="{i18n>salaryAdjValue}"/>
+                                    <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="salaryAdjValueApproval" value="{path: 'detailApprovalModel>/Zsalary', formatter: '.formatter.formatSalary'}" description="IDR" width="auto" class="sapUiMediumMarginEnd" editable="false"/>
+                                    </HBox>
+                                <Label text="{i18n>as}" required="true"/>
+                                    <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="asApproval" 
+                                    value="{parts: [
+                                                { path: 'detailApprovalModel>/Zdasar1' }, 
+                                                { path: 'dropdown>/asColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}" 
+                                            width="auto" 
+                                            class="sapUiTinyMarginEnd" 
+                                            editable="false"/>
+                                    </HBox>
+                                <Label text="{i18n>employeeChange}"/>
+                                    <HBox class="sapUiSmallMarginBeginEnd">
+                                    <Input id="employeeChangeApproval" value="{detailApprovalModel>/Zexholder}" width="auto" class="sapUiTinyMarginEnd" editable="false"/>
+                                    <Text text="{detailApprovalModel>/ZexholderDesc}" />
+                                    </HBox>
+                                <Label text="{i18n>basicCon}" required="true"/>
+                                <VBox class="sapUiSmallMarginBeginEnd">
+                                    <TextArea 
+                                        id="basicConApproval"
+                                        value="{detailApprovalModel>/Zdasar2}" 
+                                        width="57%"
+                                        rows="4"
+                                        class="sapUiTinyMarginEnd" 
+                                        editable="false"/>
+                                </VBox>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="{i18n>warningEvaluation}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                    <MessageStrip
+                                        text="{i18n>warningPKWT}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiMediumMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel> -->
+                <!-- Verification Panel -->
+                <Panel 
+                    expandable="true" 
+                    expanded="true"
+                    headerText="Verification" 
+                    width="auto" >
+                    <content>
+                        <f:SimpleForm 
+                            editable="true"
+                            id="assessmentApprovalForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="AssessmentApproval">
+                                    <Text text="{i18n>assessment}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>assessmentResult}" required="true" fieldGroupIds="grpValidation"/>
+                                <HBox>
+                                    <Input id="assessmentResultApproval" value="No data, harap upload hasil assessment" width="18rem" class="sapUiMediumMarginEnd" editable="false"/>
+                                    <CheckBox id="verifyResultApproval" text="Verify" selected="{path: 'detailApprovalModel>/Zverify', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isAssessmentEnabled}"/>
+                                </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="biCheckingApprovalForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="BICheckingApproval">
+                                    <Text text="{i18n>biChecking}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>biResult}" required="true" fieldGroupIds="grpValidation"/>
+                                <HBox class="sapUiSmallMarginEnd">
+                                    <Text text="Collection:" class="sapUiSmallMarginEnd" />
+                                    <CheckBox id="hasilApproval1" text="1" selected="{path: 'hasilApproval>/hasilApproval1', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isBiCheckingEnabled}" select="onCheckboxSelect"/>
+                                    <CheckBox id="hasilApproval2" text="2" selected="{path: 'hasilApproval>/hasilApproval2', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isBiCheckingEnabled}" select="onCheckboxSelect"/>
+                                    <CheckBox id="hasilApproval3" text="3" selected="{path: 'hasilApproval>/hasilApproval3', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isBiCheckingEnabled}" select="onCheckboxSelect"/>
+                                    <CheckBox id="hasilApproval4" text="4" selected="{path: 'hasilApproval>/hasilApproval4', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isBiCheckingEnabled}" select="onCheckboxSelect"/>
+                                    <CheckBox id="hasilApproval5" text="5" selected="{path: 'hasilApproval>/hasilApproval5', formatter: '.formatter.formatCheckboxValue'}" enabled="{verificationModel>/isBiCheckingEnabled}" select="onCheckboxSelect"/>
+                                    <!-- <Text text="Collection:" class="sapUiSmallMarginEnd" />
+                                    <CheckBox id="hasilApproval1" text="1" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '1'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval2" text="2" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '2'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval3" text="3" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '3'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval4" text="4" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '4'}], formatter: '.formatter.formatCheckboxBIValue'}" 
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                    <CheckBox id="hasilApproval5" text="5" selected="{parts: [{path: 'detailApprovalModel>/Zbichecking'}, {value: '5'}], formatter: '.formatter.formatCheckboxBIValue'}"  -->
+                                    
+                                </HBox>
+                                <Label text="{i18n>biNotes}" />
+                                <TextArea 
+                                    id="hasilBiCheckingApproval"
+                                    value="{detailApprovalModel>/Znotebicheck}"
+                                    width="57%"
+                                    rows="4"
+                                    enabled="{verificationModel>/isBiCheckingEnabled}"/>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="{i18n>warningBiChecking}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="dispoApprovalForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="4"
+                            labelSpanL="4"
+                            labelSpanM="4"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="disposisiToolbarApproval">
+                                    <Text text="{i18n>disposisi}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <Label text="{i18n>rekomendasiHCM}" />
+                                <TextArea 
+                                    id="rekomendasiHCMApproval"
+                                    value="{detailApprovalModel>/ZrekomHcm}"
+                                    width="57%"
+                                    rows="4"
+                                    class="sapUiSmallMarginBottom"
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
+                                <Label text="{i18n>downloadDis}" />
+                                <HBox class="sapUiSmallMarginEnd">
+                                    <Button
+                                        icon="sap-icon://download"
+                                        text="Download"
+                                        type="Emphasized"
+                                        press="onDownloadDisposisi"
+                                        class="sapUiTinyMarginEnd"/>
+                                </HBox>
+                                <Label text="{i18n>disResult}" required="true" fieldGroupIds="grpValidation"/>
+                                <RadioButtonGroup id="disposisiApproval" columns="2" width="100%" selectedIndex="{path: 'detailApprovalModel>/Zdisposisi', formatter: '.formatter.formatDisposisi'}" enabled="{verificationModel>/isDisposisiEnabled}">
+                                    <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd" />
+                                    <RadioButton text="Tidak Direkomendasikan" />
+                                </RadioButtonGroup>
+                                <Label text="{i18n>dispoNote}" />
+                                <TextArea 
+                                    id="dispoNoteApproval"
+                                    value="{detailApprovalModel>/Znotedisp}"
+                                    width="57%"
+                                    rows="4"
+                                    enabled="{verificationModel>/isDisposisiEnabled}"/>
+                                <Label text="informasi" visible="false"/>
+                                <VBox class="sapUiSmallMarginTop" width="57%">
+                                    <MessageStrip
+                                        text="{i18n>warningDisposisi}"
+                                        type="Information"
+                                        showIcon="true"
+                                        class="sapUiTinyMarginBottom">
+                                    </MessageStrip>
+                                </VBox>
+                                <Label text="{i18n>salaryAdj}" />
+                                <HBox>
+                                    <Input 
+                                        id="gajiApproval"
+                                        type="Text"
+                                        value="{path: 'detailApprovalModel>/Zsalaryfnl', formatter: '.formatter.formatSalary'}"
+                                        description="IDR"
+                                        width="auto"
+                                        maxLength="50"
+                                        enabled="{verificationModel>/isDisposisiEnabled}"/>
+                                </HBox>
+                            </f:content>
+                        </f:SimpleForm>
+                        <f:SimpleForm
+                            editable="true"
+                            id="upDocApprovalForm"
+                            layout="ResponsiveGridLayout" 
+                            labelSpanXL="2"
+                            labelSpanL="2"
+                            labelSpanM="2"
+                            labelSpanS="12">
+                            <f:content>
+                                <Toolbar id="upDocApproval">
+                                    <Text text="{i18n>upDoc}" class="sapUiSmallMarginBegin"/>
+                                </Toolbar>
+                                <VBox class="sapUiNoMargin">
+                                <Table
+                                    id="table-uploadSet"
+                                    width="100%"
+                                    mode="None"
+                                    fixedLayout="false"
+                                    inset="false"
+                                    autoPopinMode="true"
+                                    items="{path: 'fileAttachmentView>/results', templateShareable: false}">
+                                    <columns>
+                                        <Column id="namaDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Nama Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="jenisDokumen" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Jenis Dokumen" />
+                                            </header>
+                                        </Column>
+                                        <Column id="pic" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="PIC" />
+                                            </header>
+                                        </Column>
+                                        <Column id="action" width="7rem" minScreenWidth="Tablet" demandPopin="true">
+                                            <header>
+                                                <Label text="Action" />
+                                            </header>
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem vAlign="Middle">
+                                            <cells>
+                                                <HBox class="sapUiNoMargin">
+                                                    <core:Icon
+                                                        src="{path: 'fileAttachmentView>FileType', formatter: '.formatter.getFileTypeIcon'}"
+                                                        color="red"
+                                                        class="sapUiTinyMarginEnd"
+                                                    />
+                                                    <Link
+                                                        text="{fileAttachmentView>FileName}"
+                                                        wrapping="true"
+                                                        href="{fileAttachmentView>Url}"
+                                                        target="_blank"
+                                                        class="sapUiTinyMarginBottom"
+                                                    />
+                                                </HBox>
+                                                <Text text="{fileAttachmentView>TypeDoc}" />
+                                                <VBox>
+                                                    <ObjectIdentifier title="{fileAttachmentView>PicName} ({fileAttachmentView>PicId})" />
+                                                    <Text text="{fileAttachmentView>PicPosition}" />
+                                                </VBox>
+                                                <Button
+                                                    icon="sap-icon://document-text" 
+                                                    text="Show Document"
+                                                    type="Emphasized"
+                                                    tooltip="View Document"
+                                                    press="onShowDocument"/>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                                </VBox> 
+                            </f:content>
+                        </f:SimpleForm>
+                    </content>
+                </Panel>
+            <HBox justifyContent="Center" class="sapUiSmallMarginTop sapUiSmallMarginBottom" visible="true">
+                <Button
+                    text="Approve"
+                    press="onApprovePress"
+                    enabled="{buttonState>/isApproveEnabled}"
+                    type="Accept"
+                    class="sapUiSmallMarginEnd"
+                    width="7rem"
+                    ariaDescribedBy="defaultButtonDescription genericButtonDescription">
+                </Button>
+                <Button
+                    text="Reject"
+                    press="onRejectPress"
+                    enabled="{buttonState>/isRejectEnabled}"
+                    type="Reject"
+                    class="sapUiSmallMarginEnd sapUiSmallMarginBegin"
+                    width="7rem"
+                    ariaDescribedBy="acceptButtonDescription genericButtonDescription">
+                </Button>
+            </HBox>
+            <Panel id="apprPanel" expandable="true" expanded="true" headerText="History" width="auto">
+                <Table id="idApprTable" items="{appr>/results}" inset="false" alternateRowColors="true">
+                    <columns>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Actor" class="sapUiSmallMarginBegin"/>
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Action" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Action Date" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Action Time" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="Comment" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <ObjectIdentifier title="{appr>ApproverId}" text="{appr>ApproverName}" class="sapUiSmallMarginBegin"/>
+                                <ObjectStatus text="{appr>StatusText}" state="{path:'appr>Status', formatter:'.formatter.formatStatus'}" />
+                                <Text text="{path:'appr>ApprovalDate',type:'sap.ui.model.odata.type.Date',formatOptions:{pattern:'yyyy-MM-dd'}}" />
+                                <Text text="{path:'appr>ApprovalTime', formatter:'.formatApprovalTime'}" />
+                                <Text text="{path:'appr>Notes',type:'sap.ui.model.odata.type.Date',formatOptions:{style:'medium'}}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </Panel>
+        </semantic:content>
+    </semantic:FullscreenPage>
+</mvc:View>
+
+                

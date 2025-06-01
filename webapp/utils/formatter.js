@@ -22,13 +22,40 @@ sap.ui.define([], function () {
         formatStatus: function (s) {
             switch (s) {
                 case "D":
+                case "V":
                 case "S":
                     return sap.ui.core.ValueState.Warning;
                 case "R":
                     return sap.ui.core.ValueState.Error;
+                case "Posted":
+                    return sap.ui.core.ValueState.Success;
                 default:
                     return sap.ui.core.ValueState.Success;
             }
+        },
+
+        // fallbackValue: function(selected, fallback) {
+        //     // Use selected if not empty/null/undefined, else fallback
+        //     return selected ? selected : fallback;
+        // },
+
+        fallbackValue: function(selected, fallback) {
+            return (selected !== null && selected !== undefined && selected !== "") ? selected : fallback;
+        },
+
+        displayPositionOrPlans: function(sActionType, sPlansDesc, sPositionName) {
+            if (sActionType === "ZB") {
+                console.log("PositionName; ", sPositionName);
+                return sPositionName;
+            }
+            return sPlansDesc;
+        },
+
+        removeLeadingZeros: function (sValue) {
+            if (!sValue) {
+                return sValue; // Return the original value if it's null or undefined
+            }
+            return parseInt(sValue, 10).toString(); // Convert to integer and back to string to remove leading zeros
         },
 
         getFileTypeIcon: function (sFileType) {
@@ -296,37 +323,85 @@ sap.ui.define([], function () {
         },
 
         formatDisposisi: function (value) {
+            console.log("formatDisposisi input:", value);
             if (value === "1") {
-                return 0; // Index for "Rekomendasi"
+                return 0;
             } else if (value === "2") {
-                return 1; // Index for "Tidak Direkomendasikan"
+                return 1;
             }
-            return -1; // Default (no selection)
+            return -1;
+        },
+
+        // formatDisposisi: function (value) {
+        //     if (value === "1") {
+        //         return 0; // Index for "Rekomendasi"
+        //     } else if (value === "2") {
+        //         return 1; // Index for "Tidak Direkomendasikan"
+        //     }
+        //     return -1; // Default (no selection)
+        // },
+
+        // formatCheckboxValue: function(value) {
+        //     // Handle undefined or null values
+        //     if (value === undefined || value === null) {
+        //         return false;
+        //     }
+            
+        //     // Convert the string "1" to true
+        //     if (value === "1") {
+        //         return true;
+        //     }
+            
+        //     // Convert the string "0" to false
+        //     if (value === "0") {
+        //         return false;
+        //     }
+            
+        //     // If already a boolean, return as is
+        //     if (typeof value === "boolean") {
+        //         return value;
+        //     }
+            
+        //     // For any other value, convert to boolean
+        //     return value === true || value === "true";
+        // },
+
+        formatCurrencyInput: function(value) {
+            var num = Number(value);
+            return isNaN(num) ? 0 : num;
         },
 
         formatCheckboxValue: function(value) {
-            // Handle undefined or null values
+            console.log("formatCheckboxValue input:", value);
             if (value === undefined || value === null) {
                 return false;
             }
-            
-            // Convert the string "1" to true
-            if (value === "1") {
+            if (value === "1" || value === 1 || value === true || value === "true") {
                 return true;
             }
-            
-            // Convert the string "0" to false
-            if (value === "0") {
+            if (value === "0" || value === 0 || value === false || value === "false") {
                 return false;
             }
-            
-            // If already a boolean, return as is
-            if (typeof value === "boolean") {
-                return value;
+            // Fallback for any other value
+            return Boolean(value);
+        },
+
+        formatApprovalTime: function (sApprovalTime) {
+            if (!sApprovalTime) {
+                return ""; 
             }
-            
-            // For any other value, convert to boolean
-            return value === true || value === "true";
+        
+            if (typeof sApprovalTime === "object" && sApprovalTime.ms !== undefined) {
+                var iMilliseconds = sApprovalTime.ms; 
+                var oDate = new Date(iMilliseconds); 
+        
+                var sHours = String(oDate.getUTCHours()).padStart(2, "0"); 
+                var sMinutes = String(oDate.getUTCMinutes()).padStart(2, "0"); 
+        
+                return `${sHours}:${sMinutes}`;
+            }
+        
+            return sApprovalTime;
         },
 
         formatCheckboxBIValue: function(value, checkboxValue) {
@@ -418,6 +493,77 @@ sap.ui.define([], function () {
         //     }
         //     return t;
         // },
+
+        isMutasiSkalaChecked: function(value) {
+            // Accepts true, 1, "1", but NOT false, 0, "0", "", null, undefined
+            return value === true || value === 1 || value === "1";
+        },
+
+        // isMutasiSkalaChecked: function(value) {
+        //     // Returns true if value is truthy (checked), false otherwise
+        //     return !!value;
+        // },
+
+        formatStatusWithStat: function(sStatus, sStat) {
+            if (sStatus === "A") {
+                if (sStat === "V0" || sStat === "V1") {
+                    return "Verified";
+                } else {
+                    return "Approved";
+                }
+            }
+            // Fallback to your existing logic or just return sStatus
+            switch (sStatus) {
+                case "S":
+                    return "Submitted";
+                case "R":
+                    return "Rejected";
+                case "V":
+                    return "Revised";
+                case "P":
+                    return "Posted";
+                default:
+                    return sStatus || "";
+            }
+        },
+
+        statusText: function(sStatus) {
+            switch (sStatus) {
+                case "S":
+                    return "Submitted";
+                case "A":
+                    return "Approved";
+                case "R":
+                    return "Rejected";
+                case "V":
+                    return "Revised";
+                case "P":
+                    return "Posted";
+                default:
+                    return sStatus || "";
+            }
+        },
+
+        statusState: function(sStatus) {
+            switch (sStatus) {
+                case "A":
+                    return "Success";   // Green
+                case "S":
+                    return "Success"; 
+                case "P":
+                    return "Success";
+                case "R":
+                    return "Error";     // Red
+                case "V":
+                    return "Warning";   // Yellow/Orange
+                default:
+                    return "None";
+            }
+        },
+
+        isApprovalButtonEnabled: function(sStatus) {
+            return !sStatus;
+        },
 
         getEmployeeInitial: function (employeeName) {
             if (!employeeName) {
@@ -772,7 +918,18 @@ sap.ui.define([], function () {
             return B + " - " + E;
         },
 
-        formatDateDisplay: function (sDate) {
+        // filepath: d:\KAHF\PROJECTS\man.movement\webapp\utils\formatter.js
+        getSanctionDescription: function (aFilteredAttachments) {
+            if (!aFilteredAttachments || !Array.isArray(aFilteredAttachments) || aFilteredAttachments.length === 0) {
+                return ""; // Default message if no attachments exist
+            }
+
+            // Return the TypeDoc of the first attachment
+            const oFirstAttachment = aFilteredAttachments[0];
+            return oFirstAttachment.TypeDoc || "";
+        },
+
+        formatDateDisplayEfk: function (sDate) {
             if (!sDate) {
                 return "";
             }
@@ -781,6 +938,38 @@ sap.ui.define([], function () {
             var iMonth = oDate.getMonth() + 1; // Months are zero-based
             var iYear = oDate.getFullYear();
             return (iDay < 10 ? "0" + iDay : iDay) + "/" + (iMonth < 10 ? "0" + iMonth : iMonth) + "/" + iYear;
+        },
+
+        formatDateDisplay: function (sDate) {
+            if (!sDate || sDate === "0000-00-00") {
+                return ""; // Return blank if the date is null, undefined, or "0000-00-00"
+            }
+        
+            var oDate = new Date(sDate);
+            var iDay = oDate.getDate();
+            var iMonth = oDate.getMonth() + 1; // Months are zero-based
+            var iYear = oDate.getFullYear();
+        
+            // Check if the date is 31/12/9999
+            if (iDay === 31 && iMonth === 12 && iYear === 9999) {
+                return ""; // Return blank for placeholder date
+            }
+        
+            return (iDay < 10 ? "0" + iDay : iDay) + "/" + (iMonth < 10 ? "0" + iMonth : iMonth) + "/" + iYear;
+        },
+
+        formatCareerBand: function (sValue) {
+            if (sValue === "Y") {
+                return "Ya";
+            }
+            return "Tidak";
+        },
+
+        formatEmployeeChange: function (sValue) {
+            if (sValue === "00000000") {
+                return ""; 
+            }
+            return sValue;
         },
 
         formatDateUtc: function (date, m) {

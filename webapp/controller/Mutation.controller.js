@@ -29,39 +29,166 @@ sap.ui.define([
             });
             this.getView().setModel(oEmployeeModel, "employee");
 
-            let oRequestorModel = new JSONModel({
-                EmployeeNumber: "81000038"
-            });
-            this.getView().setModel(oRequestorModel, "requestor");
+            // let oRequestorModel = new JSONModel({
+            //     EmployeeNumber: "81000038"
+            // });
+            // this.getView().setModel(oRequestorModel, "requestor");
 
-            let oDocUploadModel = new JSONModel({
-                uploads: []
+            // Set the Grievances OData model
+            const oGrievancesModel = this.getOwnerComponent().getModel("Grievances");
+            if (!oGrievancesModel) {
+                console.error("Grievances model is not available.");
+                return;
+            }
+
+            oGrievancesModel.read("/RequestSet", {
+                urlParameters: {
+                    "$expand": "toAttachmentView", // Expand toAttachmentView
+                    "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+                },
+                success: (oData) => {
+                    console.log("Grievances data with attachments loaded successfully:", oData);
+            
+                    const aRequests = oData.results || [];
+                    const sEmployeeNumber = this.getView().getModel("employee").getProperty("/EmployeeNumber");
+            
+                    if (!sEmployeeNumber) {
+                        console.error("Employee number is missing in the 'employee' model.");
+                        // sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+                        return;
+                    }
+            
+                    const aFilteredRequests = aRequests.filter(request => request.EmployeeNumber === sEmployeeNumber);
+            
+                    if (aFilteredRequests.length === 0) {
+                        console.warn(`No requests found for EmployeeNumber: ${sEmployeeNumber}`);
+                        // Set hasRequest to false and hide the button
+                        const oAttachmentModel = new sap.ui.model.json.JSONModel({ hasRequest: false });
+                        this.getView().setModel(oAttachmentModel, "FilteredAttachments");
+                        return;
+                    }
+            
+                    const oLatestRequest = aFilteredRequests[0]; // The first request is the newest due to sorting
+                    console.log("Most recent request:", oLatestRequest);
+            
+                    // Process attachments from the newest request
+                    const aAttachments = oLatestRequest.toAttachmentView?.results || [];
+                    const aFilteredAttachments = aAttachments.filter(attachment => attachment.TypeDoc === "ST/SP Baru");
+            
+                    const oAttachmentModel = new sap.ui.model.json.JSONModel({
+                        hasRequest: aFilteredAttachments.length > 0,
+                        attachments: aFilteredAttachments
+                    });
+                    this.getView().setModel(oAttachmentModel, "FilteredAttachments");
+            
+                    if (aFilteredAttachments.length > 0) {
+                        console.log("Filtered Attachments with TypeDoc 'ST/SP Baru':", aFilteredAttachments);
+                    } else {
+                        console.warn("No attachments with TypeDoc 'ST/SP Baru' found.");
+                    }
+                },
+                error: (oError) => {
+                    console.error("Error loading grievances data with attachments:", oError);
+                    const oAttachmentModel = new sap.ui.model.json.JSONModel({ hasRequest: false });
+                    this.getView().setModel(oAttachmentModel, "FilteredAttachments");
+                }
             });
-            this.getView().setModel(oDocUploadModel, "docUploads");
+
+            // oGrievancesModel.read("/RequestSet", {
+            //     urlParameters: {
+            //         "$expand": "toAttachmentView", // Expand toAttachmentView
+            //         "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+            //     },
+            //     success: (oData) => {
+            //         console.log("Grievances data with attachments loaded successfully:", oData);
+            
+            //         // Step 1: Get the most recent request
+            //         const aRequests = oData.results || [];
+            //         if (aRequests.length === 0) {
+            //             console.warn("No requests found.");
+            //             sap.m.MessageBox.error("No requests found.");
+            //             return;
+            //         }
+            
+            //         const oLatestRequest = aRequests[0]; // The first request is the newest due to sorting
+            //         console.log("Most recent request:", oLatestRequest);
+            
+            //         // Step 2: Process attachments from the newest request
+            //         const aAttachments = oLatestRequest.toAttachmentView?.results || [];
+            //         const aFilteredAttachments = aAttachments.filter(attachment => attachment.TypeDoc === "ST/SP Baru");
+            
+            //         if (aFilteredAttachments.length > 0) {
+            //             console.log("Filtered Attachments with TypeDoc 'ST/SP Baru':", aFilteredAttachments);
+            
+            //             // Step 3: Bind filtered attachments to a model
+            //             const oAttachmentModel = new sap.ui.model.json.JSONModel(aFilteredAttachments);
+            //             this.getView().setModel(oAttachmentModel, "FilteredAttachments");
+            //         } else {
+            //             console.warn("No attachments with TypeDoc 'ST/SP Baru' found.");
+            //             sap.m.MessageBox.error("No attachments with TypeDoc 'ST/SP Baru' found.");
+            //         }
+            //     },
+            //     error: (oError) => {
+            //         console.error("Error loading grievances data with attachments:", oError);
+            //         sap.m.MessageBox.error("Failed to load grievances data.");
+            //     }
+            // });
+
+            // Optionally, preload data into the model
+            // oGrievancesModel.read("/RequestSet", {
+            //     urlParameters: {
+            //         "$expand": "toAttachmentView", // Expand toAttachmentView
+            //         "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+            //     },
+            //     success: (oData) => {
+            //         console.log("Grievances data with attachments loaded successfully:", oData);
+            
+            //         // Step 1: Get the most recent request
+            //         const aRequests = oData.results || [];
+            //         if (aRequests.length === 0) {
+            //             console.warn("No requests found.");
+            //             sap.m.MessageBox.error("No requests found.");
+            //             return;
+            //         }
+            
+            //         const oLatestRequest = aRequests[0]; // The first request is the newest due to sorting
+            //         console.log("Most recent request:", oLatestRequest);
+            
+            //         // Step 2: Process attachments from the newest request
+            //         const aAttachments = oLatestRequest.toAttachmentView?.results || [];
+            //         const aFilteredAttachments = aAttachments.filter(attachment => attachment.TypeDoc === "ST/SP Baru");
+            
+            //         if (aFilteredAttachments.length > 0) {
+            //             console.log("Filtered Attachments with TypeDoc 'ST/SP Baru':", aFilteredAttachments);
+            
+            //             // Step 3: Bind filtered attachments to a model
+            //             const oAttachmentModel = new sap.ui.model.json.JSONModel(aFilteredAttachments);
+            //             this.getView().setModel(oAttachmentModel, "FilteredAttachments");
+            //         } else {
+            //             console.warn("No attachments with TypeDoc 'ST/SP Baru' found.");
+            //             sap.m.MessageBox.error("No attachments with TypeDoc 'ST/SP Baru' found.");
+            //         }
+            //     },
+            //     error: (oError) => {
+            //         console.error("Error loading grievances data with attachments:", oError);
+            //         sap.m.MessageBox.error("Failed to load grievances data.");
+            //     }
+            // });
 
             const oFileAttachmentModel = new sap.ui.model.json.JSONModel({ results: [] });
             this.getView().setModel(oFileAttachmentModel, "fileAttachment");
 
-            let oDropdownModel = new JSONModel({
-                selectedPIC: "",
-                selectedJenisDokumen: "",
-                selectedSalaryAdj: "",
-                selectedAs: "",
+            const oViewModel = new JSONModel({
+                isSubmitDisabled: false,
+                isVerifyMutation: false
+            });
+            this.getView().setModel(oViewModel, "viewModel");
 
-                jenisDokumenColl: [
-                    { key: "1", text: "Evaluasi Karyawan" },
-                    { key: "2", text: "PKWT Terakhir" },
-                    { key: "3", text: "Assessment" },
-                    { key: "4", text: "Hasil BI Checking" },
-                    { key: "5", text: "Disposisi" },
-                    { key: "6", text: "PKWT Baru" }
-                ],
-                PICColl: [
-                    { key: "1", text: "Requestor" },
-                    { key: "2", text: "Talent & Management" },
-                    { key: "3", text: "Compensation & Benefit" },
-                    { key: "4", text: "Data Management" },
-                ],
+            let oDropdownModel = new JSONModel({
+                selectedSalaryAdj: "",
+                selectedAs: "1",
+                isEmployeeChangeEnabled: false,
+                isSalaryAdjEnabled: false,
 
                 salaryAdjColl : [
                     { key: "1", text: "Ya"},
@@ -95,101 +222,243 @@ sap.ui.define([
             this.getView().byId("effectiveDateEndMutation").setValue(sFormattedEndDate);
             this.getView().byId("effectiveDateStartMutation").setValue(sFormattedDate);
 
-            let oSubGroupModel = this.getOwnerComponent().getModel("subGroup");
-            this.getView().setModel(oSubGroupModel, "subGroup");
+            // --- Auto-set tanggalBerakhirMutation based on effectiveDateStartMutation ---
+            var oEndDate = new Date(oDate);
+            oEndDate.setFullYear(oEndDate.getFullYear() + 4);
+            oEndDate.setDate(oEndDate.getDate() - 1);
+            this.getView().byId("tanggalBerakhirMutation").setDateValue(oEndDate);
 
-            let oSubAreaModel = this.getOwnerComponent().getModel("subArea");
-            this.getView().setModel(oSubAreaModel, "subArea");
+            // let oGroupModel = this.getOwnerComponent().getModel("group");
+            // this.getView().setModel(oGroupModel, "group");
+
+            // let oAreaModel = this.getOwnerComponent().getModel("area");
+            // // this.getView().setModel(oAreaModel, "area");
+
+            // let oSubGroupModel = this.getOwnerComponent().getModel("subGroup");
+            // this.getView().setModel(oSubGroupModel, "subGroup");
+
+            // let oSubAreaModel = this.getOwnerComponent().getModel("subArea");
+            // this.getView().setModel(oSubAreaModel, "subArea");
         },
 
         _onMutationRouteMatched: function (oEvent) {
-            const EmployeeNumber = oEvent.getParameter("arguments").EmployeeNumber;
-            if (EmployeeNumber) {
-                this._getEmployeeData(EmployeeNumber);
+            const oArguments = oEvent.getParameter("arguments") || {};
+            const EmployeeNumber = oArguments.EmployeeNumber;
+            const oAppModel = this.getModel("appModel");
+        
+            if (!EmployeeNumber) {
+                MessageBox.error("Employee number is missing. Cannot proceed.");
+                this.onNavBack();
+                return;
             }
+        
+            const oModel = this.getOwnerComponent().getModel();
+        
+            const oUploadSet = this.byId("idUploadSet");
+            if (oUploadSet) {
+                oUploadSet.removeAllItems();
+            }
+            const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+            if (oFileAttachmentModel) {
+                oFileAttachmentModel.setProperty("/results", []);
+            }
+        
+            // Cek jika ada request yang sedang berjalan
+            oModel.read("/RequestSet", {
+                filters: [
+                    new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, EmployeeNumber),
+                    new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.NE, "A7")
+                ],
+                success: (oData) => {
+                    const aRequests = oData.results || [];
+                    const hasPendingRequest = aRequests.some(
+                        r => r.EmployeeNumber === EmployeeNumber && r.Status !== "A7"
+                    );
+        
+                    if (hasPendingRequest) {
+                        MessageBox.error(
+                            "A movement request for this employee is already in progress. Please complete it before creating a new one.",
+                            { onClose: () => this.onNavBack() }
+                        );
+                        return;
+                    }
+        
+                    // Tidak ada request yang menggantung, lanjutkan
+                    this._getEmployeeData(EmployeeNumber)
+                        .then(() => {
+                            console.log("Loaded employee data for:", EmployeeNumber);
 
-             // Clear any existing files in the upload set
-             const oUploadSet = this.byId("idUploadSet");
-             if (oUploadSet) {
-                 oUploadSet.removeAllItems();
-             }
+                            this._sRequestId = oArguments?.requestId || oAppModel?.getProperty("/selectedRequest/RequestId");
+        
+                            if (this._sRequestId) {
+                                this._getRequestData();
+                            } else {
+                                this.getRouter().navTo("mutation", {
+                                    EmployeeNumber: EmployeeNumber
+                                });
+                                
+                            }
+                        })
+                        .catch((err) => {
+                            console.error("Error loading employee data:", err);
+                            MessageBox.error("Failed to load employee data.");
+                            this.onNavBack();
+                        });
+                },
+                error: (err) => {
+                    console.error("Error checking existing requests:", err);
+                    MessageBox.error("Failed to check existing requests.", {
+                        onClose: () => this.onNavBack()
+                    });
+                }
+            });
+        },        
+
+        // fix
+        // _onMutationRouteMatched: function (oEvent) {
+        //     const EmployeeNumber = oEvent.getParameter("arguments").EmployeeNumber;
+        //     if (EmployeeNumber) {
+        //         this._getEmployeeData(EmployeeNumber);
+        //     }
+
+        //      // Clear any existing files in the upload set
+        //      const oUploadSet = this.byId("idUploadSet");
+        //      if (oUploadSet) {
+        //          oUploadSet.removeAllItems();
+        //      }
              
-             // Reset the file attachment model
-             const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-             if (oFileAttachmentModel) {
-                 oFileAttachmentModel.setProperty("/results", []);
-             }
+        //      // Reset the file attachment model
+        //      const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //      if (oFileAttachmentModel) {
+        //          oFileAttachmentModel.setProperty("/results", []);
+        //      }
              
-             // Get request ID from route parameters
-             var oArguments = oEvent.getParameter("arguments");
+        //      // Get request ID from route parameters
+        //      var oArguments = oEvent.getParameter("arguments");
              
-             if (oArguments && oArguments.requestId) {
-                 this._sRequestId = oArguments.requestId;
-                 this._getRequestData();
-             } else {
-                 // Try to get from application model if we're coming from another view
-                 var oAppModel = this.getModel("appModel");
-                 if (oAppModel && oAppModel.getProperty("/selectedRequest")) {
-                     this._sRequestId = oAppModel.getProperty("/selectedRequest/RequestId");
-                     this._getRequestData();
-                 } else {
-                     M.information("No request selected");
-                     this.onNavBack();
-                 }
-            }
-        },
+        //      if (oArguments && oArguments.requestId) {
+        //          this._sRequestId = oArguments.requestId;
+        //          this._getRequestData();
+        //      } else {
+        //          // Try to get from application model if we're coming from another view
+        //          var oAppModel = this.getModel("appModel");
+        //          if (oAppModel && oAppModel.getProperty("/selectedRequest")) {
+        //              this._sRequestId = oAppModel.getProperty("/selectedRequest/RequestId");
+        //              this._getRequestData();
+        //          } else {
+        //              M.information("No request selected");
+        //              this.onNavBack();
+        //          }
+        //     }
+        // },
 
         _getEmployeeData: function (EmployeeNumber) {
-            // Define paths for EmployeeSet and EmployeeDetailSet
-            const sEmployeePath = `/EmployeeSet('${EmployeeNumber}')`;
-            const sEmployeeDetailPath = `/EmployeeDetailSet('${EmployeeNumber}')`;
+            return new Promise((resolve, reject) => {
+                // Define paths for EmployeeSet and EmployeeDetailSet
+                const sEmployeePath = `/EmployeeSet('${EmployeeNumber}')`;
+                const sEmployeeDetailPath = `/EmployeeDetailSet('${EmployeeNumber}')`;
         
-            let oEmployeeModel = this.getView().getModel("employee");
-            let oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+                let oEmployeeModel = this.getView().getModel("employee");
+                let oEmployeeDetailModel = this.getView().getModel("employeeDetail");
         
-            this._oBusy.open();
+                this._oBusy.open();
         
-            // Fetch EmployeeSet data
-            this.readEntity(sEmployeePath)
-                .then((employeeResult) => {
-                    if (!employeeResult) {
-                        MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
-                            actions: ["Exit"],
-                            onClose: (sAction) => {
-                                this._navBack();
-                            },
-                        });
-                        return Promise.reject("No EmployeeSet data found.");
-                    }
-        
-                    // Set EmployeeSet data to the model
-                    oEmployeeModel.setData(employeeResult);
-                    console.log("EmployeeSet Data loaded:", employeeResult);
-        
-                    // Fetch EmployeeDetailSet data
-                    return this.readEntity(sEmployeeDetailPath);
-                })
-                .then((employeeDetailResult) => {
-                    if (employeeDetailResult) {
-                        // Set EmployeeDetailSet data to the model
-                        if (!oEmployeeDetailModel) {
-                            oEmployeeDetailModel = new sap.ui.model.json.JSONModel();
-                            this.getView().setModel(oEmployeeDetailModel, "employeeDetail");
+                // Fetch EmployeeSet data
+                this.readEntity(sEmployeePath)
+                    .then((employeeResult) => {
+                        if (!employeeResult) {
+                            MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
+                                actions: ["Exit"],
+                                onClose: (sAction) => {
+                                    this._navBack();
+                                },
+                            });
+                            return Promise.reject("No EmployeeSet data found.");
                         }
-                        oEmployeeDetailModel.setData(employeeDetailResult);
-                        console.log("EmployeeDetailSet Data loaded:", employeeDetailResult);
-                    } else {
-                        console.warn("EmployeeDetailSet data is missing.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading employee data:", error);
-                    MessageBox.error("Error loading employee details");
-                })
-                .finally(() => {
-                    this._oBusy.close();
-                });
+        
+                        // Set EmployeeSet data to the model
+                        oEmployeeModel.setData(employeeResult);
+                        console.log("EmployeeSet Data loaded:", employeeResult);
+        
+                        // Fetch EmployeeDetailSet data
+                        return this.readEntity(sEmployeeDetailPath);
+                    })
+                    .then((employeeDetailResult) => {
+                        if (employeeDetailResult) {
+                            // Set EmployeeDetailSet data to the model
+                            if (!oEmployeeDetailModel) {
+                                oEmployeeDetailModel = new sap.ui.model.json.JSONModel();
+                                this.getView().setModel(oEmployeeDetailModel, "employeeDetail");
+                            }
+                            oEmployeeDetailModel.setData(employeeDetailResult);
+                            console.log("EmployeeDetailSet Data loaded:", employeeDetailResult);
+                        } else {
+                            console.warn("EmployeeDetailSet data is missing.");
+                        }
+                        resolve(); // Resolve the Promise after successful data loading
+                    })
+                    .catch((error) => {
+                        console.error("Error loading employee data:", error);
+                        MessageBox.error("Error loading employee details");
+                        reject(error); // Reject the Promise in case of an error
+                    })
+                    .finally(() => {
+                        this._oBusy.close();
+                    });
+            });
         },
+
+        // _getEmployeeData: function (EmployeeNumber) {
+        //     // Define paths for EmployeeSet and EmployeeDetailSet
+        //     const sEmployeePath = `/EmployeeSet('${EmployeeNumber}')`;
+        //     const sEmployeeDetailPath = `/EmployeeDetailSet('${EmployeeNumber}')`;
+        
+        //     let oEmployeeModel = this.getView().getModel("employee");
+        //     let oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+        
+        //     this._oBusy.open();
+        
+        //     // Fetch EmployeeSet data
+        //     this.readEntity(sEmployeePath)
+        //         .then((employeeResult) => {
+        //             if (!employeeResult) {
+        //                 MessageBox.error(this.getResourceBundle().getText("msgNotAuthorized"), {
+        //                     actions: ["Exit"],
+        //                     onClose: (sAction) => {
+        //                         this._navBack();
+        //                     },
+        //                 });
+        //                 return Promise.reject("No EmployeeSet data found.");
+        //             }
+        
+        //             // Set EmployeeSet data to the model
+        //             oEmployeeModel.setData(employeeResult);
+        //             console.log("EmployeeSet Data loaded:", employeeResult);
+        
+        //             // Fetch EmployeeDetailSet data
+        //             return this.readEntity(sEmployeeDetailPath);
+        //         })
+        //         .then((employeeDetailResult) => {
+        //             if (employeeDetailResult) {
+        //                 // Set EmployeeDetailSet data to the model
+        //                 if (!oEmployeeDetailModel) {
+        //                     oEmployeeDetailModel = new sap.ui.model.json.JSONModel();
+        //                     this.getView().setModel(oEmployeeDetailModel, "employeeDetail");
+        //                 }
+        //                 oEmployeeDetailModel.setData(employeeDetailResult);
+        //                 console.log("EmployeeDetailSet Data loaded:", employeeDetailResult);
+        //             } else {
+        //                 console.warn("EmployeeDetailSet data is missing.");
+        //             }
+        //         })
+        //         .catch((error) => {
+        //             console.error("Error loading employee data:", error);
+        //             MessageBox.error("Error loading employee details");
+        //         })
+        //         .finally(() => {
+        //             this._oBusy.close();
+        //         });
+        // },
 
         // _getEmployeeData: function (EmployeeNumber) {
         //     const sPath = `/EmployeeDetailSet('${EmployeeNumber}')`; // Path for specific employee
@@ -314,161 +583,464 @@ sap.ui.define([
             return isValid;
         },
 
-        onOpenDialog: function () {
-            var oView = this.getView();
-
-            // Create dialog lazily
-            if (!this._oDialog) {
-                // Load and create fragment asynchronously
-                Fragment.load({
-                    id: oView.getId(),
-                    name: "bsim.hcmapp.man.movement.view.fragments.DocumentUpload",
-                    controller: this
-                }).then(function (oDialog) {
-                    this._oDialog = oDialog;
-                    // Connect dialog to view's lifecycle management
-                    oView.addDependent(this._oDialog);
-                    this._oDialog.setModel(this.getView().getModel("dropdown"), "dropdown");
-                    this._oDialog.open();
-                }.bind(this));
-            } else {
-                this._oDialog.open();
-            }
-        },
-
-        onDialogClose: function () {
-            if (this._oDialog) {
-                this._oDialog.close();
-            }
-        },
-
-        onDialogSubmit: function () {
-            let oView = this.getView();
-            
-            if (!this._oDialog) {
-                console.error("Dialog belum dimuat.");
-                return;
-            }
-
-            // Retrieve fragment controls using the fixed fragment ID ("documentUploadDialog")
-            let oDocTypeSelect = Fragment.byId(oView.getId(), "docTypeSelect");
-            let oPicSelect = Fragment.byId(oView.getId(), "picSelect");
-            let oKeteranganInput = Fragment.byId(oView.getId(), "keteranganInput");
-            let oFileUploader = Fragment.byId(oView.getId(), "fileUploader");
-
-            if (!oDocTypeSelect || !oPicSelect || !oKeteranganInput || !oFileUploader) {
-                console.error("Salah satu elemen dalam fragment tidak ditemukan.");
-                return;
-            }
-
-            // Get selected document type key and text
-            let sDocTypeKey   = oDocTypeSelect.getSelectedKey();
-            let sDocTypeText  = oDocTypeSelect.getSelectedItem() ? oDocTypeSelect.getSelectedItem().getText() : "";
-            // // Get selected PIC text from the picSelect control
-            let sPICText      = oPicSelect.getSelectedItem() ? oPicSelect.getSelectedItem().getText() : "";
-            // Get keterangan input and file uploader value
-            let sKeterangan   = oKeteranganInput.getValue();
-            let sFileValue    = oFileUploader.getValue();
-
-            if (!sFileValue) {
-                MessageBox.error("Dokumen harus diunggah.");
-                return;
-            }
-
-            let sFileSize = oFileUploader.oFileUpload.files[0].size;
-            let sFileName = sFileValue.split("\\").pop();
-            let sFileType = sFileValue.split('.').pop().toLowerCase();
-
-            // Validate file type
-            if (sFileType !== "pdf") {
-                MessageBox.error(this.getResourceBundle().getText("msgDocType"));
-                return false;
-            }
-
-            // Check if document is blank
-            if (!sFileValue) {
-                MessageBox.error(this.getResourceBundle().getText("msgMissingDoc"));
-                return false;
-            }
-            
-            let sFileUrl      = "/uploads/" + + sFileName;
-            
-            // Prepare new document item
-            let oNewDoc = {
-                docType: sDocTypeKey,
-                docTypeText: sDocTypeText,
-                keterangan: sKeterangan,
-                fileUrl: sFileUrl,
-                fileSize: sFileSize,
-                fileName: sFileName,
-                pic: sPICText
-            };
-
-            let isValid = this._validateEntries(this._oDialog, "grpValidation");
-            if (!isValid) {
-                return false;
-            }
-
-            // Add new document to the "docUploads" model
-            let oDocUploadModel = oView.getModel("docUploads");
-            let aUploads = oDocUploadModel.getProperty("/uploads");
-            aUploads.push(oNewDoc);
-            oDocUploadModel.setProperty("/uploads", aUploads);
-            
-            // Clear fields then close dialog
-            oDocTypeSelect.setSelectedKey("");
-            oPicSelect.setSelectedKey("");
-            oKeteranganInput.setValue("");
-            oFileUploader.setValue("");
-            this._oDialog.close();
-        },
+        // onDisplayDocumentWarning: function () {
+        //     const oEmployeeModel = this.getView().getModel("employee");
+        //     const oEmployeeDetailModel = this.getView().getModel("employeeDetail");
         
-        onShowDoc: function(oEvent) {
-            // Get the binding context from the pressed link
-            const oSource = oEvent.getSource();
-            const oBindingContext = oSource.getBindingContext("docUploads");
-            
-            if (!oBindingContext) {
-                MessageToast.show("Document information not found.");
-                return;
-            }
-            
-            // Get the document details from the context
-            const oDocItem = oBindingContext.getObject();
-            console.log("Document to preview:", oDocItem);
-            
-            if (!oDocItem || !oDocItem.fileName) {
-                MessageToast.show("Document file not found.");
-                return;
-            }
-            
-            // For PDF preview, let's use a dialog with PDF viewer
-            if (!this._pdfViewerDialog) {
-                Fragment.load({
-                    name: "bsim.hcmapp.man.grievance.view.fragments.PDFViewer",
-                    controller: this
-                }).then(function(oDialog) {
-                    this._pdfViewerDialog = oDialog;
-                    this.getView().addDependent(this._pdfViewerDialog);
-                    this._pdfViewerDialog.open();
-                    
-                    // Wait for dialog to be rendered before setting content
-                    setTimeout(function() {
-                        this._showPdfInDialog(oDocItem);
-                    }.bind(this), 300);
-                    
-                }.bind(this)).catch(function(err) {
+        //     // Attempt to get EmployeeNumber from employee model
+        //     let sEmployeeNumber = oEmployeeModel ? oEmployeeModel.getProperty("/EmployeeNumber") : null;
+        //     console.warn("EmployeeNumber from 'employee' model:", sEmployeeNumber);
+        
+        //     // If not found, fallback to employeeDetail model
+        //     if (!sEmployeeNumber) {
+        //         sEmployeeNumber = oEmployeeDetailModel ? oEmployeeDetailModel.getProperty("/EmployeeNumber") : null;
+        //         console.warn("EmployeeNumber from 'employeeDetail' model:", sEmployeeNumber);
+        //     }
+        
+        //     if (!sEmployeeNumber) {
+        //         console.error("Employee number is missing in both 'employee' and 'employeeDetail' models.");
+        //         sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+        //         return;
+        //     }
+        
+        //     const oModel = this.getOwnerComponent().getModel("Grievances"); // Access the Grievances model
+        //     if (!oModel) {
+        //         console.error("Grievances model is not available.");
+        //         sap.m.MessageBox.error("System error: Grievances model is not available.");
+        //         return;
+        //     }
+        
+        //     console.warn("Fetching requests for EmployeeNumber:", sEmployeeNumber);
+        
+        //     // Step 1: Fetch requests matching the employee number
+        //     oModel.read("/RequestSet", {
+        //         filters: [new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, sEmployeeNumber)],
+        //         urlParameters: {
+        //             "$orderby": "CreatedOn desc" // Sort by CreatedOn descending
+        //         },
+        //         success: (oData) => {
+        //             console.warn("Requests fetched successfully:", oData);
+        
+        //             if (!oData.results || oData.results.length === 0) {
+        //                 console.warn("No requests found for EmployeeNumber:", sEmployeeNumber);
+        //                 sap.m.MessageBox.error("No requests found for the given employee.");
+        //                 return;
+        //             }
+        
+        //             // Step 2: Get the most recent request
+        //             const oLatestRequest = oData.results[0];
+        //             const sRequestGUID = oLatestRequest.RequestId;
+        //             console.warn("Most recent RequestId:", sRequestGUID);
+        
+        //             // Step 3: Expand to toAttachmentView
+        //             const sExpandPath = `/RequestSet(guid'${sRequestGUID}')/toAttachmentView`;
+        //             console.warn("Expanding to path:", sExpandPath);
+        
+        //             oModel.read(sExpandPath, {
+        //                 success: (oAttachmentData) => {
+        //                     console.warn("Attachments fetched successfully:", oAttachmentData);
+        
+        //                     if (!oAttachmentData.results || oAttachmentData.results.length === 0) {
+        //                         console.warn("No attachments found for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No attachments found for the latest request.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 4: Find the document with the latest SequenceNo
+        //                     const oLatestAttachment = oAttachmentData.results.reduce((latest, current) => {
+        //                         return current.SequenceNo > latest.SequenceNo ? current : latest;
+        //                     });
+        
+        //                     console.warn("Latest attachment:", oLatestAttachment);
+        
+        //                     if (!oLatestAttachment || !oLatestAttachment.Url) {
+        //                         console.warn("No valid document URL found in the attachments for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No valid document URL found in the attachments.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 5: Display the document
+        //                     const sDocumentUrl = oLatestAttachment.Url;
+        //                     console.warn("Opening document URL:", sDocumentUrl);
+        //                     window.open(sDocumentUrl, "_blank");
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error("Error fetching attachments:", oError);
+        //                     sap.m.MessageBox.error("Failed to fetch attachments for the latest request.");
+        //                 }
+        //             });
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error fetching requests:", oError);
+        //             sap.m.MessageBox.error("Failed to fetch requests for the given employee.");
+        //         }
+        //     });
+        // },
 
-                    MessageToast.show("Error loading PDF viewer. See console for details.");
-                });
-            } else {
-                this._pdfViewerDialog.open();
-                // Use timeout to ensure dialog is rendered before accessing the iframe
-                setTimeout(function() {
-                    this._showPdfInDialog(oDocItem);
-                }.bind(this), 300);
+        onDisplayDocumentWarning: function () {
+            const oEmployeeModel = this.getView().getModel("employee");
+            const sEmployeeNumber = oEmployeeModel ? oEmployeeModel.getProperty("/EmployeeNumber") : null;
+        
+            if (!sEmployeeNumber) {
+                console.error("Employee number is missing in the 'employee' model.");
+                sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+                return;
             }
+        
+            console.log("Fetching requests for EmployeeNumber:", sEmployeeNumber);
+        
+            const oModel = this.getOwnerComponent().getModel("Grievances");
+            if (!oModel) {
+                console.error("Grievances model is not available.");
+                sap.m.MessageBox.error("System error: Grievances model is not available.");
+                return;
+            }
+        
+            oModel.read("/RequestSet", {
+                filters: [new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, sEmployeeNumber)],
+                urlParameters: {
+                    "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+                },
+                success: (oData) => {
+                    console.log("Requests fetched successfully:", oData);
+        
+                    const aRequests = oData.results || [];
+                    const aFilteredRequests = aRequests.filter(request => request.EmployeeNumber === sEmployeeNumber);
+        
+                    if (aFilteredRequests.length === 0) {
+                        console.warn(`No requests found for EmployeeNumber: ${sEmployeeNumber}`);
+                        sap.m.MessageBox.error(`No requests found for EmployeeNumber: ${sEmployeeNumber}`);
+                        return;
+                    }
+        
+                    const oLatestRequest = aFilteredRequests[0]; // The first request is the newest due to sorting
+                    console.log("Most recent request:", oLatestRequest);
+        
+                    const sExpandPath = `/RequestSet(guid'${oLatestRequest.RequestId}')/toAttachmentView`;
+                    console.log("Expanding to path:", sExpandPath);
+        
+                    oModel.read(sExpandPath, {
+                        success: (oAttachmentData) => {
+                            console.log("Attachments fetched successfully:", oAttachmentData);
+        
+                            if (!oAttachmentData.results || oAttachmentData.results.length === 0) {
+                                console.warn("No attachments found for the latest request.");
+                                sap.m.MessageBox.error("No attachments found for the latest request.");
+                                return;
+                            }
+        
+                            const oSelectedAttachment = oAttachmentData.results.reduce((highest, current) => {
+                                return current.SequenceNo > highest.SequenceNo ? current : highest;
+                            });
+        
+                            console.log("Selected attachment with highest SequenceNo:", oSelectedAttachment);
+        
+                            if (!oSelectedAttachment || !oSelectedAttachment.Url) {
+                                console.warn("No valid document URL found in the attachments.");
+                                sap.m.MessageBox.error("No valid document URL found in the attachments.");
+                                return;
+                            }
+        
+                            const sDocumentUrl = oSelectedAttachment.Url;
+                            console.log("Opening document URL:", sDocumentUrl);
+                            window.open(sDocumentUrl, "_blank");
+                        },
+                        error: (oError) => {
+                            console.error("Error fetching attachments:", oError);
+                            sap.m.MessageBox.error("Failed to fetch attachments for the latest request.");
+                        }
+                    });
+                },
+                error: (oError) => {
+                    console.error("Error fetching requests:", oError);
+                    sap.m.MessageBox.error("Failed to fetch requests for the given employee.");
+                }
+            });
         },
+
+        // onDisplayDocumentWarning: function () {
+        //     const oEmployeeModel = this.getView().getModel("employee");
+        //     const oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+        
+        //     // Attempt to get EmployeeNumber from employee model
+        //     let sEmployeeNumber = oEmployeeModel ? oEmployeeModel.getProperty("/EmployeeNumber") : null;
+        //     console.warn("EmployeeNumber from 'employee' model:", sEmployeeNumber);
+        
+        //     // If not found, fallback to employeeDetail model
+        //     if (!sEmployeeNumber) {
+        //         sEmployeeNumber = oEmployeeDetailModel ? oEmployeeDetailModel.getProperty("/EmployeeNumber") : null;
+        //         console.warn("EmployeeNumber from 'employeeDetail' model:", sEmployeeNumber);
+        //     }
+        
+        //     if (!sEmployeeNumber) {
+        //         console.error("Employee number is missing in both 'employee' and 'employeeDetail' models.");
+        //         sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+        //         return;
+        //     }
+        
+        //     const oModel = this.getOwnerComponent().getModel("Grievances"); // Access the Grievances model
+        //     if (!oModel) {
+        //         console.error("Grievances model is not available.");
+        //         sap.m.MessageBox.error("System error: Grievances model is not available.");
+        //         return;
+        //     }
+        
+        //     console.warn("Fetching requests for EmployeeNumber:", sEmployeeNumber);
+        
+        //     // Step 1: Fetch requests matching the employee number
+        //     oModel.read("/RequestSet", {
+        //         filters: [new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, sEmployeeNumber)],
+        //         urlParameters: {
+        //             "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+        //         },
+        //         success: (oData) => {
+        //             console.warn("Requests fetched successfully:", oData);
+        
+        //             if (!oData.results || oData.results.length === 0) {
+        //                 console.warn("No requests found for EmployeeNumber:", sEmployeeNumber);
+        //                 sap.m.MessageBox.error("No requests found for the given employee.");
+        //                 return;
+        //             }
+        
+        //             // Step 2: Get the most recent request based on CreatedOn and CreatedAt
+        //             const oLatestRequest = oData.results.reduce((latest, current) => {
+        //                 const latestDate = new Date(latest.CreatedOn);
+        //                 const currentDate = new Date(current.CreatedOn);
+        
+        //                 if (currentDate > latestDate) {
+        //                     return current;
+        //                 } else if (currentDate.getTime() === latestDate.getTime()) {
+        //                     // Compare CreatedAt if CreatedOn is the same
+        //                     const latestTime = latest.CreatedAt.ms || 0;
+        //                     const currentTime = current.CreatedAt.ms || 0;
+        //                     return currentTime > latestTime ? current : latest;
+        //                 }
+        //                 return latest;
+        //             });
+        
+        //             const sRequestGUID = oLatestRequest.RequestId;
+        //             console.warn("Most recent RequestId:", sRequestGUID);
+        
+        //             const sExpandPath = `/RequestSet(guid'${sRequestGUID}')/toAttachmentView`;
+        //             console.warn("Expanding to path:", sExpandPath);
+        
+        //             oModel.read(sExpandPath, {
+        //                 success: (oAttachmentData) => {
+        //                     console.warn("Attachments fetched successfully:", oAttachmentData);
+        
+        //                     if (!oAttachmentData.results || oAttachmentData.results.length === 0) {
+        //                         console.warn("No attachments found for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No attachments found for the latest request.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 4: Filter documents with TypeDoc "ST/TP Baru"
+        //                     const aSTTPBaruDocs = oAttachmentData.results.filter(doc => doc.TypeDoc === "ST/SP Baru");
+        
+        //                     if (aSTTPBaruDocs.length === 0) {
+        //                         console.warn("No documents with TypeDoc 'ST/SP Baru' found for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No documents with TypeDoc 'ST/TP Baru' found.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 5: Find the document with the highest SequenceNo
+        //                     const oSelectedAttachment = aSTTPBaruDocs.reduce((highest, current) => {
+        //                         return current.SequenceNo > highest.SequenceNo ? current : highest;
+        //                     });
+        
+        //                     console.warn("Selected attachment with highest SequenceNo:", oSelectedAttachment);
+        
+        //                     if (!oSelectedAttachment || !oSelectedAttachment.Url) {
+        //                         console.warn("No valid document URL found in the attachments for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No valid document URL found in the attachments.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 6: Display the document
+        //                     const sDocumentUrl = oSelectedAttachment.Url;
+        //                     console.warn("Opening document URL:", sDocumentUrl);
+        //                     window.open(sDocumentUrl, "_blank");
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error("Error fetching attachments:", oError);
+        //                     sap.m.MessageBox.error("Failed to fetch attachments for the latest request.");
+        //                 }
+        //             });
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error fetching requests:", oError);
+        //             sap.m.MessageBox.error("Failed to fetch requests for the given employee.");
+        //         }
+        //     });
+        // },
+
+        // onDisplayDocumentWarning: function () {
+        //     const oEmployeeModel = this.getView().getModel("employee");
+        //     const oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+        
+        //     // Attempt to get EmployeeNumber from employee model
+        //     let sEmployeeNumber = oEmployeeModel ? oEmployeeModel.getProperty("/EmployeeNumber") : null;
+        //     console.warn("EmployeeNumber from 'employee' model:", sEmployeeNumber);
+        
+        //     // If not found, fallback to employeeDetail model
+        //     if (!sEmployeeNumber) {
+        //         sEmployeeNumber = oEmployeeDetailModel ? oEmployeeDetailModel.getProperty("/EmployeeNumber") : null;
+        //         console.warn("EmployeeNumber from 'employeeDetail' model:", sEmployeeNumber);
+        //     }
+        
+        //     if (!sEmployeeNumber) {
+        //         console.error("Employee number is missing in both 'employee' and 'employeeDetail' models.");
+        //         sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+        //         return;
+        //     }
+        
+        //     const oModel = this.getOwnerComponent().getModel("Grievances"); // Access the Grievances model
+        //     if (!oModel) {
+        //         console.error("Grievances model is not available.");
+        //         sap.m.MessageBox.error("System error: Grievances model is not available.");
+        //         return;
+        //     }
+        
+        //     console.warn("Fetching requests for EmployeeNumber:", sEmployeeNumber);
+        
+        //     // Step 1: Fetch requests matching the employee number
+        //     oModel.read("/RequestSet", {
+        //         filters: [new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, sEmployeeNumber)],
+        //         urlParameters: {
+        //             "$orderby": "CreatedOn desc, CreatedAt desc" // Sort by CreatedOn and CreatedAt descending
+        //         },
+        //         success: (oData) => {
+        //             console.warn("Requests fetched successfully:", oData);
+        
+        //             if (!oData.results || oData.results.length === 0) {
+        //                 console.warn("No requests found for EmployeeNumber:", sEmployeeNumber);
+        //                 sap.m.MessageBox.error("No requests found for the given employee.");
+        //                 return;
+        //             }
+        
+        //             // Step 2: Get the most recent request based on CreatedOn and CreatedAt
+        //             const oLatestRequest = oData.results.reduce((latest, current) => {
+        //                 const latestDate = new Date(latest.CreatedOn);
+        //                 const currentDate = new Date(current.CreatedOn);
+        
+        //                 if (currentDate > latestDate) {
+        //                     return current;
+        //                 } else if (currentDate.getTime() === latestDate.getTime()) {
+        //                     // Compare CreatedAt if CreatedOn is the same
+        //                     const latestTime = latest.CreatedAt.ms || 0;
+        //                     const currentTime = current.CreatedAt.ms || 0;
+        //                     return currentTime > latestTime ? current : latest;
+        //                 }
+        //                 return latest;
+        //             });
+        
+        //             const sRequestGUID = oLatestRequest.RequestId;
+        //             console.warn("Most recent RequestId:", sRequestGUID);
+        
+        //             // Step 3: Expand to toAttachmentView
+        //             const sExpandPath = `/RequestSet(guid'${sRequestGUID}')/toAttachmentView`;
+        //             console.warn("Expanding to path:", sExpandPath);
+        
+        //             oModel.read(sExpandPath, {
+        //                 success: (oAttachmentData) => {
+        //                     console.warn("Attachments fetched successfully:", oAttachmentData);
+        
+        //                     if (!oAttachmentData.results || oAttachmentData.results.length === 0) {
+        //                         console.warn("No attachments found for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No attachments found for the latest request.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 4: Find the document with the latest SequenceNo
+        //                     const oLatestAttachment = oAttachmentData.results.reduce((latest, current) => {
+        //                         return current.SequenceNo > latest.SequenceNo ? current : latest;
+        //                     });
+        
+        //                     console.warn("Latest attachment:", oLatestAttachment);
+        
+        //                     if (!oLatestAttachment || !oLatestAttachment.Url) {
+        //                         console.warn("No valid document URL found in the attachments for RequestId:", sRequestGUID);
+        //                         sap.m.MessageBox.error("No valid document URL found in the attachments.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 5: Display the document
+        //                     const sDocumentUrl = oLatestAttachment.Url;
+        //                     console.warn("Opening document URL:", sDocumentUrl);
+        //                     window.open(sDocumentUrl, "_blank");
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error("Error fetching attachments:", oError);
+        //                     sap.m.MessageBox.error("Failed to fetch attachments for the latest request.");
+        //                 }
+        //             });
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error fetching requests:", oError);
+        //             sap.m.MessageBox.error("Failed to fetch requests for the given employee.");
+        //         }
+        //     });
+        // },
+
+        // onDisplayDocumentWarning: function () {
+        //     const oModel = this.getOwnerComponent().getModel("Grievances"); // Access the Grievances model
+        //     const sEmployeeNumber = this.getView().getModel("employeeDetail").getProperty("/EmployeeNumber");
+        
+        //     if (!sEmployeeNumber) {
+        //         sap.m.MessageBox.error("Employee number is missing. Cannot fetch document.");
+        //         return;
+        //     }
+        
+        //     // Step 1: Fetch requests matching the employee number
+        //     oModel.read("/RequestSet", {
+        //         filters: [new sap.ui.model.Filter("EmployeeNumber", sap.ui.model.FilterOperator.EQ, sEmployeeNumber)],
+        //         urlParameters: {
+        //             "$orderby": "CreatedOn desc" // Sort by CreatedOn descending
+        //         },
+        //         success: (oData) => {
+        //             if (!oData.results || oData.results.length === 0) {
+        //                 sap.m.MessageBox.error("No requests found for the given employee.");
+        //                 return;
+        //             }
+        
+        //             // Step 2: Get the most recent request
+        //             const oLatestRequest = oData.results[0];
+        //             const sRequestGUID = oLatestRequest.RequestId;
+        
+        //             // Step 3: Expand to toAttachmentView
+        //             const sExpandPath = `/RequestSet(guid'${sRequestGUID}')/toAttachmentView`;
+        //             oModel.read(sExpandPath, {
+        //                 success: (oAttachmentData) => {
+        //                     if (!oAttachmentData.results || oAttachmentData.results.length === 0) {
+        //                         sap.m.MessageBox.error("No attachments found for the latest request.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 4: Find the document with the latest SequenceNo
+        //                     const oLatestAttachment = oAttachmentData.results.reduce((latest, current) => {
+        //                         return current.SequenceNo > latest.SequenceNo ? current : latest;
+        //                     });
+        
+        //                     if (!oLatestAttachment || !oLatestAttachment.DocumentUrl) {
+        //                         sap.m.MessageBox.error("No valid document found in the attachments.");
+        //                         return;
+        //                     }
+        
+        //                     // Step 5: Display the document
+        //                     window.open(oLatestAttachment.DocumentUrl, "_blank");
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error("Error fetching attachments:", oError);
+        //                     sap.m.MessageBox.error("Failed to fetch attachments for the latest request.");
+        //                 }
+        //             });
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error fetching requests:", oError);
+        //             sap.m.MessageBox.error("Failed to fetch requests for the given employee.");
+        //         }
+        //     });
+        // },
 
         handleLiveChange: function (oEvent) {
             var oTextArea = oEvent.getSource(),
@@ -579,6 +1151,10 @@ sap.ui.define([
             if (!this._validateEntries(oView, "grpValidation")) {
                 return;
             }
+
+            // Disable the submit button
+            const oViewModel = this.getView().getModel("viewModel");
+            oViewModel.setProperty("/isSubmitDisabled", true);
         
             // Confirm with user before sending
             MessageBox.confirm("Do you want to submit this request?", {
@@ -595,16 +1171,156 @@ sap.ui.define([
             });
         },
 
-        _postRequest: function () {
-            // Prepare mutation payload
-            let oEmployeeModel = this.getView().getModel("employee");
-            let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
+        // onSendRequest: function () {
+        //     // Get employee model
+        //     let oEmployeeModel = this.getView().getModel("employee");
+        //     console.log("Employee Model Data:", oEmployeeModel.getData());
+        //     let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
+        //     let oSelectedEmpSupervisor = oEmployeeModel.getProperty("/Supervisor");
         
-            let oCurrentUserModel = this.getView().getModel("currentUser");
-            let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
+        //     // Get the logged-in user's employee number
+        //     let oCurrentUserModel = this.getView().getModel("currentUser");
+        //     let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
+        
+        //     console.log("Selected Employee:", oSelectedEmp);
+        //     console.log("Selected Employee's Supervisor:", oSelectedEmpSupervisor);
+        //     console.log("Logged-in User's Employee ID:", sLoggedInEmployeeId);
+        
+        //     if (!oSelectedEmp) {
+        //         MessageBox.error("Please select an employee first.");
+        //         return;
+        //     }
+        
+        //     if (!sLoggedInEmployeeId) {
+        //         MessageBox.error("Unable to retrieve logged-in user details.");
+        //         return;
+        //     }
+        
+        //     // Ensure the user cannot perform actions on themselves
+        //     if (oSelectedEmp === sLoggedInEmployeeId) {
+        //         MessageBox.error("You cannot perform actions on yourself.");
+        //         return;
+        //     }
+        
+        //     // Check if the logged-in user is a supervisor of the selected employee
+        //     if (oSelectedEmpSupervisor !== sLoggedInEmployeeId) {
+        //         MessageBox.error("You are not authorized to perform this action on the selected employee.");
+        //         return;
+        //     }
+        
+        //     // Check for existing requests for the employee
+        //     const oModel = this.getOwnerComponent().getModel();
+        //     oModel.read("/RequestSet", {
+        //         filters: [
+        //             new Filter("EmployeeNumber", FilterOperator.EQ, oSelectedEmp),
+        //             new Filter("Status", FilterOperator.NE, "P") // Exclude "posted" requests
+        //         ],
+        //         success: (oData) => {
+        //             console.log("Data returned from backend:", oData);
+                
+        //             // Ensure results exist and are properly filtered
+        //             const aResults = oData.results || [];
+        //             const aFilteredResults = aResults.filter(request => request.EmployeeNumber === oSelectedEmp && request.Status !== "P");
+                
+        //             if (aFilteredResults.length > 0) {
+        //                 MessageBox.error("A movement request for this employee is already in progress. Please complete the approval process before creating a new request.");
+        //                 return;
+        //             }
+                
+        //             // Proceed with submission if no conflicting requests are found
+        //             this._validateAndSubmitRequest();
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error checking existing requests:", oError);
+        //             MessageBox.error("Failed to check existing requests. Please try again later.");
+        //         }
+        //     });
+        // },
+        
+        // _validateAndSubmitRequest: function () {
+        //     // Validate required entries
+        //     var oView = this.getView();
+        //     if (!this._validateEntries(oView, "grpValidation")) {
+        //         return;
+        //     }
+        
+        //     // Confirm with user before sending
+        //     MessageBox.confirm("Do you want to submit this request?", {
+        //         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        //         emphasizedAction: MessageBox.Action.NO,
+        //         initialFocus: MessageBox.Action.NO,
+        //         onClose: (sAction) => {
+        //             if (sAction === MessageBox.Action.YES) {
+        //                 this._postRequest();
+        //             }
+        //         }
+        //     });
+        // },
 
+        _postRequest: function () {
+            const oEmployeeModel = this.getView().getModel("employee");
+            const oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+            const oCurrentUserModel = this.getView().getModel("currentUser");
+        
+            if (!oEmployeeModel || !oCurrentUserModel) {
+                MessageBox.error("Required models are not available.");
+                return;
+            }
+        
+            const oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
+            const sLoggedInEmployeeId = oCurrentUserModel.getProperty("/EmployeeNumber");
+            
+            const oPlansReqDesc = oCurrentUserModel.getProperty("/EmployeePositionLongtext");
+            const oNamaKantorReq = oCurrentUserModel.getProperty("/NamaKantorReq");
+            const oDivisiDescReq = oCurrentUserModel.getProperty("/DivisionText");
+
+            const sBeginDate = oEmployeeDetailModel.getProperty("/BeginDate");
+
+            const oDropdownModel = this.getView().getModel("dropdown");
+            const sSelectedAs = oDropdownModel.getProperty("/selectedAs") || "";
+
+            // Get models
+            const oPositionModel = this.getView().getModel("position");
+            const oGroupModel = this.getView().getModel("group");
+            const oSubGroupModel = this.getView().getModel("subGroup");
+            const oAreaModel = this.getView().getModel("area");
+            const oSubAreaModel = this.getView().getModel("subArea");
+
+            // Get selected objects
+            const oSelectedPosition = oPositionModel.getProperty("/selectedPosition") || {};
+            const oSelectedGroup = oGroupModel.getProperty("/selectedGroup") || {};
+            const oSelectedSubGroup = oSubGroupModel.getProperty("/selectedSubGroup") || {};
+            const oSelectedArea = oAreaModel.getProperty("/selectedArea") || {};
+            const oSelectedSubArea = oSubAreaModel.getProperty("/selectedSubArea") || {};
+
+            // Use value help selection if present, else fallback to position
+            const PlansDest      = oSelectedPosition.Key || this.byId("newPositionIdMutation").getValue();
+            const PlansDesc_Dest = oSelectedPosition.Value || this.byId("newPositionTextMutation").getText();
+
+            const PersgDest      = oSelectedGroup.Key || oSelectedPosition.Key6 || this.byId("newEmployeeGroupIdMutation").getValue();
+            const PersgDestDesc  = oSelectedGroup.Value || oSelectedPosition.KeyDesc6 || this.byId("newEmployeeGroupTextMutation").getText();
+
+            const PerskDest      = oSelectedSubGroup.Key2 || oSelectedPosition.Key7 || this.byId("newEmployeeSubgroupIdMutation").getValue();
+            const PerskDestDesc  = oSelectedSubGroup.Value || oSelectedPosition.KeyDesc7 || this.byId("newEmployeeSubgroupTextMutation").getText();
+
+            const WerksDest      = oSelectedArea.Key || oSelectedPosition.Key4 || this.byId("newPerAreaIdMutation").getValue();
+            const WerksDestDesc  = oSelectedArea.Value || oSelectedPosition.KeyDesc4 || this.byId("newPerAreaTextMutation").getText();
+
+            const BtrtlDest      = oSelectedSubArea.Key2 || oSelectedPosition.Key5 || this.byId("newPerSubAreaIdMutation").getValue();
+            const BtrtlDestDesc  = oSelectedSubArea.Value || oSelectedPosition.KeyDesc5 || this.byId("newPerSubAreaTextMutation").getText();
+        
             if (!sLoggedInEmployeeId) {
                 MessageBox.error("Unable to retrieve logged-in user details.");
+                return;
+            }
+        
+            if (!oSelectedEmp) {
+                MessageBox.error("Please select an employee first.");
+                return;
+            }
+
+            if (!sBeginDate) {
+                MessageBox.error("Unable to retrieve the employee's BeginDate.");
                 return;
             }
         
@@ -616,79 +1332,67 @@ sap.ui.define([
                 }
                 return null;
             };
-
-            const checkboxIds = ["hasilMutation1", "hasilMutation2", "hasilMutation3", "hasilMutation4", "hasilMutation5"];
-            let Zbichecking = checkboxIds
-                .map(id => this.byId(id))
-                .filter(checkbox => checkbox && checkbox.getSelected())
-                .map(checkbox => checkbox.getText())
-                .join(",");
-
-            // Retrieve the position description from the ValueHelpPositionSet model
-            let oPositionModel = this.getView().getModel("position");
-            let oSelectedPosition = oPositionModel.getProperty("/selectedPosition");
-            let sPlansDestDesc = oSelectedPosition ? oSelectedPosition.Value : "";
-
-            let oAreaModel = this.getView().getModel("area");
-            let oSelectedArea = oAreaModel.getProperty("/selectedArea");
-            let sWerksDestDesc = oSelectedArea ? oSelectedArea.Value : "";
-
-            let oReasonModel = this.getView().getModel("reason");
-            let oSelectedReason = oReasonModel.getProperty("/selectedReason");
-            let sMassgDesc = oSelectedReason ? oSelectedReason.Value : "";
         
-            // Retrieve the sub-area description from the ValueHelpSubArea model
-            let oSubAreaModel = this.getView().getModel("subArea");
-            let oSelectedSubArea = oSubAreaModel.getProperty("/selectedSubArea");
-            let sBtrtlDestDesc = oSelectedSubArea ? oSelectedSubArea.Value : "";
-
-            // Retrieve the group description from the ValueHelpGroup model
-            let oGroupModel = this.getView().getModel("group");
-            let oSelectedGroup = oGroupModel.getProperty("/selectedGroup");
-            let sPersgDestDesc = oSelectedGroup ? oSelectedGroup.Value : "";
-
-            // Retrieve the subgroup description from the ValueHelpSubGroup model
-            let oSubGroupModel = this.getView().getModel("subGroup");
-            let oSelectedSubGroup = oSubGroupModel.getProperty("/selectedSubGroup");
-            let sPerskDestDesc = oSelectedSubGroup ? oSelectedSubGroup.Value : "";
-
-            // Retrieve the employee change description from the ValueHelpNumberSet model
-            let oEmployeeChangeModel = this.getView().getModel("employeechange");
-            let oSelectedEmployeeChange = oEmployeeChangeModel.getProperty("/selectedEmployeeChange");
-            let sZexholderDesc = oSelectedEmployeeChange ? oSelectedEmployeeChange.Value : "";
-        
-            let oPayload = {
+            const oPayload = {
                 RequestId: "00000000-0000-0000-0000-000000000000",
                 EmployeeNumber: oSelectedEmp,
                 Status: "S",
                 PicNumber: sLoggedInEmployeeId,
                 Massg: this.byId("reasonMutation").getValue(),
+                MassgDesc: this.byId("reasonTextMutation").getText(),
+                BeginDate: getFormattedDate("actDateStartMutation"),
+                EndDate: getFormattedDate("actDateEndMutation"),
+                StartDate: sBeginDate,
                 ZbegdaEfktf: getFormattedDate("effectiveDateStartMutation"),
                 ZenddaEfktf: getFormattedDate("effectiveDateEndMutation"),
-                PlansDest: this.byId("newPositionIdMutation").getValue(),
-                PersgDest: this.byId("newEmployeeGroupIdMutation").getValue(),
-                PerskDest: this.byId("newEmployeeSubgroupIdMutation").getValue(),
-                WerksDest: this.byId("newPerAreaIdMutation").getValue(),
-                BtrtlDest: this.byId("newPerSubAreaIdMutation").getValue(),
+                // PlansDest: this.byId("newPositionIdMutation").getValue(),
+                // PlansDesc_Dest: this.byId("newPositionTextMutation").getText(),
+                // PersgDest: this.byId("newEmployeeGroupIdMutation").getValue(),
+                // PersgDestDesc: this.byId("newEmployeeGroupTextMutation").getText(),
+                // PerskDest: this.byId("newEmployeeSubgroupIdMutation").getValue(),
+                // PerskDestDesc: this.byId("newEmployeeSubgroupTextMutation").getText(),
+                // WerksDest: this.byId("newPerAreaIdMutation").getValue(),
+                // WerksDestDesc: this.byId("newPerAreaTextMutation").getText(),
+                // BtrtlDest: this.byId("newPerSubAreaIdMutation").getValue(),
+                // BtrtlDestDesc: this.byId("newPerSubAreaTextMutation").getText(),
+                PlansDest: PlansDest,
+                PlansDesc_Dest: PlansDesc_Dest,
+                PersgDest: PersgDest,
+                PersgDestDesc: PersgDestDesc,
+                PerskDest: PerskDest,
+                PerskDestDesc: PerskDestDesc,
+                WerksDest: WerksDest,
+                WerksDestDesc: WerksDestDesc,
+                BtrtlDest: BtrtlDest,
+                BtrtlDestDesc: BtrtlDestDesc,
                 Adjstmn: this.getView().getModel("dropdown").getProperty("/selectedSalaryAdj") || "",
                 Zsalary: this.byId("salaryAdjValueMutation").getValue() ? this.byId("salaryAdjValueMutation").getValue().replace(/\D/g, '') : "0",
-                Zdasar1: this.getView().getModel("dropdown").getProperty("/selectedAs") || "",
+                Zdasar1: sSelectedAs,
                 Zexholder: this.byId("employeeChangeMutation").getValue(),
+                ZexholderDesc: this.byId("employeeChangeTextMutation").getText(),
                 Zdasar2: this.byId("basicConMutation").getValue(),
-                // Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
-                // Zbichecking: Zbichecking,
-                // Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
-                // ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
-                // Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(),
-                // Znotedisp: this.byId("dispoNoteMutation").getValue(),
-                // Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0",
-                PlansDesc_Dest: sPlansDestDesc,
-                WerksDestDesc: sWerksDestDesc,
-                BtrtlDestDesc: sBtrtlDestDesc,
-                PersgDestDesc: sPersgDestDesc,
-                PerskDestDesc: sPerskDestDesc,
-                ZexholderDesc: sZexholderDesc,
-                MassgDesc: sMassgDesc
+                PlansAsl: this.byId("currentPositionIdMutation").getValue(),
+                PlansDescAsl: this.byId("currentPositionTextMutation").getText(),
+                WerksAsl: this.byId("currentPerAreaIdMutation").getValue(), 
+                WerksDescAsl: this.byId("currentPerAreaTextMutation").getText(),
+                BtrtlAsl: this.byId("currentPerSubAreaIdMutation").getValue(),
+                BtrtlDescAsl: this.byId("currentPerSubAreaTextMutation").getText(),
+                OuAsl: this.byId("currentUnitOrgIdMutation").getValue(),
+                OuDecAsl: this.byId("currentUnitOrgTextMutation").getText(),
+                OuDest: this.byId("newUnitOrgIdMutation").getValue(),
+                OuDescDest: this.byId("newUnitOrgTextMutation").getText(),
+                DivisiAsl: this.byId("currentDivisionIdMutation").getValue(),
+                DivisiDescAsl: this.byId("currentDivisionTextMutation").getText(), 
+                DivisiDest: this.byId("newDivisionIdMutation").getValue(),
+                DivisiDescDest: this.byId("newDivisionTextMutation").getText(),
+                PlansReqDesc: oPlansReqDesc,
+                NamaKantorReq: oNamaKantorReq,
+                DivisiDescReq: oDivisiDescReq,
+                CareerBandAsl: this.byId("careerAsalMutasi").getValue(),
+                CareerBandDescAsl: this.byId("careerAsalTextMutasi").getText(),
+                CareerBandDest: this.byId("careerTujuanMutasi").getValue(),
+                CareerBandDescDest: this.byId("careerTujuanTextMutasi").getText(),
+                TanggalJabatanDest: getFormattedDate("tanggalBerakhirMutation")
             };
         
             console.log("Mutation Payload:", oPayload);
@@ -702,26 +1406,26 @@ sap.ui.define([
             this._oBusyDialog.open();
         
             // Submit mutation data
-            let oModel = this.getOwnerComponent().getModel();
+            const oModel = this.getOwnerComponent().getModel();
             oModel.create("/RequestSet", oPayload, {
                 success: (oData) => {
                     this._oBusyDialog.close();
-                    this.onSubmitFiles(oData.RequestId);
+                    // this.onSubmitFiles(oData.RequestId);
         
-                    // Show success message
-                    sap.m.MessageToast.show("Request submitted successfully.");
-                    MessageBox.show("Request has been submitted successfully.", {
-                        icon: MessageBox.Icon.SUCCESS,
-                        title: "Success"
+                    MessageBox.success("Request has been submitted successfully.", {
+                        onClose: () => {
+                            // Navigate to history view after success
+                            this.getRouter().navTo("history");
+                        }
                     });
                 },
                 error: (oError) => {
                     this._oBusyDialog.close();
-                    
+        
                     // Show error message
                     if (oError) {
                         try {
-                            let oErrorMessage = JSON.parse(oError.responseText);
+                            const oErrorMessage = JSON.parse(oError.responseText);
                             MessageBox.error(oErrorMessage.error.message.value);
                         } catch (e) {
                             MessageBox.error("Error submitting request: " + oError.message);
@@ -729,12 +1433,271 @@ sap.ui.define([
                     } else {
                         MessageBox.error("Unknown error occurred while submitting request.");
                     }
-                },
-                urlParameters: {
-                    "sap-client": "110"
                 }
             });
         },
+
+        // onSubmitFiles: function (sRequestId) {
+        //     if (!sRequestId) {
+        //         MessageBox.error("No request ID found. Cannot upload files.");
+        //         return;
+        //     }
+        
+        //     const oModel = this.getOwnerComponent().getModel();
+        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //     const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+        
+        //     if (!aFiles || aFiles.length === 0) {
+        //         MessageBox.warning("No files to upload. Submission completed without file uploads.");
+        //         return;
+        //     }
+        
+        //     // Show busy indicator
+        //     this._oBusyDialog.open();
+        
+        //     const aPromises = aFiles.map((oFile, index) => {
+        //         const oPayload = {
+        //             Reqid: sRequestId,
+        //             Seqnr: index.toString(),
+        //             FileName: oFile.FileName,
+        //             FileType: oFile.FileType,
+        //             FileSize: oFile.FileSize.toString(),
+        //             Attachment: oFile.Attachment,
+        //             CreatedOn: new Date().toISOString().split('.')[0], // Format as ISO without milliseconds
+        //             TypeDoc: "BI Checking", // Ensure this matches backend expectations
+        //             PicPosition: "Compensation & Benefit", // Ensure this matches backend expectations
+        //             PicName: "Roy", // Ensure this matches backend expectations
+        //             PicId: "81000061", // Ensure this matches backend expectations
+        //         };
+        
+        //         console.log("Uploading file with payload:", oPayload); // Log the payload for debugging
+        
+        //         return new Promise((resolve, reject) => {
+        //             oModel.create("/FileAttachmentSet", oPayload, {
+        //                 success: resolve,
+        //                 error: reject
+        //             });
+        //         });
+        //     });
+        
+        //     Promise.all(aPromises)
+        //         .then(() => {
+        //             this._oBusyDialog.close();
+        //             MessageBox.success("All files uploaded successfully.");
+        //         })
+        //         .catch((oError) => {
+        //             this._oBusyDialog.close();
+        
+        //             // Parse and display backend error message
+        //             let sErrorMessage = "Failed to upload one or more files.";
+        //             if (oError && oError.responseText) {
+        //                 try {
+        //                     const oErrorResponse = JSON.parse(oError.responseText);
+        //                     if (oErrorResponse.error && oErrorResponse.error.message) {
+        //                         sErrorMessage = oErrorResponse.error.message.value || sErrorMessage;
+        //                     }
+        //                 } catch (e) {
+        //                     console.error("Error parsing backend response:", e);
+        //                 }
+        //             }
+        
+        //             console.error("File upload error:", oError);
+        //             MessageBox.error(sErrorMessage);
+        //         });
+        // },
+        
+        // onSubmitFiles: function (sRequestId) {
+        //     if (!sRequestId) {
+        //         MessageBox.error("No request ID found. Cannot upload files.");
+        //         return;
+        //     }
+        
+        //     const oModel = this.getOwnerComponent().getModel();
+        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //     const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+        
+        //     if (!aFiles || aFiles.length === 0) {
+        //         MessageBox.warning("No files to upload. Submission completed without file uploads.");
+        //         return;
+        //     }
+        
+        //     // Show busy indicator
+        //     this._oBusyDialog.open();
+        
+        //     const aPromises = aFiles.map((oFile, index) => {
+        //         const oPayload = {
+        //             Reqid: sRequestId,
+        //             Seqnr: index.toString(),
+        //             FileName: oFile.FileName,
+        //             FileType: oFile.FileType,
+        //             FileSize: oFile.FileSize.toString(),
+        //             Attachment: oFile.Attachment,
+        //             CreatedOn: new Date().toISOString().split('.')[0], // Format as ISO without milliseconds
+        //             TypeDoc: "BI Checking",
+        //             PicPosition: "Compensation & Benefit",
+        //             PicName: "Roy",
+        //             PicId: "81000061",
+        //         };
+        
+        //         return new Promise((resolve, reject) => {
+        //             oModel.create("/FileAttachmentSet", oPayload, {
+        //                 success: resolve,
+        //                 error: reject
+        //             });
+        //         });
+        //     });
+        
+        //     Promise.all(aPromises)
+        //         .then(() => {
+        //             this._oBusyDialog.close();
+        //             MessageBox.success("All files uploaded successfully.");
+        //         })
+        //         .catch((oError) => {
+        //             this._oBusyDialog.close();
+        //             MessageBox.error("Failed to upload one or more files. Please try again.");
+        //         });
+        // },
+
+        // _postRequest: function () {
+        //     // Prepare mutation payload
+        //     let oEmployeeModel = this.getView().getModel("employee");
+        //     let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
+        
+        //     let oCurrentUserModel = this.getView().getModel("currentUser");
+        //     let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
+
+        //     if (!sLoggedInEmployeeId) {
+        //         MessageBox.error("Unable to retrieve logged-in user details.");
+        //         return;
+        //     }
+        
+        //     const getFormattedDate = (controlId) => {
+        //         const control = this.byId(controlId);
+        //         if (control && typeof control.getDateValue === "function") {
+        //             const dateValue = control.getDateValue();
+        //             return dateValue ? this.formatter.formatDateUtc(dateValue) : null;
+        //         }
+        //         return null;
+        //     };
+
+        //     const checkboxIds = ["hasilMutation1", "hasilMutation2", "hasilMutation3", "hasilMutation4", "hasilMutation5"];
+        //     let Zbichecking = checkboxIds
+        //         .map(id => this.byId(id))
+        //         .filter(checkbox => checkbox && checkbox.getSelected())
+        //         .map(checkbox => checkbox.getText())
+        //         .join(",");
+
+        //     // Retrieve the position description from the ValueHelpPositionSet model
+        //     let oPositionModel = this.getView().getModel("position");
+        //     let oSelectedPosition = oPositionModel.getProperty("/selectedPosition");
+        //     let sPlansDestDesc = oSelectedPosition ? oSelectedPosition.Value : "";
+
+        //     let oAreaModel = this.getView().getModel("area");
+        //     let oSelectedArea = oAreaModel.getProperty("/selectedArea");
+        //     let sWerksDestDesc = oSelectedArea ? oSelectedArea.Value : "";
+
+        //     let oReasonModel = this.getView().getModel("reason");
+        //     let oSelectedReason = oReasonModel.getProperty("/selectedReason");
+        //     let sMassgDesc = oSelectedReason ? oSelectedReason.Value : "";
+        
+        //     // Retrieve the sub-area description from the ValueHelpSubArea model
+        //     let oSubAreaModel = this.getView().getModel("subArea");
+        //     let oSelectedSubArea = oSubAreaModel.getProperty("/selectedSubArea");
+        //     let sBtrtlDestDesc = oSelectedSubArea ? oSelectedSubArea.Value : "";
+
+        //     // Retrieve the group description from the ValueHelpGroup model
+        //     let oGroupModel = this.getView().getModel("group");
+        //     let oSelectedGroup = oGroupModel.getProperty("/selectedGroup");
+        //     let sPersgDestDesc = oSelectedGroup ? oSelectedGroup.Value : "";
+
+        //     // Retrieve the subgroup description from the ValueHelpSubGroup model
+        //     let oSubGroupModel = this.getView().getModel("subGroup");
+        //     let oSelectedSubGroup = oSubGroupModel.getProperty("/selectedSubGroup");
+        //     let sPerskDestDesc = oSelectedSubGroup ? oSelectedSubGroup.Value : "";
+
+        //     // Retrieve the employee change description from the ValueHelpNumberSet model
+        //     let oEmployeeChangeModel = this.getView().getModel("employeechange");
+        //     let oSelectedEmployeeChange = oEmployeeChangeModel.getProperty("/selectedEmployeeChange");
+        //     let sZexholderDesc = oSelectedEmployeeChange ? oSelectedEmployeeChange.Value : "";
+        
+        //     let oPayload = {
+        //         RequestId: "00000000-0000-0000-0000-000000000000",
+        //         EmployeeNumber: oSelectedEmp,
+        //         Status: "S",
+        //         PicNumber: sLoggedInEmployeeId,
+        //         Massg: this.byId("reasonMutation").getValue(),
+        //         ZbegdaEfktf: getFormattedDate("effectiveDateStartMutation"),
+        //         ZenddaEfktf: getFormattedDate("effectiveDateEndMutation"),
+        //         PlansDest: this.byId("newPositionIdMutation").getValue(),
+        //         PersgDest: this.byId("newEmployeeGroupIdMutation").getValue(),
+        //         PerskDest: this.byId("newEmployeeSubgroupIdMutation").getValue(),
+        //         WerksDest: this.byId("newPerAreaIdMutation").getValue(),
+        //         BtrtlDest: this.byId("newPerSubAreaIdMutation").getValue(),
+        //         Adjstmn: this.getView().getModel("dropdown").getProperty("/selectedSalaryAdj") || "",
+        //         Zsalary: this.byId("salaryAdjValueMutation").getValue() ? this.byId("salaryAdjValueMutation").getValue().replace(/\D/g, '') : "0",
+        //         Zdasar1: this.getView().getModel("dropdown").getProperty("/selectedAs") || "",
+        //         Zexholder: this.byId("employeeChangeMutation").getValue(),
+        //         Zdasar2: this.byId("basicConMutation").getValue(),
+        //         // Zverify: this.byId("verifyResultMutation").getSelected() ? "1" : "",
+        //         // Zbichecking: Zbichecking,
+        //         // Znotebicheck: this.byId("hasilBiCheckingMutation").getValue(),
+        //         // ZrekomHcm: this.byId("rekomendasiHCMMutation").getValue(),
+        //         // Zdisposisi: (parseInt(this.getView().getModel("disposisiMutation").getProperty("/selectedIndex")) + 1).toString(),
+        //         // Znotedisp: this.byId("dispoNoteMutation").getValue(),
+        //         // Zsalaryfnl: this.byId("gajiMutation").getValue() ? this.byId("gajiMutation").getValue().replace(/\D/g, '') : "0",
+        //         PlansDesc_Dest: sPlansDestDesc,
+        //         WerksDestDesc: sWerksDestDesc,
+        //         BtrtlDestDesc: sBtrtlDestDesc,
+        //         PersgDestDesc: sPersgDestDesc,
+        //         PerskDestDesc: sPerskDestDesc,
+        //         ZexholderDesc: sZexholderDesc,
+        //         MassgDesc: sMassgDesc
+        //     };
+        
+        //     console.log("Mutation Payload:", oPayload);
+        
+        //     // Show busy dialog
+        //     if (!this._oBusyDialog) {
+        //         this._oBusyDialog = new sap.m.BusyDialog();
+        //     }
+        //     this._oBusyDialog.setTitle("Please wait...");
+        //     this._oBusyDialog.setText("Submitting request...");
+        //     this._oBusyDialog.open();
+        
+        //     // Submit mutation data
+        //     let oModel = this.getOwnerComponent().getModel();
+        //     oModel.create("/RequestSet", oPayload, {
+        //         success: (oData) => {
+        //             this._oBusyDialog.close();
+        //             this.onSubmitFiles(oData.RequestId);
+        
+        //             // Show success message
+        //             sap.m.MessageToast.show("Request submitted successfully.");
+        //             MessageBox.show("Request has been submitted successfully.", {
+        //                 icon: MessageBox.Icon.SUCCESS,
+        //                 title: "Success"
+        //             });
+        //         },
+        //         error: (oError) => {
+        //             this._oBusyDialog.close();
+                    
+        //             // Show error message
+        //             if (oError) {
+        //                 try {
+        //                     let oErrorMessage = JSON.parse(oError.responseText);
+        //                     MessageBox.error(oErrorMessage.error.message.value);
+        //                 } catch (e) {
+        //                     MessageBox.error("Error submitting request: " + oError.message);
+        //                 }
+        //             } else {
+        //                 MessageBox.error("Unknown error occurred while submitting request.");
+        //             }
+        //         },
+        //         urlParameters: {
+        //             "sap-client": "110"
+        //         }
+        //     });
+        // },
 
         // _submitDocument: function (sRequestId) {
         //     let oView = this.getView();
@@ -785,6 +1748,30 @@ sap.ui.define([
         //         });
         // },
 
+        onEffectiveDateStartChange: function(oEvent) {
+            var oView = this.getView();
+            var oStartDatePicker = oView.byId("effectiveDateStartMutation");
+            var oEndDatePicker = oView.byId("tanggalBerakhirMutation");
+            var oStartDate = oStartDatePicker.getDateValue();
+
+            if (oStartDate instanceof Date && !isNaN(oStartDate)) {
+                // Add 4 years
+                var oEndDate = new Date(oStartDate);
+                oEndDate.setFullYear(oEndDate.getFullYear() + 4);
+                // Subtract 1 day
+                oEndDate.setDate(oEndDate.getDate() - 1);
+
+                // Set value to tanggalBerakhirMutation if valid
+                if (oEndDate instanceof Date && !isNaN(oEndDate)) {
+                    oEndDatePicker.setDateValue(oEndDate);
+                } else {
+                    oEndDatePicker.setValue("");
+                }
+            } else {
+                oEndDatePicker.setValue("");
+            }
+        },
+
         _loadEmployeeChangeData: function() {
             return new Promise((resolve, reject) => {
                 const oModel = this.getOwnerComponent().getModel();
@@ -825,9 +1812,17 @@ sap.ui.define([
 
         handleSearchEmployeeChange: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("EmployeeNumber", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
         handleCloseEmployeeChange: function(oEvent) {
@@ -840,6 +1835,19 @@ sap.ui.define([
                 this.byId("employeeChangeMutation").setValue(oSelectedItem.Key);
             }
             oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        onEmployeeChangeInput: function (oEvent) {
+            const sValue = oEvent.getParameter("value");
+            const oEmployeeChangeModel = this.getView().getModel("employeechange");
+            const oSelectedEmployee = oEmployeeChangeModel.getProperty("/selectedEmployeeChange");
+        
+            // Check if the entered value matches the selected employee
+            if (!oSelectedEmployee || sValue !== oSelectedEmployee.Key) {
+                // Reset the field to the last valid selection
+                this.byId("employeeChangeMutation").setValue(oSelectedEmployee ? oSelectedEmployee.Key : "");
+                MessageBox.warning("Please select a valid employee from the list.");
+            }
         },
 
         _loadReasonData: function() {
@@ -882,9 +1890,17 @@ sap.ui.define([
 
         handleSearchReason: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
         handleCloseReason: function(oEvent) {
@@ -897,6 +1913,26 @@ sap.ui.define([
                 this.byId("reasonMutation").setValue(oSelectedItem.Key);
             }
             oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        onPositionChange: function(oEvent) {
+            // Clear value help selections so fallback to position works
+            var oGroupModel = this.getView().getModel("group");
+            if (oGroupModel) {
+                oGroupModel.setProperty("/selectedGroup", null);
+            }
+            var oSubGroupModel = this.getView().getModel("subGroup");
+            if (oSubGroupModel) {
+                oSubGroupModel.setProperty("/selectedSubGroup", null);
+            }
+            var oAreaModel = this.getView().getModel("area");
+            if (oAreaModel) {
+                oAreaModel.setProperty("/selectedArea", null);
+            }
+            var oSubAreaModel = this.getView().getModel("subArea");
+            if (oSubAreaModel) {
+                oSubAreaModel.setProperty("/selectedSubArea", null);
+            }
         },
 
         _loadPositionData: function() {
@@ -939,29 +1975,117 @@ sap.ui.define([
 
         handleSearchPosition: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
-        handleClosePosition: function(oEvent) {
+        handleClosePosition: function (oEvent) {
             let aContexts = oEvent.getParameter("selectedContexts");
             if (aContexts && aContexts.length) {
                 let oSelectedItem = aContexts[0].getObject();
                 let oPositionModel = this.getView().getModel("position");
-                
                 oPositionModel.setProperty("/selectedPosition", oSelectedItem);
                 this.byId("newPositionIdMutation").setValue(oSelectedItem.Key);
+
+                // --- Auto-select group based on position ---
+                let oGroupModel = this.getView().getModel("group");
+                if (oGroupModel) {
+                    let aGroups = oGroupModel.getProperty("/items") || [];
+                    let oDefaultGroup = aGroups.find(g => g.Key === oSelectedItem.Key6) || null;
+                    oGroupModel.setProperty("/selectedGroup", oDefaultGroup);
+                }
+
+                // --- Auto-select area based on position ---
+                let oAreaModel = this.getView().getModel("area");
+                if (oAreaModel) {
+                    let aAreas = oAreaModel.getProperty("/items") || [];
+                    let oDefaultArea = aAreas.find(a => a.Key === oSelectedItem.Key4) || null;
+                    oAreaModel.setProperty("/selectedArea", oDefaultArea);
+                }
+
+                // Always clear sub-group and sub-area selection
+                let oSubGroupModel = this.getView().getModel("subGroup");
+                if (oSubGroupModel) {
+                    oSubGroupModel.setProperty("/selectedSubGroup", null);
+                }
+                let oSubAreaModel = this.getView().getModel("subArea");
+                if (oSubAreaModel) {
+                    oSubAreaModel.setProperty("/selectedSubArea", null);
+                }
             }
             oEvent.getSource().getBinding("items").filter([]);
         },
+
+        // handleClosePosition: function (oEvent) {
+        //     let aContexts = oEvent.getParameter("selectedContexts");
+        //     if (aContexts && aContexts.length) {
+        //         let oSelectedItem = aContexts[0].getObject();
+        //         let oPositionModel = this.getView().getModel("position");
+        
+        //         // Update the selected position in the position model
+        //         oPositionModel.setProperty("/selectedPosition", oSelectedItem);
+        //         this.byId("newPositionIdMutation").setValue(oSelectedItem.Key);
+
+        //         let oGroupModel = this.getView().getModel("group");
+        //         if (oGroupModel) {
+        //             oGroupModel.setProperty("/selectedGroup", null);
+        //         }
+        //         let oSubGroupModel = this.getView().getModel("subGroup");
+        //         if (oSubGroupModel) {
+        //             oSubGroupModel.setProperty("/selectedSubGroup", null);
+        //         }
+        //         let oAreaModel = this.getView().getModel("area");
+        //         if (oAreaModel) {
+        //             oAreaModel.setProperty("/selectedArea", null);
+        //         }
+        //         let oSubAreaModel = this.getView().getModel("subArea");
+        //         if (oSubAreaModel) {
+        //             oSubAreaModel.setProperty("/selectedSubArea", null);
+        //         }
+        
+        //         // Update the newUnitOrgIdMutation field with the corresponding Key2
+        //         // if (oEmployeeDetailModel) {
+        //         //     oEmployeeDetailModel.setProperty("/EmployeeOrgunitId", oSelectedItem.Key2);
+        //         //     oEmployeeDetailModel.setProperty("/EmployeeOrgunitLongtext", oSelectedItem.KeyDesc2); // Update KeyDesc2 for newUnitOrgTextMutation
+        //         // } else {
+        //         //     console.error("EmployeeDetail model is not available.");
+        //         // }
+        //     }
+        
+        //     // Clear the filter after closing the dialog
+        //     oEvent.getSource().getBinding("items").filter([]);
+        // },
+
+        // handleClosePosition: function(oEvent) {
+        //     let aContexts = oEvent.getParameter("selectedContexts");
+        //     if (aContexts && aContexts.length) {
+        //         let oSelectedItem = aContexts[0].getObject();
+        //         let oPositionModel = this.getView().getModel("position");
+                
+        //         oPositionModel.setProperty("/selectedPosition", oSelectedItem);
+        //         this.byId("newPositionIdMutation").setValue(oSelectedItem.Key);
+        //     }
+        //     oEvent.getSource().getBinding("items").filter([]);
+        // },
 
         _loadAreaData: function() {
             return new Promise((resolve, reject) => {
                 const oModel = this.getOwnerComponent().getModel();
                 oModel.read("/ValueHelpArea", {
                     success: (oData) => {
-                        const oAreaModel = new JSONModel(oData.results);
+                        const oAreaModel = new sap.ui.model.json.JSONModel({
+                            items: oData.results,
+                            selectedArea: null
+                        });
                         this.getView().setModel(oAreaModel, "area");
                         resolve();
                     },
@@ -996,9 +2120,17 @@ sap.ui.define([
 
         handleSearchArea: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
         handleCloseArea: function(oEvent) {
@@ -1012,23 +2144,11 @@ sap.ui.define([
         
                 // Clear the selected sub-area when a new area is selected
                 let oSubAreaModel = this.getView().getModel("subArea");
-                oSubAreaModel.setProperty("/selectedSubArea", {});
+                oSubAreaModel.setProperty("/selectedSubArea", null);
                 this.byId("newPerSubAreaIdMutation").setValue("");
             }
             oEvent.getSource().getBinding("items").filter([]);
         },
-
-        // handleCloseArea: function(oEvent) {
-        //     let aContexts = oEvent.getParameter("selectedContexts");
-        //     if (aContexts && aContexts.length) {
-        //         let oSelectedItem = aContexts[0].getObject();
-        //         let oAreaModel = this.getView().getModel("area");
-
-        //         oAreaModel.setProperty("/selectedArea", oSelectedItem);
-        //         this.byId("newPerAreaIdMutation").setValue(oSelectedItem.Key);
-        //     }
-        //     oEvent.getSource().getBinding("items").filter([]);
-        // },
 
         _loadSubAreaData: function () {
             return new Promise((resolve, reject) => {
@@ -1099,9 +2219,17 @@ sap.ui.define([
 
         handleSearchSubArea: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
         handleCloseSubArea: function (oEvent) {
@@ -1125,12 +2253,32 @@ sap.ui.define([
             oEvent.getSource().getBinding("items").filter([]);
         },
 
+        // _loadGroupData: function() {
+        //     return new Promise((resolve, reject) => {
+        //         const oModel = this.getOwnerComponent().getModel();
+        //         oModel.read("/ValueHelpGrup", {
+        //             success: (oData) => {
+        //                 const oGroupModel = new JSONModel(oData.results);
+        //                 this.getView().setModel(oGroupModel, "group");
+        //                 resolve();
+        //             },
+        //             error: (oError) => {
+        //                 MessageBox.error("Failed to load group data.");
+        //                 reject(oError);
+        //             }
+        //         });
+        //     });
+        // },
+
         _loadGroupData: function() {
             return new Promise((resolve, reject) => {
                 const oModel = this.getOwnerComponent().getModel();
                 oModel.read("/ValueHelpGrup", {
                     success: (oData) => {
-                        const oGroupModel = new JSONModel(oData.results);
+                        const oGroupModel = new sap.ui.model.json.JSONModel({
+                            items: oData.results,
+                            selectedGroup: null
+                        });
                         this.getView().setModel(oGroupModel, "group");
                         resolve();
                     },
@@ -1170,6 +2318,12 @@ sap.ui.define([
             oBinding.filter([oFilter]);
         },
 
+        isVerifyMutation: function(oEvent) {
+            var oViewModel = this.getView().getModel("viewModel");
+            var bSelected = oEvent.getSource().getSelected();
+            oViewModel.setProperty("/isVerifyMutation", bSelected);
+        },
+
         handleCloseGroup: function (oEvent) {
             let aContexts = oEvent.getParameter("selectedContexts");
             if (aContexts && aContexts.length) {
@@ -1177,24 +2331,24 @@ sap.ui.define([
                 let oGroupModel = this.getView().getModel("group");
         
                 if (oGroupModel) {
-                    // Update the selected group
-                    oGroupModel.setData({
-                        ...oGroupModel.getData(),
-                        selectedGroup: oSelectedItem
-                    });
+                    oGroupModel.setProperty("/selectedGroup", oSelectedItem);
+                    // oGroupModel.setData({
+                    //     ...oGroupModel.getData(),
+                    //     selectedGroup: oSelectedItem
+                    // });
                     this.byId("newEmployeeGroupIdMutation").setValue(oSelectedItem.Key);
                 } else {
                     console.error("Group model is not initialized.");
                 }
-        
-                // Clear the selected sub-group by directly modifying the subGroup model's data
+
                 let oSubGroupModel = this.getView().getModel("subGroup");
                 if (oSubGroupModel) {
                     let oSubGroupData = oSubGroupModel.getData();
                     if (oSubGroupData) {
-                        oSubGroupData.selectedSubGroup = {}; // Clear the selected sub-group
-                        this.byId("newEmployeeSubgroupIdMutation").setValue(""); // Clear the input field
-                        oSubGroupModel.setData(oSubGroupData); // Update the model
+                        oSubGroupData.selectedSubGroup = null;
+                        oSubGroupModel.setProperty("/selectedSubGroup", null);
+                        this.byId("newEmployeeSubgroupIdMutation").setValue(""); 
+                        oSubGroupModel.setData(oSubGroupData);
                     }
                 } else {
                     console.error("SubGroup model is not initialized.");
@@ -1203,9 +2357,136 @@ sap.ui.define([
             oEvent.getSource().getBinding("items").filter([]);
         },
 
+        // _loadGroupData: function() {
+        //     return new Promise((resolve, reject) => {
+        //         const oModel = this.getOwnerComponent().getModel();
+        //         oModel.read("/ValueHelpGrup", {
+        //             success: (oData) => {
+        //                 // Set the group model as a flat array (root)
+        //                 let oGroupModel = this.getView().getModel("group");
+        //                 if (!oGroupModel) {
+        //                     oGroupModel = new sap.ui.model.json.JSONModel(oData.results);
+        //                     this.getView().setModel(oGroupModel, "group");
+        //                 } else {
+        //                     oGroupModel.setData(oData.results);
+        //                 }
+        //                 resolve();
+        //             },
+        //             error: (oError) => {
+        //                 MessageBox.error("Failed to load group data.");
+        //                 reject(oError);
+        //             }
+        //         });
+        //     });
+        // },
+
+        // handleValueHelpGroup: function() {
+        //     if (!this._oValueHelpGroupDialog) {
+        //         Fragment.load({
+        //             name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpGroup",
+        //             controller: this
+        //         }).then(function(oDialog) {
+        //             this._oValueHelpGroupDialog = oDialog;
+        //             // Bind the group model (flat array) to the dialog
+        //             this._oValueHelpGroupDialog.setModel(this.getView().getModel("group"), "group");
+        //             // Bind the selection model
+        //             this._oValueHelpGroupDialog.setModel(this.getView().getModel("groupSelection"), "groupSelection");
+        //             this.getView().addDependent(this._oValueHelpGroupDialog);
+
+        //             this._loadGroupData().then(() => {
+        //                 this._oValueHelpGroupDialog.open();
+        //             });
+        //         }.bind(this));
+        //     } else {
+        //         this._oValueHelpGroupDialog.open();
+        //     }
+        // },
+
+        // handleSearchGroup: function (oEvent) {
+        //     var sValue = oEvent.getParameter("value");
+        //     var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+        //     var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        //     var oCombinedFilter = new Filter({
+        //         filters: [oKeyFilter, oValueFilter],
+        //         and: false
+        //     });
+        //     var oBinding = oEvent.getSource().getBinding("items");
+        //     oBinding.filter([oCombinedFilter]);
+        // },
+
+        // handleCloseGroup: function (oEvent) {
+        //     const aContexts = oEvent.getParameter("selectedContexts");
+        //     if (aContexts && aContexts.length) {
+        //         const oSelectedItem = aContexts[0].getObject();
+        //         // Store selection in a separate model
+        //         let oGroupSelectionModel = this.getView().getModel("groupSelection");
+        //         if (!oGroupSelectionModel) {
+        //             oGroupSelectionModel = new sap.ui.model.json.JSONModel({ selectedGroup: oSelectedItem });
+        //             this.getView().setModel(oGroupSelectionModel, "groupSelection");
+        //         } else {
+        //             oGroupSelectionModel.setProperty("/selectedGroup", null);
+        //             oGroupSelectionModel.setProperty("/selectedGroup", oSelectedItem);
+        //         }
+        //         // No need to set the value manually if using binding
+        //         // Clear the selected sub-group when group changes
+        //         let oSubGroupModel = this.getView().getModel("subGroup");
+        //         if (oSubGroupModel) {
+        //             let oSubGroupData = oSubGroupModel.getData();
+        //             if (oSubGroupData) {
+        //                 oSubGroupData.selectedSubGroup = {};
+        //                 this.byId("newEmployeeSubgroupIdMutation").setValue(""); 
+        //                 oSubGroupModel.setData(oSubGroupData);
+        //             }
+        //         } else {
+        //             console.error("SubGroup model is not initialized.");
+        //         }
+        //     }
+        //     // Always clear filters after dialog closes
+        //     oEvent.getSource().getBinding("items").filter([]);
+        // },
+
+        // // onGroupInputChange: function(oEvent) {
+        // //     var sValue = oEvent.getParameter("value");
+        // //     if (!sValue) {
+        // //         this.byId("newEmployeeGroupIdMutation").setValue("");
+        // //         this.byId("newEmployeeGroupTextMutation").setText("");
+        // //     }
+        // // },
+
+        // onGroupInputChange: function(oEvent) {
+        //     var sValue = oEvent.getParameter("value");
+        //     var oGroupSelectionModel = this.getView().getModel("groupSelection");
+        //     var oGroupModel = this.getView().getModel("group");
+        //     var aGroups = oGroupModel ? oGroupModel.getData() : [];
+
+        //     if (!sValue) {
+        //         // Clear display and model selection
+        //         this.byId("newEmployeeGroupIdMutation").setValue("");
+        //         this.byId("newEmployeeGroupTextMutation").setText("");
+        //         if (oGroupSelectionModel) {
+        //             oGroupSelectionModel.setProperty("/selectedGroup", {}); // Clear the model selection!
+        //         }
+        //     } else if (aGroups && Array.isArray(aGroups)) {
+        //         // If user types a value that matches a group key, set the selection in the model
+        //         var oFound = aGroups.find(function(o) { return o.Key === sValue; });
+        //         if (oFound && oGroupSelectionModel) {
+        //             oGroupSelectionModel.setProperty("/selectedGroup", oFound);
+        //             this.byId("newEmployeeGroupTextMutation").setText(oFound.Value || "");
+        //         }
+        //     }
+        // },
+
+        // onGroupInputChange: function(oEvent) {
+        //     var sValue = oEvent.getParameter("value");
+        //     var oGroupSelectionModel = this.getView().getModel("groupSelection");
+        //     if (!sValue && oGroupSelectionModel) {
+        //         oGroupSelectionModel.setProperty("/selectedGroup", {}); // Only clear the selection
+        //     }
+        // },
+
         _loadSubGroupData: function () {
             return new Promise((resolve, reject) => {
-                const oModel = this.getOwnerComponent().getModel(); // Use the global model
+                const oModel = this.getOwnerComponent().getModel(); 
                 oModel.read("/ValueHelpSubGrupSet", {
                     success: (oData) => {
                         const oSubGroupModel = this.getOwnerComponent().getModel("subGroup");
@@ -1228,6 +2509,48 @@ sap.ui.define([
             });
         },
     
+        // handleValueHelpSubGroup: function () {
+        //     if (!this._oValueHelpSubGroupDialog) {
+        //         Fragment.load({
+        //             name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpSubGroup",
+        //             controller: this
+        //         }).then(function (oDialog) {
+        //             this._oValueHelpSubGroupDialog = oDialog;
+        
+        //             // Set the subGroup model to the dialog
+        //             const oSubGroupModel = this.getView().getModel("subGroup");
+        //             if (!oSubGroupModel) {
+        //                 console.error("SubGroup model is not initialized.");
+        //                 return;
+        //             }
+        //             this._oValueHelpSubGroupDialog.setModel(oSubGroupModel, "subGroup");
+        //             this.getView().addDependent(this._oValueHelpSubGroupDialog);
+        
+        //             // Load sub-group data and open the dialog
+        //             this._loadSubGroupData().then(() => {
+        //                 const sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
+        //                 if (sSelectedGroupKey) {
+        //                     const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
+        //                     if (oBinding) {
+        //                         oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
+        //                     }
+        //                 }
+        //                 this._oValueHelpSubGroupDialog.open();
+        //             });
+        //         }.bind(this));
+        //     } else {
+        //         // Apply filter and open the dialog if it already exists
+        //         const sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
+        //         if (sSelectedGroupKey) {
+        //             const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
+        //             if (oBinding) {
+        //                 oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
+        //             }
+        //         }
+        //         this._oValueHelpSubGroupDialog.open();
+        //     }
+        // },
+
         handleValueHelpSubGroup: function () {
             if (!this._oValueHelpSubGroupDialog) {
                 Fragment.load({
@@ -1235,8 +2558,7 @@ sap.ui.define([
                     controller: this
                 }).then(function (oDialog) {
                     this._oValueHelpSubGroupDialog = oDialog;
-        
-                    // Set the subGroup model to the dialog
+
                     const oSubGroupModel = this.getView().getModel("subGroup");
                     if (!oSubGroupModel) {
                         console.error("SubGroup model is not initialized.");
@@ -1244,14 +2566,14 @@ sap.ui.define([
                     }
                     this._oValueHelpSubGroupDialog.setModel(oSubGroupModel, "subGroup");
                     this.getView().addDependent(this._oValueHelpSubGroupDialog);
-        
-                    // Load sub-group data and open the dialog
+
                     this._loadSubGroupData().then(() => {
+                        // Use selected group key for filtering
                         const sSelectedGroupKey = this.getView().getModel("group").getProperty("/selectedGroup/Key");
                         if (sSelectedGroupKey) {
                             const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
                             if (oBinding) {
-                                oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
+                                oBinding.filter(new sap.ui.model.Filter("Key", sap.ui.model.FilterOperator.EQ, sSelectedGroupKey));
                             }
                         }
                         this._oValueHelpSubGroupDialog.open();
@@ -1263,7 +2585,7 @@ sap.ui.define([
                 if (sSelectedGroupKey) {
                     const oBinding = this._oValueHelpSubGroupDialog.getBinding("items");
                     if (oBinding) {
-                        oBinding.filter(new Filter("Key", FilterOperator.EQ, sSelectedGroupKey));
+                        oBinding.filter(new sap.ui.model.Filter("Key", sap.ui.model.FilterOperator.EQ, sSelectedGroupKey));
                     }
                 }
                 this._oValueHelpSubGroupDialog.open();
@@ -1272,9 +2594,17 @@ sap.ui.define([
 
         handleSearchSubGroup: function (oEvent) {
             var sValue = oEvent.getParameter("value");
-            var oFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false
+            });
+        
             var oBinding = oEvent.getSource().getBinding("items");
-            oBinding.filter([oFilter]);
+            oBinding.filter([oCombinedFilter]);
         },
 
         handleCloseSubGroup: function (oEvent) {
@@ -1298,8 +2628,59 @@ sap.ui.define([
             oEvent.getSource().getBinding("items").filter([]);
         },
 
-        onDisplayDocumentWarning: function () {
-            MessageToast.show("Display Document button pressed");
+        onAsFieldChange: function (oEvent) {
+            const sSelectedAs = oEvent.getSource().getSelectedKey(); 
+            const oModel = this.getView().getModel("dropdown"); 
+        
+            if (sSelectedAs === "1") { // 
+                oModel.setProperty("/isEmployeeChangeEnabled", false); 
+            } else if (sSelectedAs === "2") {
+                oModel.setProperty("/isEmployeeChangeEnabled", true);
+            }
+
+            oModel.setProperty("/selectedAs", sSelectedAs);
+        },
+
+        onSalaryAdjChange: function (oEvent) {
+            const sSelectedKey = oEvent.getSource().getSelectedKey();
+            const oModel = this.getView().getModel("dropdown");
+        
+            if (sSelectedKey === "1") { // "Ya"
+                oModel.setProperty("/isSalaryAdjEnabled", true);
+            } else if (sSelectedKey === "2") { // "Tidak"
+                oModel.setProperty("/isSalaryAdjEnabled", false);
+                this.byId("salaryAdjValueMutation").setValue(""); // Clear the input value
+            }
+        },
+
+        // onAsFieldChange: function (oEvent) {
+        //     const sSelectedAs = oEvent.getSource().getSelectedKey(); 
+        //     const oModel = this.getView().getModel("dropdown"); 
+        
+        //     if (sSelectedAs === "1") {
+        //         oModel.setProperty("/isEmployeeChangeEnabled", true);
+        //     } else if (sSelectedAs === "2") {
+        //         oModel.setProperty("/isEmployeeChangeEnabled", false); 
+        //         oModel.setProperty("/selectedEmployeeChange/Key", ""); 
+        //         oModel.setProperty("/selectedEmployeeChange/Value", ""); 
+        //     }
+        // },
+
+        // onDisplayDocumentWarning: function () {
+        //     MessageToast.show("Display Document button pressed");
+        // },
+        
+        onAfterItemRemoved: function (oEvent) {
+            const oItem = oEvent.getParameter("item");
+            const sFileName = oItem.getFileName();
+            const oModel = this.getView().getModel("fileAttachment");
+            const aData = oModel.getProperty("/results");
+        
+            const aFilteredData = aData.filter(function (item) {
+                return item.FileName !== sFileName;
+            });
+        
+            oModel.setProperty("/results", aFilteredData);
         },
 
         onAfterItemAdded: function (oEvent) {
@@ -1311,8 +2692,8 @@ sap.ui.define([
             if (oFile) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const sBase64 = e.target.result.split(",")[1]; // Remove data:image/... prefix
-                    const sFileType = oFile.type || this._getMimeTypeFromExtension(oFile.name); // Detect MIME type
+                    const sBase64 = e.target.result.split(",")[1]; 
+                    const sFileType = oFile.type || this._getMimeTypeFromExtension(oFile.name);
         
                     aUploadedFiles.push({
                         FileName: oFile.name,
@@ -1330,8 +2711,7 @@ sap.ui.define([
                 }.bind(this);
                 reader.readAsDataURL(oFile);
             }
-        
-            // Optional: Reset UploadSet value state
+
             oItem.setUploadState("Complete");
             oItem.setVisibleEdit(false);
         },
@@ -1349,127 +2729,101 @@ sap.ui.define([
                 "jpeg": "image/jpeg",
                 "txt": "text/plain"
             };
-            return oFileTypes[sExtension] || "application/octet-stream"; // Default to binary if unknown
+            return oFileTypes[sExtension] || "application/octet-stream";
         },
 
-        onAfterItemRemoved: function (oEvent) {
-            const oItem = oEvent.getParameter("item");
-            const sFileName = oItem.getFileName();
-            const oModel = this.getView().getModel("fileAttachment");
-            const aData = oModel.getProperty("/results");
+        // onSubmitFiles: function (sRequestId) {
+        //     if (!sRequestId) {
+        //         MessageBox.error("No request ID found. Cannot upload files.");
+        //         return;
+        //     }
         
-            // Filter out the removed file
-            const aFilteredData = aData.filter(function (item) {
-                return item.FileName !== sFileName;
-            });
+        //     const oModel = this.getOwnerComponent().getModel();
+        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //     const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
         
-            oModel.setProperty("/results", aFilteredData);
-        },
+        //     if (!aFiles || aFiles.length === 0) {
+        //         MessageBox.warning("No files to upload. Do you want to continue with submission?", {
+        //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        //             emphasizedAction: MessageBox.Action.YES,
+        //             onClose: function (sAction) {
+        //                 if (sAction === MessageBox.Action.YES) {
+        //                     MessageBox.success("Submission completed without file uploads.");
+        //                 }
+        //             }.bind(this)
+        //         });
+        //         return;
+        //     }
 
-        onSubmitFiles: function (sRequestId) {
-            if (!sRequestId) {
-                MessageBox.error("No request ID found. Cannot upload files.");
-                return;
-            }
+        //     const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+        //     const sBatchGroupId = oBundle.getText("batchcratt");
+        //     oModel.setDeferredGroups([sBatchGroupId]);
         
-            const oModel = this.getOwnerComponent().getModel();
-            const oFileAttachmentModel = this.getView().getModel("fileAttachment");
-            const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+        //     this._oBusy.open();
         
-            if (!aFiles || aFiles.length === 0) {
-                MessageBox.warning("No files to upload. Do you want to continue with submission?", {
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.YES,
-                    onClose: function (sAction) {
-                        if (sAction === MessageBox.Action.YES) {
-                            MessageBox.success("Submission completed without file uploads.");
-                        }
-                    }.bind(this)
-                });
-                return;
-            }
+        //     const processNextFile = (index) => {
+        //         if (index >= aFiles.length) {
+        //             this._oBusy.close();
+        //             MessageBox.success("All files uploaded successfully.", {
+        //                 onClose: () => {
+        //                     console.log("File upload process completed.");
+        //                 }
+        //             });
+        //             return;
+        //         }
+        
+        //         const oFile = aFiles[index];
+        
+        //         const oPayload = {
+        //             Reqid: sRequestId,
+        //             Seqnr: index.toString(),
+        //             FileName: oFile.FileName,
+        //             FileType: oFile.FileType,
+        //             FileSize: oFile.FileSize.toString(),
+        //             Attachment: oFile.Attachment,
+        //             CreatedOn: new Date().toISOString().split('.')[0], 
+        //             TypeDoc: "BI Checking",
+        //             PicPosition: "Compensation & Benefit",
+        //             PicName: "Roy",
+        //             PicId: "81000061",
+        //             Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [sRequestId, index, 'Mdt'])
+        //         };
+        
+        //         console.log("Uploading file:", oFile.FileName);
+        //         console.log("Payload:", JSON.stringify(oPayload));
+        
+        //         oModel.create("/FileAttachmentSet", oPayload, {
+        //             success: function () {
+        //                 console.log("File uploaded successfully:", oFile.FileName);
+        //                 processNextFile(index + 1);
+        //             },
+        //             error: function (oError) {
+        //                 this._oBusy.close();
 
-            // Prepare batch group ID
-            const oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            const sBatchGroupId = oBundle.getText("batchcratt");
-            oModel.setDeferredGroups([sBatchGroupId]);
+        //                 console.error("Error response:", oError);
         
-            // Show busy indicator
-            this._oBusy.open();
+        //                 let errorDetails = "Unknown error";
+        //                 try {
+        //                     if (oError.responseText) {
+        //                         const oErrorResponse = JSON.parse(oError.responseText);
+        //                         if (oErrorResponse.error && oErrorResponse.error.message) {
+        //                             errorDetails = oErrorResponse.error.message.value || oErrorResponse.error.message;
+        //                         } else if (oErrorResponse.error && oErrorResponse.error.innererror) {
+        //                             errorDetails = oErrorResponse.error.innererror.message;
+        //                         }
+        //                     }
+        //                 } catch (e) {
+        //                     errorDetails = oError.message || "Parsing error response failed";
+        //                 }
         
-            // Function to process one file at a time
-            const processNextFile = (index) => {
-                if (index >= aFiles.length) {
-                    // All files processed
-                    this._oBusy.close();
-                    MessageBox.success("All files uploaded successfully.", {
-                        onClose: () => {
-                            console.log("File upload process completed.");
-                        }
-                    });
-                    return;
-                }
+        //                 console.error("File upload error:", errorDetails);
+        //                 MessageBox.error("Failed to upload file '" + oFile.FileName + "': " + errorDetails);
+        //             }.bind(this)
+        //         });
+        //     };
         
-                const oFile = aFiles[index];
-        
-                // Prepare the payload for the current file
-                const oPayload = {
-                    Reqid: sRequestId,
-                    Seqnr: index.toString(),
-                    FileName: oFile.FileName,
-                    FileType: oFile.FileType,
-                    // FileType: oFile.FileType.split('/')[1] || oFile.FileType, // Extract file extension if MIME type
-                    FileSize: oFile.FileSize.toString(),
-                    Attachment: oFile.Attachment,
-                    CreatedOn: new Date().toISOString().split('.')[0], // Format as ISO without milliseconds
-                    TypeDoc: "BI Checking",
-                    PicPosition: "Compensation & Benefit",
-                    PicName: "Roy",
-                    PicId: "81000061",
-                    Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [sRequestId, index, 'Mdt'])
-                };
-        
-                // Debugging output
-                console.log("Uploading file:", oFile.FileName);
-                console.log("Payload:", JSON.stringify(oPayload));
-        
-                // Upload the current file
-                oModel.create("/FileAttachmentSet", oPayload, {
-                    success: function () {
-                        console.log("File uploaded successfully:", oFile.FileName);
-                        // Process the next file
-                        processNextFile(index + 1);
-                    },
-                    error: function (oError) {
-                        this._oBusy.close();
-
-                        // Log the full error response for debugging
-                        console.error("Error response:", oError);
-        
-                        // Extract detailed error information
-                        let errorDetails = "Unknown error";
-                        try {
-                            if (oError.responseText) {
-                                const oErrorResponse = JSON.parse(oError.responseText);
-                                if (oErrorResponse.error && oErrorResponse.error.message) {
-                                    errorDetails = oErrorResponse.error.message.value || oErrorResponse.error.message;
-                                } else if (oErrorResponse.error && oErrorResponse.error.innererror) {
-                                    errorDetails = oErrorResponse.error.innererror.message;
-                                }
-                            }
-                        } catch (e) {
-                            errorDetails = oError.message || "Parsing error response failed";
-                        }
-        
-                        console.error("File upload error:", errorDetails);
-                        MessageBox.error("Failed to upload file '" + oFile.FileName + "': " + errorDetails);
-                    }.bind(this)
-                });
-            };
-        
-            // Start processing files
-            processNextFile(0);
-        },
+        //     processNextFile(0);
+        // },
 
         onFileSizeExceed: function (oEvent) {
             MessageBox.show(oBundle.getText("sizelimit"));

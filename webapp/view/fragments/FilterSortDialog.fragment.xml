@@ -1,0 +1,52 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+<Dialog id="filterSortDialog" title="Filter Sort" draggable="true" resizable="true">
+    <VBox class="sapUiSmallMargin">
+        <Label text="Action Type"/>
+        <Select id="FieldActionType" width="100%" items="{actionTypeModel>/items}">
+            <core:Item key="" text="All"/>
+            <core:Item key="{actionTypeModel>key}" text="{actionTypeModel>text}"/>
+        </Select>
+        <Label text="Date Action"/>
+        <HBox>
+            <DatePicker id="FieldDateActionFrom" placeholder="From" width="8rem"/>
+            <DatePicker id="FieldDateActionTo" placeholder="To" width="8rem"/>
+        </HBox>
+        <Label text="Date Request"/>
+        <HBox>
+            <DatePicker id="FieldDateRequestFrom" placeholder="From" width="8rem"/>
+            <DatePicker id="FieldDateRequestTo" placeholder="To" width="8rem"/>
+        </HBox>
+        <Label text="Status"/>
+        <Select id="FieldStatus" width="100%" items="{statusModel>/items}">
+            <core:Item key="" text="All"/>
+            <core:Item key="{statusModel>key}" text="{statusModel>text}"/>
+        </Select>
+        <Label text="Person Responsible"/>
+        <Input id="FieldPersonResponsible" placeholder="Person Responsible" width="100%"/>
+        <Label text="Sort By"/>
+        <Select id="FieldSort" width="100%">
+            <core:Item key="" text="Sort By"/>
+            <core:Item key="EmployeeName" text="Employee"/>
+            <core:Item key="ActionType" text="Action Type"/>
+            <core:Item key="ZbegdaEfktf" text="Date Action"/>
+            <core:Item key="CreatedOn" text="Date Request"/>
+            <core:Item key="StatusText" text="Status"/>
+            <core:Item key="ApproverName" text="Person Responsible"/>
+        </Select>
+        <Label text="Sort Order"/>
+        <Select id="FieldSortOrder" width="100%">
+            <core:Item key="asc" text="Asc"/>
+            <core:Item key="desc" text="Desc"/>
+        </Select>
+    </VBox>
+    <beginButton>
+        <Button text="Apply" type="Emphasized" press="onFilterSortDialogApply"/>
+    </beginButton>
+    <endButton>
+        <Button text="Cancel" press="onFilterSortDialogCancel"/>
+    </endButton>
+</Dialog>
+</core:FragmentDefinition>

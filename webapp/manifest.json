@@ -25,8 +25,8 @@
           "odataVersion": "2.0"
         }
       },
-      "ZHR_STAT_CHANGE_MAN_SRV": {
-        "uri": "/sap/opu/odata/sap/ZHR_STAT_CHANGE_MAN_SRV/",
+      "ZHR_STAT_CHANGE_MAN_SRV_01": {
+        "uri": "/sap/opu/odata/sap/ZHR_STAT_CHANGE_MAN_SRV_01/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -35,7 +35,7 @@
         }
       },
       "ZHR_ACTING_MAN_SRV": {
-        "uri": "/sap/opu/odata/sap/ZHR_ACTING_MAN_SRV/",
+        "uri": "/sap/opu/odata/sap/ZHR_ACTING_MAN_SRV_01/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -43,8 +43,8 @@
           "odataVersion": "2.0"
         }
       },
-      "ZHR_PROMOTION_MAN_SRV": {
-        "uri": "/sap/opu/odata/sap/ZHR_PROMOTION_MAN_SRV/",
+      "ZHR_PROMOTION_MAN_SRV_01": {
+        "uri": "/sap/opu/odata/sap/ZHR_PROMOTION_MAN_SRV_01/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -53,7 +53,7 @@
         }
       },
       "ZHR_DEMOTION_MAN_SRV": {
-        "uri": "/sap/opu/odata/sap/ZHR_DEMOTION_MAN_SRV/",
+        "uri": "/sap/opu/odata/sap/ZHR_DEMOTION_MAN_SRV_01/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -62,7 +62,16 @@
         }
       },
       "ZHR_ASSIGNMENT_MAN_SRV": {
-        "uri": "/sap/opu/odata/sap/ZHR_ASSIGNMENT_MAN_SRV/",
+        "uri": "/sap/opu/odata/sap/ZHR_ASSIGNMENT_MAN_SRV_01/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZHR_GRIEVANCES_MAN_SRV": {
+        "uri": "/sap/opu/odata/sap/ZHR_GRIEVANCES_MAN_SRV/",
         "type": "OData",
         "settings": {
           "annotations": [],
@@ -121,7 +130,7 @@
         "defaultBindingMode": "OneTime",
         "defaultCountMode": "Request"
         },
-        "dataSource": "ZHR_STAT_CHANGE_MAN_SRV",
+        "dataSource": "ZHR_STAT_CHANGE_MAN_SRV_01",
         "preload": true
       },
       "Acting": {
@@ -141,7 +150,7 @@
         "defaultBindingMode": "OneTime",
         "defaultCountMode": "Request"
         },
-        "dataSource": "ZHR_PROMOTION_MAN_SRV",
+        "dataSource": "ZHR_PROMOTION_MAN_SRV_01",
         "preload": true
       },
       "Demotion": {
@@ -162,6 +171,16 @@
         "defaultCountMode": "Request"
         },
         "dataSource": "ZHR_ASSIGNMENT_MAN_SRV",
+        "preload": true
+      },
+      "Grievances": {
+        "type": "sap.ui.model.odata.v2.ODataModel",
+        "settings": {
+        "defaultOperationMode": "Server",
+        "defaultBindingMode": "OneTime",
+        "defaultCountMode": "Request"
+        },
+        "dataSource": "ZHR_GRIEVANCES_MAN_SRV",
         "preload": true
       }
     },
@@ -225,6 +244,60 @@
           "greedy": false,
           "target": [
             "detailapproval"
+          ]
+        },
+        {
+          "name": "detailapprovalmov",
+          "pattern": "detailapprovalmov/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovalmov"
+          ]
+        },
+        {
+          "name": "detailapprovalprom",
+          "pattern": "detailapprovalprom/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovalprom"
+          ]
+        },
+        {
+          "name": "detailapprovaldem",
+          "pattern": "detailapprovaldem/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovaldem"
+          ]
+        },
+        {
+          "name": "detailapprovalassign",
+          "pattern": "detailapprovalassign/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovalassign"
+          ]
+        },
+        {
+          "name": "detailapprovalacting",
+          "pattern": "detailapprovalacting/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovalacting"
+          ]
+        },
+        {
+          "name": "detailapprovalstatuschange",
+          "pattern": "detailapprovalstatuschange/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailapprovalstatuschange"
           ]
         },
         {
@@ -298,6 +371,60 @@
           "target": [
             "detailhistory"
           ]
+        },
+        {
+          "name": "detailhistorymov",
+          "pattern": "detailhistorymov/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistorymov"
+          ]
+        },
+        {
+          "name": "detailhistoryprom",
+          "pattern": "detailhistoryprom/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistoryprom"
+          ]
+        },
+        {
+          "name": "detailhistorydem",
+          "pattern": "detailhistorydem/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistorydem"
+          ]
+        },
+        {
+          "name": "detailhistoryassign",
+          "pattern": "detailhistoryassign/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistoryassign"
+          ]
+        },
+        {
+          "name": "detailhistoryacting",
+          "pattern": "detailhistoryacting/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistoryacting"
+          ]
+        },
+        {
+          "name": "detailhistorystatuschange",
+          "pattern": "detailhistorystatuschange/{RequestId}",
+          "titleTarget": "",
+          "greedy": false,
+          "target": [
+            "detailhistorystatuschange"
+          ]
         }
       ],
       "targets": {
@@ -331,6 +458,54 @@
           "clearAggregation": true,
           "viewName": "DetailApproval",
           "viewId": "detailapproval",
+          "viewLevel": 1
+        },
+        "detailapprovalmov": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalMov",
+          "viewId": "detailapprovalmov",
+          "viewLevel": 1
+        },
+        "detailapprovalprom": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalProm",
+          "viewId": "detailapprovalprom",
+          "viewLevel": 1
+        },
+        "detailapprovaldem": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalDem",
+          "viewId": "detailapprovaldem",
+          "viewLevel": 1
+        },
+        "detailapprovalassign": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalAssign",
+          "viewId": "detailapprovalassign",
+          "viewLevel": 1
+        },
+        "detailapprovalacting": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalActing",
+          "viewId": "detailapprovalacting",
+          "viewLevel": 1
+        },
+        "detailapprovalstatuschange": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailApprovalStatusChange",
+          "viewId": "detailapprovalstatuschange",
           "viewLevel": 1
         },
         "mutation": {
@@ -395,6 +570,54 @@
           "clearAggregation": true,
           "viewName": "DetailHistory",
           "viewId": "detailhistory",
+          "viewLevel": 1
+        },
+        "detailhistorymov": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryMov",
+          "viewId": "detailhistorymov",
+          "viewLevel": 1
+        },
+        "detailhistoryprom": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryProm",
+          "viewId": "detailhistoryprom",
+          "viewLevel": 1
+        },
+        "detailhistorydem": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryDem",
+          "viewId": "detailhistorydem",
+          "viewLevel": 1
+        },
+        "detailhistoryassign": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryAssign",
+          "viewId": "detailhistoryassign",
+          "viewLevel": 1
+        },
+        "detailhistoryacting": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryActing",
+          "viewId": "detailhistoryacting",
+          "viewLevel": 1
+        },
+        "detailhistorystatuschange": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearAggregation": true,
+          "viewName": "DetailHistoryStatusChange",
+          "viewId": "detailhistorystatuschange",
           "viewLevel": 1
         }
       }
