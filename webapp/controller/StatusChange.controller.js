@@ -300,7 +300,7 @@ sap.ui.define([
             const sEmployeePath = `/EmployeeSet('${EmployeeNumber}')`;
             const sEmployeeDetailPath = `/EmployeeDetailSet('${EmployeeNumber}')`;
         
-            // Get the Promotion OData model
+            // Get the Status OData model
             const oStatusChangeModel = this.getOwnerComponent().getModel("StatusChange");
         
             if (!oStatusChangeModel) {
@@ -497,7 +497,7 @@ sap.ui.define([
 
         readEntity: function (sPath) {
             return new Promise((resolve, reject) => {
-                const oModel = this.getOwnerComponent().getModel();
+                const oModel = this.getOwnerComponent().getModel("StatusChange");
                 oModel.read(sPath, {
                     success: (oData) => {
                         resolve(oData);

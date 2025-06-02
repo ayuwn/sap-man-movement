@@ -284,7 +284,7 @@ sap.ui.define([
 
         readEntity: function (sPath) {
             return new Promise((resolve, reject) => {
-                const oModel = this.getOwnerComponent().getModel();
+                const oModel = this.getOwnerComponent().getModel("Assignment");
                 oModel.read(sPath, {
                     success: (oData) => {
                         resolve(oData);

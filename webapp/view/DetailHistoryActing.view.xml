@@ -172,6 +172,96 @@
                         </f:SimpleForm>
                     </content>
                 </Panel>
+                <!-- sanksi berjalan panel -->
+                <Panel
+                expandable="true"
+                expanded="false"
+                headerText="Sanksi Berjalan"
+                width="auto">
+                <content>
+                    <f:SimpleForm 
+                        id="sanksiBerjalanHistoryForm"
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="4"
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        labelSpanS="12">
+                        <f:content>
+                        <Label text="{i18n>sanctionProgress}"/>
+                                    <l:Grid vSpacing="0" containerQuery="true">
+                                    <Input id="sanctionProgressActing" value="{HistoryActing>/SanksiAktif}" width="auto" editable="false" >
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text 
+                                        id="sanctionProgressDescActing1" 
+                                        text="{employeeDetail>/SanksiAktifDesc}" 
+                                        wrapping="true" 
+                                        width="100%" 
+                                        class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                            <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="Jenis Pelanggaran" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress1Acting" value="{HistoryActing>/JenPel1}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress1Acting" text="{path: 'HistoryActing>/DescPel1', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress2Acting" value="{HistoryActing>/JenPel2}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress2Acting" text="{path: 'HistoryActing>/DescPel2', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress3Acting" value="{HistoryActing>/JenPel3}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress3Acting" text="{path: 'HistoryActing>/DescPel3', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>
+                                <Label text="" />
+                                    <l:Grid defaultSpan="XL1 L1 M1 S12" vSpacing="0" containerQuery="true">
+                                    <Input id="jenPelProgress4Acting" value="{HistoryActing>/JenPel4}" width="auto" editable="false">
+                                        <layoutData>
+                                        <l:GridData span="L1 M1 S12" />
+                                        </layoutData>
+                                    </Input>
+                                    <Text id="descPelProgress4Acting" text="{path: 'HistoryActing>/DescPel4', formatter: '.formatter.formatDescPel'}" wrapping="true" width="100%" class="sapUiTinyMarginBegin">
+                                        <layoutData>
+                                        <l:GridData span="L11 M11 S12" />
+                                        </layoutData>
+                                    </Text>
+                                    </l:Grid>    
+                        </f:content>
+                    </f:SimpleForm>
+                </content>
+                </Panel>
                 <!-- Action Request Panel -->
                 <Panel 
                     expandable="true" 
@@ -438,6 +528,28 @@
                                             <l:GridData span="L4 M4 S12" />
                                         </layoutData>
                                     </DatePicker>
+                                <Label text="{i18n>salaryAdj}" required="true"/>
+                                    <Input 
+                                        id="salaryAdjHistory"
+                                        value="{parts: [
+                                                { path: 'HistoryActing>/Adjstmn' }, 
+                                                { path: 'dropdown>/salaryAdjColl' }
+                                            ], 
+                                            formatter: '.formatter.asTextFormatter'}"  
+                                            editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
+                                <Label text="{i18n>salaryAdjValue}"/>
+                                    <Input 
+                                        id="salaryAdjValueHistory" 
+                                        value="{path: 'HistoryActing>/Zsalary', formatter: '.formatter.formatSalary'}"
+                                        editable="false">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Input>
                                 <Label text="{i18n>as}" required="true"/>
                                     <Input id="asHistory" 
                                     value="{parts: [
@@ -596,6 +708,30 @@
                             description="IDR"
                             editable="false"/>
                         </HBox>
+                    <Label text="{i18n>tunjanganPLT}"/>
+                        <Input 
+                            id="tunjanganPltHistory" 
+                            value="{HistoryActing>/TunjanganPLT}"
+                            editable="false">
+                        <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                    <Label text="{i18n>nomTunjanganPLT}"/>
+                        <Input 
+                            id="nomTunjanganPltHistory" 
+                            value="{path: 'HistoryActing>/AmountPLT', formatter: '.formatter.formatSalary'}"
+                            width="auto"
+                            editable="false">
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                        <Text text="IDR">
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Text>
                     </f:content>
                 </f:SimpleForm>
                 <f:SimpleForm

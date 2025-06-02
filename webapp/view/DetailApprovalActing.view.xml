@@ -329,7 +329,7 @@
                                     </Text>
                                 <Label text="{i18n>effectiveDate}" required="true" />
                                 <HBox class="sapUiSmallMarginBottom">
-                                    <DatePicker id="effectiveDateStartApprovalActing" value="{path: 'detailApprovalActingModel>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" required="true" width="95%" editable="false"/>
+                                    <DatePicker id="effectiveDateStartApprovalActing" value="{path: 'detailApprovalActingModel>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" required="true" width="95%" editable="{= ${currentUser>/Stat} === 'A5' }"/>
                                     <Text text="-" class="sapUiSmallMarginBegin sapUiTinyMarginEnd"/>
                                     <DatePicker id="effectiveDateEndApprovalActing" value="{path: 'detailApprovalActingModel>/ZenddaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" width="95%" class="sapUiSmallMarginBegin" editable="false"/>
                                 </HBox>
@@ -617,7 +617,7 @@
                 <!-- Verification Panel -->
                 <Panel 
                     expandable="true" 
-                    expanded="false"
+                    expanded="true"
                     headerText="Verification" 
                     width="auto" >
                     <content>
@@ -792,8 +792,7 @@
                                             useSymbol: false,
                                             minFractionDigits: 0,
                                             maxFractionDigits: 0
-                                        },
-                                        targetType: 'any'
+                                            }
                                     }"
                                     placeholder="0"
                                     enabled="{verificationModel>/isSalaryFinalEditable}"
@@ -806,6 +805,57 @@
                                     value="{path: 'detailApprovalActingModel>/Zsalaryfnl', formatter: '.formatter.formatSalary'}"
                                     editable="false"
                                     visible="{= ${verificationModel>/isSalaryFinalEditable} === false }"
+                                />
+                            </HBox>
+                            <Label text="{i18n>tunjanganPLT}"/>
+                            <HBox>
+                            <Select id="tunjanganPltActingAppr"
+                                items="{ path: 'dropdown>/Tunjangan', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedTunjangan}"
+                                change=".onTunjanganChange"
+                                visible="{= ${currentUser>/Stat} === 'A5' }">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Select>
+                            <Input
+                                id="tunjanganPLTActingDisplay" 
+                                value="{detailApprovalActingModel>/TunjanganPLT}" 
+                                editable="false"
+                                visible="{= ${currentUser>/Stat} !== 'A5' }"
+                            />
+                            </HBox>
+                            <Label text="{i18n>nomTunjanganPLT}"/>
+                            <HBox>
+                            <Input 
+                                id="nominalTunjanganPlt"
+                                enabled="{dropdown>/isTunjanganEnabled}"
+                                value="{
+                                path: 'detailApprovalActingModel>/AmountPLT',
+                                type: 'sap.ui.model.type.Currency',
+                                formatOptions: {
+                                    showMeasure: false,
+                                    currencyCode: 'IDR',
+                                    useSymbol: false,
+                                    minFractionDigits: 0,
+                                    maxFractionDigits: 0
+                                    }
+                                }"
+                                visible="{= ${currentUser>/Stat} === 'A5' }"
+                                placeholder="0">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            <Input 
+                                    id="nominalTunjanganPltDisplay"
+                                    value="{path: 'detailApprovalActingModel>/AmountPLT', formatter: '.formatter.formatSalary'}"
+                                    editable="false"
+                                    visible="{= ${currentUser>/Stat} !== 'A5' }"
                                 />
                             </HBox>
                             </f:content>
@@ -915,7 +965,7 @@
                                     </upload:UploadSetItem>
                                 </upload:items>
                             </upload:UploadSet>
-                            <MessageStrip
+                            <!-- <MessageStrip
                                 text="Maksimal upload dokumen adalah 5 MB dan hanya format PDF yang diperbolehkan."
                                 type="Information"
                                 showIcon="true"
@@ -923,8 +973,9 @@
                                 <layoutData>
                                     <l:GridData span="L12 M12 S12" />
                                 </layoutData>
-                            </MessageStrip>
+                            </MessageStrip> -->
                             <Label />
+                            <ObjectStatus id="objAttLimit" class="sapUiSmallMarginBottom" text="{i18n>attFileSizeLimitMsg}" icon="sap-icon://message-information" state="Information" />
                             <!-- <ObjectStatus id="objAttLimit" class="sapUiSmallMarginBottom" text="{i18n>attFileSizeLimitMsg}" icon="sap-icon://message-information" state="Information" /> -->
                         </f:content>
                     </f:SimpleForm>

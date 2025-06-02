@@ -1,0 +1,17 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    stretch="false">
+    <SelectDialog
+        noDataText="No Tunjangan PLT Found"
+        title="Select Tunjangan PLT"
+        search="handleSearchTunjangan"
+        confirm="handleCloseTunjangan"
+        cancel="handleCloseTunjangan"
+        items="{tunjangan>/}">
+        <StandardListItem
+            title="{tunjangan>Key}"
+            description="{tunjangan>Value}"
+            type="Active" />
+    </SelectDialog>
+</core:FragmentDefinition>

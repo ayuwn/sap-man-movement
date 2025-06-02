@@ -31,7 +31,10 @@ sap.ui.define([
 
             this.getRouter().getRoute("detailapprovalacting").attachPatternMatched(this._onDetailApprovalActingRouteMatched, this);
 
-            const oDropdownModel = new sap.ui.model.json.JSONModel({
+            const oDropdownModel = new JSONModel({
+                selectedTunjangan: "",
+                isTunjanganEnabled: false,
+
                 asColl: [
                     { key: "1", text: "Baru" },
                     { key: "2", text: "Pengganti" }
@@ -39,6 +42,10 @@ sap.ui.define([
                 salaryAdjColl : [
                     { key: "1", text: "Ya"},
                     { key: "2", text: "Tidak"}
+                ],
+                Tunjangan : [
+                    { key: "1", text: "Ya" },
+                    { key: "2", text: "Tidak" }
                 ]
             });
             this.getView().setModel(oDropdownModel, "dropdown");
@@ -60,7 +67,8 @@ sap.ui.define([
                 isUploadVisible: false,
                 isVerifyMutation: false,
                 isDisposisiVTEnabled: false,
-                isDisposisiVCEnabled: false
+                isDisposisiVCEnabled: false,
+                isTunjanganEditable: true
             });
             this.getView().setModel(oVerificationModel, "verificationModel");
 
@@ -491,14 +499,15 @@ sap.ui.define([
                     oButtonState.setProperty("/isReviseEnabled", true);
                     oVerificationModel.setProperty("/isDisposisiEnabled", false);
                     oVerificationModel.setProperty("/isSalaryFinalEditable", false);
+                    oVerificationModel.setProperty("/isTunjanganEditable", false);
                 } else {
                     // If none checked: enable approve/reject, disable revise
                     oButtonState.setProperty("/isApproveEnabled", true);
                     oButtonState.setProperty("/isRejectEnabled", true);
                     oButtonState.setProperty("/isReviseEnabled", false);
                     oVerificationModel.setProperty("/isDisposisiEnabled", true);
-                    
                     oVerificationModel.setProperty("/isSalaryFinalEditable", true);
+                    oVerificationModel.setProperty("/isTunjanganEditable", true);
                 }
             }
         },
@@ -772,6 +781,18 @@ sap.ui.define([
             });  
         },
 
+        onTunjanganChange: function (oEvent) {
+            const sSelectedKey = oEvent.getSource().getSelectedKey();
+            const oModel = this.getView().getModel("dropdown");
+        
+            if (sSelectedKey === "1") { // "Ya"
+                oModel.setProperty("/isTunjanganEnabled", true);
+            } else if (sSelectedKey === "2") { // "Tidak"
+                oModel.setProperty("/isTunjanganEnabled", false);
+                this.byId("nominalTunjanganPlt").setValue(""); // Clear the input value
+            }
+        },
+
         loadApprovalHistoryWithRequestor: function (sRequestId) {
             const oModel = this.getView().getModel("Acting"); // Get the OData model
             const sRequestPath = `/RequestSet(guid'${sRequestId}')`;
@@ -898,6 +919,15 @@ sap.ui.define([
                 MessageBox.error("Please select a value in the Disposisi panel before submitting.");
                 return;
             }
+
+            const getFormattedDate = (controlId) => {
+                const control = this.byId(controlId);
+                if (control && typeof control.getDateValue === "function") {
+                    const dateValue = control.getDateValue();
+                    return dateValue ? this.formatter.formatDateUtc(dateValue) : null;
+                }
+                return null;
+            };
         
             this._currentUser(sRequestId)
                 .then((oCurrentUser) => {
@@ -1005,14 +1035,12 @@ sap.ui.define([
                                 // const sDisposisi = this.getView().getModel("disposisiApproval1").getProperty("/selectedIndex");
                                 const sDispoNote = this.byId("dispoNoteApprovalActing").getValue();
                                 const sSalaryFnl = this.byId("gajiApprovalActing").getValue() ? this.byId("gajiApprovalActing").getValue().replace(/\D/g, '') : "0";
+                                const sEffectiveDateStart = getFormattedDate("effectiveDateStartApprovalActing");
+                                const sTunjangan = this.getView().getModel("dropdown").getProperty("/selectedTunjangan") || "";
+                                const sAmountPlt = this.byId("nominalTunjanganPlt").getValue() ? this.byId("nominalTunjanganPlt").getValue().replace(/\D/g, '') : "0";
 
                                 const oDisposisiRadioGroup = this.byId("disposisiApprovalActing1");
                                 const iDisposisiIndex = oDisposisiRadioGroup ? oDisposisiRadioGroup.getSelectedIndex() : -1;
-        
-                                // if (!sRekomHcm || !sDispoNote || !sSalaryFnl || iDisposisiIndex === -1) {
-                                //     MessageBox.error("Please fill in all required fields in the Disposisi panel before submitting.");
-                                //     return;
-                                // }
 
                                 const bRevisiTalent = this.byId("revisiVTApprovalActing").getSelected();
                                 oApprovalData.RevisiTalent = bRevisiTalent ? "1" : "";
@@ -1020,10 +1048,13 @@ sap.ui.define([
                                 const bRevisiCombine = this.byId("reviseVCApprovalActing").getSelected();
                                 oApprovalData.RevisiCombine = bRevisiCombine ? "1" : "";
         
+                                oApprovalData.ZbegdaEfktf = sEffectiveDateStart;
                                 oApprovalData.ZrekomHcm = sRekomHcm;
                                 oApprovalData.Zdisposisi = (iDisposisiIndex + 1).toString();
                                 oApprovalData.Znotedisp = sDispoNote;
                                 oApprovalData.Zsalaryfnl = sSalaryFnl;
+                                oApprovalData.TunjanganPLT = sTunjangan;
+                                oApprovalData.AmountPLT = sAmountPlt;
 
                                 // Validate mandatory document submission for A5
                                 const oFileAttachmentModel = this.getView().getModel("fileAttachment");
@@ -1396,6 +1427,8 @@ sap.ui.define([
                     oVerificationModel.setProperty("/isSalaryFinalEditable", true);
                     oVerificationModel.setProperty("/isDisposisiVTEnabled", true);
                     oVerificationModel.setProperty("/isDisposisiVCEnabled", true);
+                    oVerificationModel.setProperty("/isEffectiveDateEditable", true);
+                    oVerificationModel.setProperty("/isTunjanganEditable", true);
                     console.log("Access set for Approver A5 (Disposisi)");
                     break;
         
@@ -1407,6 +1440,7 @@ sap.ui.define([
                     oVerificationModel.setProperty("/isDownloadEnabled", false);
                     oVerificationModel.setProperty("/isUploadVisible", false); 
                     oVerificationModel.setProperty("/isSalaryFinalEditable", false);
+                    oVerificationModel.setProperty("/isTunjanganEditable", false);
                     console.log("Access set for unknown role");
                     break;
             }
@@ -1495,6 +1529,73 @@ sap.ui.define([
                 this._getDetailApprovalData(sRequestId);
                 this.loadApprovalHistoryWithRequestor(sRequestId);
             }
+        },
+
+        _loadTunjanganData: function() {
+            return new Promise((resolve, reject) => {
+                const oModel = this.getOwnerComponent().getModel("Acting");
+                oModel.read("/ValueHelpTunjanganSet", {
+                    success: (oData) => {
+                        const oTunjanganModel = new JSONModel(oData.results);
+                        this.getView().setModel(oTunjanganModel, "tunjangan");
+                        resolve();
+                    },
+                    error: (oError) => {
+                        MessageBox.error("Failed to load tunjangan data.");
+                        reject(oError);
+                    }
+                });
+            });
+        },
+
+        handleValueHelpTunjangan: function() {
+            if (!this._oValueHelpTunjanganDialog) {
+                Fragment.load({
+                    name: "bsim.hcmapp.man.movement.view.fragments.ValueHelpTunjangan",
+                    controller: this
+                }).then(function(oDialog) {
+                    this._oValueHelpTunjanganDialog = oDialog;
+                    this._oValueHelpTunjanganDialog.setModel(this.getView().getModel("tunjangan"), "tunjangan");
+                    this.getView().addDependent(this._oValueHelpTunjanganDialog);
+                            
+                    this._loadTunjanganData().then(() => {
+                        this._oValueHelpTunjanganDialog.open();
+                    });
+                    
+                }.bind(this));
+            } else {
+                this._oValueHelpTunjanganDialog.open();
+            }
+        },
+
+        handleSearchTunjangan: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+        
+            // Create filters for both Key and Value
+            var oKeyFilter = new Filter("Key", FilterOperator.Contains, sValue);
+            var oValueFilter = new Filter("Value", FilterOperator.Contains, sValue);
+        
+            // Combine the filters with OR logic
+            var oCombinedFilter = new Filter({
+                filters: [oKeyFilter, oValueFilter],
+                and: false // OR logic
+            });
+        
+            // Apply the combined filter to the binding
+            var oBinding = oEvent.getSource().getBinding("items");
+            oBinding.filter([oCombinedFilter]);
+        },
+
+        handleCloseTunjangan: function(oEvent) {
+            let aContexts = oEvent.getParameter("selectedContexts");
+            if (aContexts && aContexts.length) {
+                let oSelectedItem = aContexts[0].getObject();
+                let oTunjanganModel = this.getView().getModel("tunjangan");
+                
+                oTunjanganModel.setProperty("/selectedTunjangan", oSelectedItem);
+                this.byId("tunjanganActing").setValue(oSelectedItem.Key);
+            }
+            oEvent.getSource().getBinding("items").filter([]);
         },
 
         onNavBack: function () {

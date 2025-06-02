@@ -997,6 +997,11 @@ sap.ui.define([
                     Promise.all(aPromises)
                         .then(aResults => {
                             const aCombinedResults = aResults.flat();
+                            // Sort by CreatedOn descending (newest first)
+                            aCombinedResults.sort(function(a, b) {
+                                return new Date(b.CreatedOn) - new Date(a.CreatedOn);
+                            });
+
                             const oApprovalModel = new sap.ui.model.json.JSONModel({ items: aCombinedResults });
                             this.getView().setModel(oApprovalModel, "approvalModel");
                             this._oBusy.close();
