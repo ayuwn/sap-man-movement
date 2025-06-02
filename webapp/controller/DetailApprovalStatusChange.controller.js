@@ -72,7 +72,7 @@ sap.ui.define([
             this.getView().setModel(oVerificationModel, "verificationModel");
 
             let oDisposisiApprovalModel = new JSONModel({
-                selectedIndex: 0
+                selectedIndex: -1
             });
             this._oView.setModel(oDisposisiApprovalModel, "disposisiApprovalStat1");
         },
@@ -1346,17 +1346,36 @@ sap.ui.define([
             var sStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
             var sReason = this._oDetailApprovalStatModel.getProperty("/Massg");
 
-            // DM Staff validation: A1 for reason 03, A3 for reason 01/02
-            if (
-                (sReason === "03" && sStat === "A1") ||
-                ((sReason === "01" || sReason === "02") && sStat === "A3")
-            ) {
+            if (sStat === "A1" && sReason === "03" ) {
                 if (!this._validateA1Submission()) {
+                    return;
+                }
+            }
+
+            if (sStat === "A3" && (sReason === "01" || sReason === "02")) {
+                if (!this._validateA3Submission()) {
                     return;
                 }
             }
             this._openApprovalDialog("approve");
         },
+
+        // onApprovePress: function () {
+        //     var oCurrentUserModel = this.getView().getModel("currentUser");
+        //     var sStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
+        //     var sReason = this._oDetailApprovalStatModel.getProperty("/Massg");
+
+        //     // DM Staff validation: A1 for reason 03, A3 for reason 01/02
+        //     if (
+        //         (sReason === "03" && sStat === "A1") ||
+        //         ((sReason === "01" || sReason === "02") && sStat === "A3")
+        //     ) {
+        //         if (!this._validateA1Submission()) {
+        //             return;
+        //         }
+        //     }
+        //     this._openApprovalDialog("approve");
+        // },
 
         onRejectPress: function () {
             var oCurrentUserModel = this.getView().getModel("currentUser");
@@ -2002,8 +2021,19 @@ sap.ui.define([
         // },
 
         _validateA1Submission: function() {
-            var sReason = this._oDetailApprovalStatModel.getProperty("/Massg");
-            var aMessages = [];
+            var sRekomHcm = this.byId("rekomendasiHCMApprovalStat").getValue();
+
+            // If any required field is missing, show a single warning
+            if (
+                !sRekomHcm
+            ) {
+                sap.m.MessageBox.warning("Mohon untuk lengkapi data yang diperlukan.");
+                return false;
+            }
+            return true;
+        },
+
+        _validateA3Submission: function() {
             var sRekomHcm = this.byId("rekomendasiHCMApprovalStat").getValue();
             var oDisposisiRadioGroup = this.byId("disposisiApprovalStat1");
             var iDisposisiIndex = oDisposisiRadioGroup ? oDisposisiRadioGroup.getSelectedIndex() : -1;
@@ -2012,30 +2042,15 @@ sap.ui.define([
             var oFileAttachmentModel = this.getView().getModel("fileAttachment");
             var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
 
-            // Get Stat from the active approval entry (not from currentUser)
-            var oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
-            var sStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
-
-            // If DM Staff stat is V1, only require document
-            if (sStat === "V1") {
-                if (!aFiles || aFiles.length === 0) {
-                    aMessages.push("Silakan unggah dokumen sebelum diajukan.");
-                }
-            } else if (sStat === "A3" || sStat === "A1") {
-                // For DM Staff A3 or A1, require all fields (as before)
-                if (sReason === "03") {
-                    if (!sRekomHcm) aMessages.push("Silakan isi rekomendasi HCM sebelum diajukan.");
-                } else {
-                    if (!sRekomHcm) aMessages.push("Silakan isi rekomendasi HCM sebelum diajukan.");
-                    if (iDisposisiIndex === -1) aMessages.push("Silakan pilih disposisi sebelum diajukan.");
-                    if (!sDispoNote) aMessages.push("Silakan isi catatan disposisi sebelum diajukan.");
-                    if (!sSalaryFnl || sSalaryFnl === "0") aMessages.push("Silakan isi gaji final sebelum diajukan.");
-                    if (!aFiles || aFiles.length === 0) aMessages.push("Silakan unggah minimal 1 dokumen sebelum diajukan.");
-                }
-            }
-
-            if (aMessages.length > 0) {
-                sap.m.MessageBox.warning(aMessages.join("\n"));
+            // If any required field is missing, show a single warning
+            if (
+                !sRekomHcm ||
+                iDisposisiIndex === -1 ||
+                !sDispoNote ||
+                !sSalaryFnl || sSalaryFnl === "0" ||
+                !aFiles || aFiles.length === 0
+            ) {
+                sap.m.MessageBox.warning("Mohon untuk lengkapi data yang diperlukan.");
                 return false;
             }
             return true;

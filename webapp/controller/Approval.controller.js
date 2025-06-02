@@ -270,6 +270,55 @@ sap.ui.define([
             });
         },
 
+        onMassApprove: function () {
+            var oTable = this.byId("approvalTable");
+            var aSelectedContexts = oTable.getSelectedContexts();
+            if (!aSelectedContexts.length) {
+                sap.m.MessageBox.warning("Please select at least one request to approve.");
+                return;
+            }
+
+            // Only approve items with allowed statuses
+            var aSelectedRequests = aSelectedContexts
+                .map(function (oCtx) { return oCtx.getObject(); })
+                .filter(function (oReq) {
+                    return ["A", "R", "P", "V"].indexOf(oReq.Status) === -1;
+                });
+
+            if (!aSelectedRequests.length) {
+                sap.m.MessageBox.warning("No valid requests selected for approval.");
+                return;
+            }
+
+            this._oBusy.open();
+
+            var aApprovePromises = aSelectedRequests.map(function (oReq) {
+                var oModel = this.getOwnerComponent().getModel(oReq.SourceModel || undefined);
+                var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+                return new Promise(function (resolve, reject) {
+                    oModel.update(sPath, { Status: "A" }, {
+                        method: "MERGE",
+                        success: resolve,
+                        error: reject
+                    });
+                });
+            }.bind(this));
+
+            Promise.allSettled(aApprovePromises)
+                .then(function (results) {
+                    var nSuccess = results.filter(r => r.status === "fulfilled").length;
+                    var nFail = results.length - nSuccess;
+                    sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+                    this._getInitialData();
+                }.bind(this))
+                .catch(function () {
+                    sap.m.MessageBox.error("Mass approval failed.");
+                })
+                .finally(function () {
+                    this._oBusy.close();
+                }.bind(this));
+        },
+
         // _getInitialData: function () {
         //     // Define the OData models for all services
         //     const aODataModels = [

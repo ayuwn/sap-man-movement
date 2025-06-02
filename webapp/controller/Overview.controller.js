@@ -87,6 +87,87 @@ sap.ui.define([
                     });
 
                     // Approval count (expand for ALL models)
+                    // const aApprovalPromises = aODataModels.map(oModel => {
+                    //     return new Promise((resolve) => {
+                    //         if (!oModel) {
+                    //             resolve([]);
+                    //             return;
+                    //         }
+                    //         // Special handling for Movement model (default)
+                    //         if (oModel === this.getOwnerComponent().getModel()) {
+                    //             oModel.read(sRequestPath, {
+                    //                 filters: [
+                    //                     new sap.ui.model.Filter("ApproverId", sap.ui.model.FilterOperator.EQ, sLoggedInEmployeeId)
+                    //                 ],
+                    //                 success: function (oRequestData) {
+                    //                     const aRequests = oRequestData.results || [];
+                    //                     if (aRequests.length === 0) {
+                    //                         console.log("[Movement] No requests found for ApproverId:", sLoggedInEmployeeId);
+                    //                         resolve([]);
+                    //                         return;
+                    //                     }
+                    //                     // Fetch toApproval for each request
+                    //                     const aApprovalFetches = aRequests.map(request => {
+                    //                         return new Promise((resolveReq) => {
+                    //                             oModel.read(`/RequestSet(guid'${request.RequestId}')/toApproval`, {
+                    //                                 success: function (oApprovalData) {
+                    //                                     console.log(`[Movement] Loaded toApproval for RequestId ${request.RequestId}:`, oApprovalData);
+                    //                                     request.toApproval = oApprovalData.results || [];
+                    //                                     resolveReq(request);
+                    //                                 },
+                    //                                 error: function (err) {
+                    //                                     console.warn(`[Movement] Failed to load toApproval for RequestId ${request.RequestId}:`, err);
+                    //                                     request.toApproval = [];
+                    //                                     resolveReq(request);
+                    //                                 }
+                    //                             });
+                    //                         });
+                    //                     });
+                    //                     Promise.all(aApprovalFetches).then(aRequestsWithApprovals => {
+                    //                         const aFilteredApprovals = aRequestsWithApprovals.filter(request => {
+                    //                             const aApprovals = Array.isArray(request.toApproval) ? request.toApproval : [];
+                    //                             return aApprovals.some(approval =>
+                    //                                 approval.ApproverId === sLoggedInEmployeeId &&
+                    //                                 (approval.Status === "" || approval.Status === "S")
+                    //                             );
+                    //                         });
+                    //                         console.log("[Movement] Filtered approvals:", aFilteredApprovals);
+                    //                         resolve(aFilteredApprovals);
+                    //                     });
+                    //                 },
+                    //                 error: function (err) {
+                    //                     console.error("[Movement] Error loading RequestSet:", err);
+                    //                     resolve([]);
+                    //                 }
+                    //             });
+                    //             return;
+                    //         }
+                    //         // Default logic for other models
+                    //         oModel.read(sRequestPath, {
+                    //             urlParameters: { "$expand": "toApproval" },
+                    //             filters: [
+                    //                 new sap.ui.model.Filter("ApproverId", sap.ui.model.FilterOperator.EQ, sLoggedInEmployeeId)
+                    //             ],
+                    //             success: function (oRequestData) {
+                    //                 console.log(`[${oModel.sServiceUrl}] Loaded RequestSet with $expand=toApproval:`, oRequestData);
+                    //                 const aFilteredApprovals = (oRequestData.results || []).filter(request => {
+                    //                     const aApprovals = (request.toApproval && Array.isArray(request.toApproval.results)) ? request.toApproval.results : [];
+                    //                     return aApprovals.some(approval =>
+                    //                         approval.ApproverId === sLoggedInEmployeeId &&
+                    //                         (approval.Status === "" || approval.Status === "S")
+                    //                     );
+                    //                 });
+                    //                 console.log(`[${oModel.sServiceUrl}] Filtered approvals:`, aFilteredApprovals);
+                    //                 resolve(aFilteredApprovals);
+                    //             },
+                    //             error: function (err) {
+                    //                 console.error(`[${oModel.sServiceUrl}] Error loading RequestSet with $expand=toApproval:`, err);
+                    //                 resolve([]);
+                    //             }
+                    //         });
+                    //     });
+                    // });
+
                     const aApprovalPromises = aODataModels.map(oModel => {
                         return new Promise((resolve) => {
                             if (!oModel) {
@@ -95,22 +176,62 @@ sap.ui.define([
                             }
                             oModel.read(sRequestPath, {
                                 urlParameters: { "$expand": "toApproval" },
-                                filters: [
-                                    new sap.ui.model.Filter("ApproverId", sap.ui.model.FilterOperator.EQ, sLoggedInEmployeeId)
-                                ],
                                 success: function (oRequestData) {
-                                    if (oModel === this.getOwnerComponent().getModel()) {
-                                        if (
-                                            !oRequestData.results ||
-                                            !oRequestData.results.length ||
-                                            typeof oRequestData.results[0].toApproval === "undefined"
-                                        ) {
-                                            console.warn("Movement model: /toApproval was NOT expanded or missing in response!", oRequestData);
-                                        } else {
-                                            console.log("Movement model: /toApproval expanded successfully.");
-                                        }
+                                    let aRequests = [];
+                                    if (Array.isArray(oRequestData.results)) {
+                                        aRequests = oRequestData.results;
+                                    } else if (oRequestData.results) {
+                                        aRequests = [oRequestData.results];
+                                    } else if (Array.isArray(oRequestData)) {
+                                        aRequests = oRequestData;
+                                    } else if (oRequestData) {
+                                        aRequests = [oRequestData];
                                     }
-                                    const aFilteredApprovals = (oRequestData.results || []).filter(request => {
+
+                                    // Check if toApproval is missing (Movement model fallback)
+                                    const isMovement = oModel === this.getOwnerComponent().getModel();
+                                    const needsFallback = isMovement && (
+                                        !aRequests.length ||
+                                        typeof aRequests[0].toApproval === "undefined"
+                                    );
+
+                                    if (needsFallback) {
+                                        // Fallback: fetch /toApproval for each request
+                                        if (!aRequests.length) {
+                                            resolve([]);
+                                            return;
+                                        }
+                                        const aApprovalFetches = aRequests.map(request => {
+                                            return new Promise((resolveReq) => {
+                                                oModel.read(`/RequestSet(guid'${request.RequestId}')/toApproval`, {
+                                                    success: function (oApprovalData) {
+                                                        let aApprovals = [];
+                                                        if (Array.isArray(oApprovalData.results)) {
+                                                            aApprovals = oApprovalData.results;
+                                                        } else if (oApprovalData.results) {
+                                                            aApprovals = [oApprovalData.results];
+                                                        }
+                                                        // Filter by ApproverId and status
+                                                        const aFiltered = aApprovals.filter(approval =>
+                                                            approval.ApproverId === sLoggedInEmployeeId &&
+                                                            (approval.Status === "" || approval.Status === "S")
+                                                        );
+                                                        resolveReq(aFiltered);
+                                                    },
+                                                    error: function () {
+                                                        resolveReq([]);
+                                                    }
+                                                });
+                                            });
+                                        });
+                                        Promise.all(aApprovalFetches).then(aAllApprovals => {
+                                            resolve(aAllApprovals.flat());
+                                        });
+                                        return;
+                                    }
+
+                                    // Normal logic for models that support $expand
+                                    const aFilteredApprovals = aRequests.filter(request => {
                                         const aApprovals = (request.toApproval && Array.isArray(request.toApproval.results)) ? request.toApproval.results : [];
                                         return aApprovals.some(approval =>
                                             approval.ApproverId === sLoggedInEmployeeId &&
@@ -120,11 +241,8 @@ sap.ui.define([
                                     resolve(aFilteredApprovals);
                                 }.bind(this),
                                 error: function () {
-                                    if (oModel === this.getOwnerComponent().getModel()) {
-                                        console.error("Movement model: Error while reading /RequestSet with $expand=toApproval");
-                                    }
                                     resolve([]);
-                                }.bind(this)
+                                }
                             });
                         });
                     });
