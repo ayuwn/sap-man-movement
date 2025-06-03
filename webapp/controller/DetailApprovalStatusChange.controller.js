@@ -1342,8 +1342,9 @@ sap.ui.define([
         },
 
         onApprovePress: function () {
-            var oCurrentUserModel = this.getView().getModel("currentUser");
-            var sStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
+            // var oCurrentUserModel = this.getView().getModel("currentUser");
+            var oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
+            var sStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
             var sReason = this._oDetailApprovalStatModel.getProperty("/Massg");
 
             if (sStat === "A1" && sReason === "03" ) {
@@ -1353,6 +1354,13 @@ sap.ui.define([
             }
 
             if (sStat === "A3" && (sReason === "01" || sReason === "02")) {
+                if (!this._validateA3Submission()) {
+                    return;
+                }
+            }
+
+            // DM Staff V1 (special: only require upload document)
+            if (sStat === "V1") {
                 if (!this._validateA3Submission()) {
                     return;
                 }
@@ -1827,6 +1835,8 @@ sap.ui.define([
             var oHomebaseTujuanLabel = this.byId("homebaseTujuanLabel");
             var oHomebaseTujuan = this.byId("homebaseTujuanStatusChange");
             var oHomebaseTujuanText = this.byId("homebaseTujuanTextStatusChange");
+            var oHomebaseAsal = this.byId("homebaseAsalStatusChange");
+            var oHomebaseAsalText = this.byId("homebaseAsalTextStatusChange");
 
             // Kontrak fields
             var oKontrakStatusChange = this.byId("KontrakStatusChange");
@@ -1840,6 +1850,8 @@ sap.ui.define([
                 if (oHomebaseTujuanLabel) oHomebaseTujuanLabel.setVisible(true);
                 if (oHomebaseTujuan) oHomebaseTujuan.setVisible(true);
                 if (oHomebaseTujuanText) oHomebaseTujuanText.setVisible(true);
+                if (oHomebaseAsal) oHomebaseAsal.setVisible(true);
+                if (oHomebaseAsalText) oHomebaseAsalText.setVisible(true);
 
                 // Hide kontrak and valid date fields
                 if (oKontrakStatusChange) oKontrakStatusChange.setVisible(false);
@@ -1852,6 +1864,8 @@ sap.ui.define([
                 if (oHomebaseTujuanLabel) oHomebaseTujuanLabel.setVisible(false);
                 if (oHomebaseTujuan) oHomebaseTujuan.setVisible(false);
                 if (oHomebaseTujuanText) oHomebaseTujuanText.setVisible(false);
+                if (oHomebaseAsal) oHomebaseAsal.setVisible(false);
+                if (oHomebaseAsalText) oHomebaseAsalText.setVisible(false);
 
                 // Show kontrak and valid date fields
                 if (oKontrakStatusChange) oKontrakStatusChange.setVisible(true);
@@ -2034,6 +2048,8 @@ sap.ui.define([
         },
 
         _validateA3Submission: function() {
+            var oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
+            var sStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;    
             var sRekomHcm = this.byId("rekomendasiHCMApprovalStat").getValue();
             var oDisposisiRadioGroup = this.byId("disposisiApprovalStat1");
             var iDisposisiIndex = oDisposisiRadioGroup ? oDisposisiRadioGroup.getSelectedIndex() : -1;
@@ -2041,6 +2057,15 @@ sap.ui.define([
             var sSalaryFnl = this.byId("gajiApprovalStat").getValue() ? this.byId("gajiApprovalStat").getValue().replace(/\D/g, '') : "0";
             var oFileAttachmentModel = this.getView().getModel("fileAttachment");
             var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+
+             // Special: If STAT is V1, only require upload document
+            if (sStat === "V1") {
+                if (!aFiles || aFiles.length === 0) {
+                    sap.m.MessageBox.warning("Mohon unggah dokumen yang diperlukan.");
+                    return false;
+                }
+                return true;
+            }
 
             // If any required field is missing, show a single warning
             if (
@@ -2360,99 +2385,222 @@ sap.ui.define([
                 return;
             }
 
-            const oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
-            let sUserStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
-            if (!sUserStat) {
-                // fallback to currentUser if no active approval entry
-                const oCurrentUserModel = this.getView().getModel("currentUser");
-                sUserStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
-            }
-
-            // Use Stat from active approval entry
-            // const oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
-            // const sUserStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
-            console.log("onSubmitFiles: oActiveApprovalEntry =", oActiveApprovalEntry, "sUserStat =", sUserStat);
+            // Always get the latest approval entry for the current user
             const oCurrentUserModel = this.getView().getModel("currentUser");
-            const sPicName = oCurrentUserModel.getProperty("/EmployeeName/FormattedName");
-            const sPicId = oCurrentUserModel.getProperty("/EmployeeNumber");
+            const sCurrentUserId = oCurrentUserModel && oCurrentUserModel.getProperty("/EmployeeNumber");
+            let sUserStat = null;
 
-            let sTypeDoc = "";
-            let sPicPosition = "Data Management";
-            switch (sUserStat) {
-                case "A1":
-                case "A3":
-                    sTypeDoc = "Hasil Disposisi";
-                    break;
-                case "V1":
-                    sTypeDoc = "SK Perpanjangan Kontrak";
-                    break;
-                case "V0":
-                    sTypeDoc = "SK Perpanjangan Kontrak";
-                    sPicPosition = "Requestor";
-                    break;
-                default:
-                    MessageBox.error("Invalid STAT for the current user. Cannot proceed with file upload.");
-                    return;
-            }
-
-            this._oBusy.open();
-            const sPath = `/FileAttachmentSet`;
-            const aFilters = [new sap.ui.model.Filter("Reqid", sap.ui.model.FilterOperator.EQ, sRequestId)];
-
-            oModel.read(sPath, {
-                filters: aFilters,
+            // Read approval entries to get the correct STAT for the current user
+            oModel.read(`/RequestSet(guid'${sRequestId}')/toApproval`, {
                 success: function (oData) {
-                    const aExistingFiles = oData.results || [];
-                    let iNextSeqnr = aExistingFiles.length;
+                    const aApprovals = oData.results || [];
+                    // --- Fix: Find the latest V1 entry for the current user ---
+                    let oV1Approval = aApprovals
+                        .filter(entry => entry.ApproverId === sCurrentUserId && entry.Stat === "V1")
+                        .sort((a, b) => parseInt(b.SequenceNumber, 10) - parseInt(a.SequenceNumber, 10))[0];
 
-                    const processNextFile = (index) => {
-                        if (index >= aFiles.length) {
-                            this._oBusy.close();
-                            MessageBox.success("Dokumen berhasil diunggah.", {
-                                onClose: () => {
-                                    console.log("File upload process completed.");
-                                }
-                            });
+                    if (oV1Approval) {
+                        sUserStat = oV1Approval.Stat;
+                    } else {
+                        // fallback to latest approval entry for current user
+                        const oLatestApproval = aApprovals
+                            .filter(entry => entry.ApproverId === sCurrentUserId)
+                            .sort((a, b) => parseInt(b.SequenceNumber, 10) - parseInt(a.SequenceNumber, 10))[0];
+                        sUserStat = oLatestApproval ? oLatestApproval.Stat : (oCurrentUserModel && oCurrentUserModel.getProperty("/Stat"));
+                    }
+
+                    // --- rest of your upload logic ---
+                    const sPicName = oCurrentUserModel.getProperty("/EmployeeName/FormattedName");
+                    const sPicId = oCurrentUserModel.getProperty("/EmployeeNumber");
+
+                    let sTypeDoc = "";
+                    let sPicPosition = "Data Management";
+                    switch (sUserStat) {
+                        case "A1":
+                        case "A3":
+                            sTypeDoc = "Hasil Disposisi";
+                            break;
+                        case "V1":
+                            sTypeDoc = "SK Perpanjangan Kontrak";
+                            break;
+                        case "V0":
+                            sTypeDoc = "SK Perpanjangan Kontrak";
+                            sPicPosition = "Requestor";
+                            break;
+                        default:
+                            MessageBox.error("Invalid STAT for the current user. Cannot proceed with file upload.");
                             return;
-                        }
-                        const oFile = aFiles[index];
-                        const oPayload = {
-                            Reqid: sRequestId,
-                            Seqnr: (iNextSeqnr++).toString(),
-                            FileName: oFile.FileName,
-                            FileType: oFile.FileType,
-                            FileSize: oFile.FileSize.toString(),
-                            Attachment: oFile.Attachment,
-                            CreatedOn: new Date().toISOString().split(".")[0],
-                            TypeDoc: sTypeDoc,
-                            PicPosition: sPicPosition,
-                            PicName: sPicName,
-                            PicId: sPicId,
-                            Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [
-                                sRequestId,
-                                iNextSeqnr - 1,
-                                "ZHR_STAT_CHANGE_MAN_SRV_01",
-                                "Mdt"
-                            ])
-                        };
-                        oModel.create("/FileAttachmentSet", oPayload, {
-                            success: function () {
-                                processNextFile(index + 1);
-                            }.bind(this),
-                            error: function (oError) {
-                                this._oBusy.close();
-                                MessageBox.error("Failed to upload file '" + oFile.FileName + "'.");
-                            }.bind(this)
-                        });
-                    };
-                    processNextFile(0);
+                    }
+
+                    this._oBusy.open();
+                    const sPath = `/FileAttachmentSet`;
+                    const aFilters = [new sap.ui.model.Filter("Reqid", sap.ui.model.FilterOperator.EQ, sRequestId)];
+
+                    oModel.read(sPath, {
+                        filters: aFilters,
+                        success: function (oData) {
+                            const aExistingFiles = oData.results || [];
+                            let iNextSeqnr = aExistingFiles.length;
+
+                            const processNextFile = (index) => {
+                                if (index >= aFiles.length) {
+                                    this._oBusy.close();
+                                    MessageBox.success("Dokumen berhasil diunggah.", {
+                                        onClose: () => {
+                                            console.log("File upload process completed.");
+                                        }
+                                    });
+                                    return;
+                                }
+                                const oFile = aFiles[index];
+                                const oPayload = {
+                                    Reqid: sRequestId,
+                                    Seqnr: (iNextSeqnr++).toString(),
+                                    FileName: oFile.FileName,
+                                    FileType: oFile.FileType,
+                                    FileSize: oFile.FileSize.toString(),
+                                    Attachment: oFile.Attachment,
+                                    CreatedOn: new Date().toISOString().split(".")[0],
+                                    TypeDoc: sTypeDoc,
+                                    PicPosition: sPicPosition,
+                                    PicName: sPicName,
+                                    PicId: sPicId,
+                                    Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [
+                                        sRequestId,
+                                        iNextSeqnr - 1,
+                                        "ZHR_STAT_CHANGE_MAN_SRV_01",
+                                        "Mdt"
+                                    ])
+                                };
+                                oModel.create("/FileAttachmentSet", oPayload, {
+                                    success: function () {
+                                        processNextFile(index + 1);
+                                    }.bind(this),
+                                    error: function (oError) {
+                                        this._oBusy.close();
+                                        MessageBox.error("Failed to upload file '" + oFile.FileName + "'.");
+                                    }.bind(this)
+                                });
+                            };
+                            processNextFile(0);
+                        }.bind(this),
+                        error: function (oError) {
+                            this._oBusy.close();
+                            MessageBox.error("Failed to fetch existing documents. Cannot proceed with file upload.");
+                        }.bind(this)
+                    });
                 }.bind(this),
                 error: function (oError) {
-                    this._oBusy.close();
-                    MessageBox.error("Failed to fetch existing documents. Cannot proceed with file upload.");
-                }.bind(this)
+                    MessageBox.error("Failed to fetch approval entries for file upload.");
+                }
             });
         },
+
+        // onSubmitFiles: function (sRequestId) {
+        //     if (!sRequestId) {
+        //         MessageBox.error("No request ID found. Cannot upload files.");
+        //         return;
+        //     }
+        //     const oModel = this.getOwnerComponent().getModel("StatusChange");
+        //     const oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //     const aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+        //     if (!aFiles || aFiles.length === 0) {
+        //         return;
+        //     }
+
+        //     const oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
+        //     let sUserStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
+        //     if (!sUserStat) {
+        //         // fallback to currentUser if no active approval entry
+        //         const oCurrentUserModel = this.getView().getModel("currentUser");
+        //         sUserStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
+        //     }
+
+        //     // Use Stat from active approval entry
+        //     // const oActiveApprovalEntry = this.getView().getModel("detailApprovalStatModel").getProperty("/activeApprovalEntry");
+        //     // const sUserStat = oActiveApprovalEntry && oActiveApprovalEntry.Stat;
+        //     console.log("onSubmitFiles: oActiveApprovalEntry =", oActiveApprovalEntry, "sUserStat =", sUserStat);
+        //     const oCurrentUserModel = this.getView().getModel("currentUser");
+        //     const sPicName = oCurrentUserModel.getProperty("/EmployeeName/FormattedName");
+        //     const sPicId = oCurrentUserModel.getProperty("/EmployeeNumber");
+
+        //     let sTypeDoc = "";
+        //     let sPicPosition = "Data Management";
+        //     switch (sUserStat) {
+        //         case "A1":
+        //         case "A3":
+        //             sTypeDoc = "Hasil Disposisi";
+        //             break;
+        //         case "V1":
+        //             sTypeDoc = "SK Perpanjangan Kontrak";
+        //             break;
+        //         case "V0":
+        //             sTypeDoc = "SK Perpanjangan Kontrak";
+        //             sPicPosition = "Requestor";
+        //             break;
+        //         default:
+        //             MessageBox.error("Invalid STAT for the current user. Cannot proceed with file upload.");
+        //             return;
+        //     }
+
+        //     this._oBusy.open();
+        //     const sPath = `/FileAttachmentSet`;
+        //     const aFilters = [new sap.ui.model.Filter("Reqid", sap.ui.model.FilterOperator.EQ, sRequestId)];
+
+        //     oModel.read(sPath, {
+        //         filters: aFilters,
+        //         success: function (oData) {
+        //             const aExistingFiles = oData.results || [];
+        //             let iNextSeqnr = aExistingFiles.length;
+
+        //             const processNextFile = (index) => {
+        //                 if (index >= aFiles.length) {
+        //                     this._oBusy.close();
+        //                     MessageBox.success("Dokumen berhasil diunggah.", {
+        //                         onClose: () => {
+        //                             console.log("File upload process completed.");
+        //                         }
+        //                     });
+        //                     return;
+        //                 }
+        //                 const oFile = aFiles[index];
+        //                 const oPayload = {
+        //                     Reqid: sRequestId,
+        //                     Seqnr: (iNextSeqnr++).toString(),
+        //                     FileName: oFile.FileName,
+        //                     FileType: oFile.FileType,
+        //                     FileSize: oFile.FileSize.toString(),
+        //                     Attachment: oFile.Attachment,
+        //                     CreatedOn: new Date().toISOString().split(".")[0],
+        //                     TypeDoc: sTypeDoc,
+        //                     PicPosition: sPicPosition,
+        //                     PicName: sPicName,
+        //                     PicId: sPicId,
+        //                     Url: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("urlpath", [
+        //                         sRequestId,
+        //                         iNextSeqnr - 1,
+        //                         "ZHR_STAT_CHANGE_MAN_SRV_01",
+        //                         "Mdt"
+        //                     ])
+        //                 };
+        //                 oModel.create("/FileAttachmentSet", oPayload, {
+        //                     success: function () {
+        //                         processNextFile(index + 1);
+        //                     }.bind(this),
+        //                     error: function (oError) {
+        //                         this._oBusy.close();
+        //                         MessageBox.error("Failed to upload file '" + oFile.FileName + "'.");
+        //                     }.bind(this)
+        //                 });
+        //             };
+        //             processNextFile(0);
+        //         }.bind(this),
+        //         error: function (oError) {
+        //             this._oBusy.close();
+        //             MessageBox.error("Failed to fetch existing documents. Cannot proceed with file upload.");
+        //         }.bind(this)
+        //     });
+        // },
 
         // onSubmitFiles: function (sRequestId) {
         //     if (!sRequestId) {

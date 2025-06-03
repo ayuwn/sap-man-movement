@@ -175,6 +175,8 @@ sap.ui.define([
             var oHomebaseTujuanLabel = this.byId("homebaseTujuanLabel");
             var oHomebaseTujuan = this.byId("homebaseTujuanStatusChange");
             var oHomebaseTujuanText = this.byId("homebaseTujuanTextStatusChange");
+            var oHomebaseAsal = this.byId("homebaseAsalStatusChange");
+            var oHomebaseAsalText = this.byId("homebaseAsalTextStatusChange");
 
             // Kontrak fields
             var oKontrakStatusChange = this.byId("KontrakStatusChange");
@@ -188,6 +190,8 @@ sap.ui.define([
                 if (oHomebaseTujuanLabel) oHomebaseTujuanLabel.setVisible(true);
                 if (oHomebaseTujuan) oHomebaseTujuan.setVisible(true);
                 if (oHomebaseTujuanText) oHomebaseTujuanText.setVisible(true);
+                if (oHomebaseAsal) oHomebaseAsal.setVisible(true);
+                if (oHomebaseAsalText) oHomebaseAsalText.setVisible(true);
 
                 // Hide kontrak and valid date fields
                 if (oKontrakStatusChange) oKontrakStatusChange.setVisible(false);
@@ -200,6 +204,8 @@ sap.ui.define([
                 if (oHomebaseTujuanLabel) oHomebaseTujuanLabel.setVisible(false);
                 if (oHomebaseTujuan) oHomebaseTujuan.setVisible(false);
                 if (oHomebaseTujuanText) oHomebaseTujuanText.setVisible(false);
+                if (oHomebaseAsal) oHomebaseAsal.setVisible(false);
+                if (oHomebaseAsalText) oHomebaseAsalText.setVisible(false);
 
                 // Show kontrak and valid date fields
                 if (oKontrakStatusChange) oKontrakStatusChange.setVisible(true);

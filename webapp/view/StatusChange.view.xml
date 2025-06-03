@@ -26,7 +26,7 @@
         <!-- Employee Data Panel -->
         <Panel 
         expandable="true" 
-        expanded="true"
+        expanded="false"
         headerText="Employee Data" 
         width="auto">
             <content>
@@ -113,7 +113,7 @@
         <!-- Status Aktif Panel -->
         <Panel 
         expandable="true" 
-        expanded="true"
+        expanded="false"
         headerText="Sanksi Aktif" 
         width="auto">
             <content>
@@ -550,7 +550,7 @@
                 </f:SimpleForm>
             </content>
         </Panel>
-        <Panel id="UploadPanel" expandable="true" expanded="false" headerText="{i18n>upDoc}" width="auto" visible="{verificationModel>/isUploadVisible}">
+        <Panel id="UploadPanel" expandable="true" expanded="false" headerText="{i18n>upDoc}" width="auto" >
                     <f:SimpleForm id="attDataStatChangeForm" editable="true" layout="ResponsiveGridLayout" labelSpanL="1" emptySpanL="-1" columnsL="1" labelSpanM="1" emptySpanM="-1" adjustLabelSpan="false" singleContainerFullSize="false">
                         <f:content>
                         <Label />

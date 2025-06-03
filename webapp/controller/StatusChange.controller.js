@@ -701,46 +701,49 @@ sap.ui.define([
             console.log("Employee Model Data:", oEmployeeModel.getData());
             let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
             let oSelectedEmpSupervisor = oEmployeeModel.getProperty("/Supervisor");
-        
+
             let oCurrentUserModel = this.getView().getModel("currentUser");
             let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
-        
+
             console.log("Selected Employee:", oSelectedEmp);
             console.log("Selected Employee's Supervisor:", oSelectedEmpSupervisor);
             console.log("Logged-in User's Employee ID:", sLoggedInEmployeeId);
-        
+
             if (!oSelectedEmp) {
                 MessageBox.error("Please select an employee first.");
                 return;
             }
-        
+
             if (!sLoggedInEmployeeId) {
                 MessageBox.error("Unable to retrieve logged-in user details.");
                 return;
             }
-        
+
             // Ensure the user cannot perform actions on themselves
             if (oSelectedEmp === sLoggedInEmployeeId) {
                 MessageBox.error("You cannot perform actions on yourself.");
                 return;
             }
-        
+
             // Check if the logged-in user is a supervisor of the selected employee
             if (oSelectedEmpSupervisor !== sLoggedInEmployeeId) {
                 MessageBox.error("You are not authorized to perform this action on the selected employee.");
                 return;
             }
-        
+
             // Validate required entries
             var oView = this.getView();
             if (!this._validateEntries(oView, "grpValidation")) {
                 return;
             }
 
-            // Mandatory upload check
+            // Check reason
+            var sReasonKey = this.byId("reasonStatusChange").getValue();
+
+            // Mandatory upload check, except for reason 03
             var oFileAttachmentModel = this.getView().getModel("fileAttachment");
             var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
-            if (!aFiles || aFiles.length === 0) {
+            if (sReasonKey !== "03" && (!aFiles || aFiles.length === 0)) {
                 MessageBox.error("Mohon unggah dokumen yang diperlukan.");
                 return;
             }
@@ -752,7 +755,7 @@ sap.ui.define([
                 initialFocus: MessageBox.Action.NO,
                 onClose: (sAction) => {
                     if (sAction === MessageBox.Action.YES) {
-                         const oViewModel = this.getView().getModel("viewModel");
+                        const oViewModel = this.getView().getModel("viewModel");
                         oViewModel.setProperty("/isSubmitDisabled", true);
                         this._postStatusChangeRequest();
                     } else {
@@ -761,6 +764,72 @@ sap.ui.define([
                 }
             });
         },
+
+        // onSendRequest: function () {
+        //     let oEmployeeModel = this.getView().getModel("employee");
+        //     console.log("Employee Model Data:", oEmployeeModel.getData());
+        //     let oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
+        //     let oSelectedEmpSupervisor = oEmployeeModel.getProperty("/Supervisor");
+        
+        //     let oCurrentUserModel = this.getView().getModel("currentUser");
+        //     let sLoggedInEmployeeId = oCurrentUserModel ? oCurrentUserModel.getProperty("/EmployeeNumber") : null;
+        
+        //     console.log("Selected Employee:", oSelectedEmp);
+        //     console.log("Selected Employee's Supervisor:", oSelectedEmpSupervisor);
+        //     console.log("Logged-in User's Employee ID:", sLoggedInEmployeeId);
+        
+        //     if (!oSelectedEmp) {
+        //         MessageBox.error("Please select an employee first.");
+        //         return;
+        //     }
+        
+        //     if (!sLoggedInEmployeeId) {
+        //         MessageBox.error("Unable to retrieve logged-in user details.");
+        //         return;
+        //     }
+        
+        //     // Ensure the user cannot perform actions on themselves
+        //     if (oSelectedEmp === sLoggedInEmployeeId) {
+        //         MessageBox.error("You cannot perform actions on yourself.");
+        //         return;
+        //     }
+        
+        //     // Check if the logged-in user is a supervisor of the selected employee
+        //     if (oSelectedEmpSupervisor !== sLoggedInEmployeeId) {
+        //         MessageBox.error("You are not authorized to perform this action on the selected employee.");
+        //         return;
+        //     }
+        
+        //     // Validate required entries
+        //     var oView = this.getView();
+        //     if (!this._validateEntries(oView, "grpValidation")) {
+        //         return;
+        //     }
+
+        //     // Mandatory upload check
+        //     var oFileAttachmentModel = this.getView().getModel("fileAttachment");
+        //     var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+        //     if (!aFiles || aFiles.length === 0) {
+        //         MessageBox.error("Mohon unggah dokumen yang diperlukan.");
+        //         return;
+        //     }
+
+        //     // Confirm with user before sending
+        //     MessageBox.confirm("Apakah Anda sudah yakin untuk melakukan pengajuan ini?", {
+        //         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        //         emphasizedAction: MessageBox.Action.NO,
+        //         initialFocus: MessageBox.Action.NO,
+        //         onClose: (sAction) => {
+        //             if (sAction === MessageBox.Action.YES) {
+        //                  const oViewModel = this.getView().getModel("viewModel");
+        //                 oViewModel.setProperty("/isSubmitDisabled", true);
+        //                 this._postStatusChangeRequest();
+        //             } else {
+        //                 return false;
+        //             }
+        //         }
+        //     });
+        // },
 
         _postStatusChangeRequest: function () {
             const oEmployeeModel = this.getView().getModel("employee");
@@ -777,12 +846,20 @@ sap.ui.define([
                 return;
             }
 
+            var sReasonKey = this.byId("reasonStatusChange").getValue();
             var oFileAttachmentModel = this.getView().getModel("fileAttachment");
             var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
-            if (!aFiles || aFiles.length === 0) {
+            if (sReasonKey !== "03" && (!aFiles || aFiles.length === 0)) {
                 MessageBox.error("Mohon unggah dokumen yang diperlukan.");
                 return;
             }
+
+            // var oFileAttachmentModel = this.getView().getModel("fileAttachment");
+            // var aFiles = oFileAttachmentModel ? oFileAttachmentModel.getProperty("/results") : [];
+            // if (!aFiles || aFiles.length === 0) {
+            //     MessageBox.error("Mohon unggah dokumen yang diperlukan.");
+            //     return;
+            // }
         
             const oSelectedEmp = oEmployeeModel.getProperty("/EmployeeNumber");
             const sLoggedInEmployeeId = oCurrentUserModel.getProperty("/EmployeeNumber");
@@ -1325,6 +1402,28 @@ sap.ui.define([
             // Only enable salary adjustment if reason is "01"
             oDropdownModel.setProperty("/isSalaryAdjEnabled", sReasonKey === "01");
 
+            // Disable upload document if reason is "03"
+            var oUploadSet = this.byId("idUploadStatChange");
+            if (oUploadSet) {
+                oUploadSet.setUploadEnabled(sReasonKey !== "03");
+            }
+
+            // Hide upload panel, form, and uploadset if reason is "03"
+            var oUploadPanel = this.byId("UploadPanel");
+            var oAttDataForm = this.byId("attDataStatChangeForm");
+            var oUploadSet = this.byId("idUploadStatChange");
+
+            var bShowUpload = sReasonKey !== "03";
+            if (oUploadPanel) {
+                oUploadPanel.setVisible(bShowUpload);
+            }
+            if (oAttDataForm) {
+                oAttDataForm.setVisible(bShowUpload);
+            }
+            if (oUploadSet) {
+                oUploadSet.setVisible(bShowUpload);
+            }
+
             // Homebase Tujuan editable only for reason "03"
             const oHomebaseInput = this.byId("homebaseTujuanStatusChange");
             if (oHomebaseInput) {
@@ -1335,6 +1434,9 @@ sap.ui.define([
             var oHomebaseTujuanLabel = this.byId("homebaseTujuanLabel");
             var oHomebaseTujuan = this.byId("homebaseTujuanStatusChange");
             var oHomebaseTujuanText = this.byId("homebaseTujuanTextStatusChange");
+            var oHomebaseAsal = this.byId("homebaseAsalStatusChange1");
+            var oHomebaseAsalText = this.byId("homebaseAsalTextStatusChange");
+
             if (sReasonKey === "01" || sReasonKey === "02") {
                 if (oHomebaseTujuan) {
                     oHomebaseTujuan.setVisible(false);
@@ -1343,12 +1445,26 @@ sap.ui.define([
                 if (oHomebaseTujuanLabel) {
                     oHomebaseTujuanLabel.setVisible(false);
                 }
+                if (oHomebaseAsal) {
+                    oHomebaseAsal.setVisible(false);
+                    oHomebaseAsal.setValue("");
+                }
+                if (oHomebaseAsalText) {
+                    oHomebaseAsalText.setVisible(false);
+                    oHomebaseAsalText.setText("");
+                }
             } else {
                 if (oHomebaseTujuan) {
                     oHomebaseTujuan.setVisible(true);
                 }
                 if (oHomebaseTujuanLabel) {
                     oHomebaseTujuanLabel.setVisible(true);
+                }
+                if (oHomebaseAsal) {
+                    oHomebaseAsal.setVisible(true);
+                }
+                if (oHomebaseAsalText) {
+                    oHomebaseAsalText.setVisible(true);
                 }
             }
 
@@ -1359,6 +1475,12 @@ sap.ui.define([
             }
             if (oHomebaseTujuanText) {
                 oHomebaseTujuanText.setVisible(true);
+            }
+            if (oHomebaseAsal) {
+            oHomebaseAsal.setVisible(true);
+            }
+            if (oHomebaseAsalText) {
+                oHomebaseAsalText.setVisible(true);
             }
         } else {
             // Clear and show homebase fields for other reasons
@@ -1372,6 +1494,14 @@ sap.ui.define([
             if (oHomebaseTujuanText) {
                 oHomebaseTujuanText.setText("");
                 oHomebaseTujuanText.setVisible(false); // or set to false if you want to hide
+            }
+            if (oHomebaseAsal) {
+            oHomebaseAsal.setValue("");
+            oHomebaseAsal.setVisible(false);
+            }
+            if (oHomebaseAsalText) {
+                oHomebaseAsalText.setText("");
+                oHomebaseAsalText.setVisible(false);
             }
         }
 

@@ -27,7 +27,7 @@
                 <!-- Employee Data Panel -->
                 <Panel
                     expandable="true"
-                    expanded="true"
+                    expanded="false"
                     headerText="Employee Data"
                     width="auto">
                     <content>
@@ -445,6 +445,11 @@
                                             <l:GridData span="L2 M2 S12" />
                                         </layoutData>
                                     </Input>
+                                    <Text id="homebaseAsalTextStatusChange" text="{detailApprovalStatModel>/HmbsDescAsl}" wrapping="true" width="100%">
+                                        <layoutData>
+                                            <l:GridData span="L2 M2 S12" />
+                                        </layoutData>
+                                    </Text>
                                 <Label text="{i18n>homebasetujuan}" required="true"/>
                                     <Input 
                                         id="homebaseTujuanStatusChange" 

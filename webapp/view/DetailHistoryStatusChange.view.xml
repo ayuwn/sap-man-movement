@@ -440,6 +440,11 @@
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
+                            <Text id="homebaseAsalTextStatusChange" text="{HistoryStatusChange>/HmbsDescAsl}" wrapping="true" width="100%">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
                         <Label text="{i18n>homebasetujuan}"/>
                             <Input 
                                 id="homebaseTujuanStatusChange" 
@@ -509,8 +514,8 @@
                             id="disposisiHistory" 
                             enabled="false" 
                             columns="2" 
-                            width="100%" 
-                            selectedIndex="{path: 'HistoryDemotion>/Zdisposisi', formatter: '.formatter.formatDisposisi'}">
+                            width="100%"
+                            selectedIndex="{= ${HistoryStatusChange>/Zdisposisi} - 1 }" >
                             <RadioButton text="Rekomendasi" class="sapUiSmallMarginEnd"/>
                             <RadioButton text="Tidak Direkomendasikan" />
                         </RadioButtonGroup>
