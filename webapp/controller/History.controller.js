@@ -31,13 +31,17 @@ sap.ui.define([
             var aCols = [];
             aCols.push({ label: "Employee Number", property: "EmployeeNumber", type: EdmType.String });
             aCols.push({ label: "Employee Name", property: "EmployeeName", type: EdmType.String });
+            aCols.push({ label: "Position", property: "PositionName", type: EdmType.String });
             aCols.push({ label: "Action Type", property: "ActionType", type: EdmType.String });
             aCols.push({ label: "Action Type Desc", property: "ActionTypeDesc", type: EdmType.String });
-            aCols.push({ label: "Action Reason", property: "MassgDesc", type: EdmType.String });
+            aCols.push({ label: "Reason", property: "Massg", type: EdmType.String }); 
+            aCols.push({ label: "Reason Desc", property: "MassgDesc", type: EdmType.String });
             aCols.push({ label: "Date Action", property: "ZbegdaEfktf", type: EdmType.Date });
             aCols.push({ label: "Date Request", property: "CreatedOn", type: EdmType.Date });
             aCols.push({ label: "Status", property: "StatusText", type: EdmType.String });
+            aCols.push({ label: "Employee Number Person Responsible", property: "ApproverId", type: EdmType.String });
             aCols.push({ label: "Person Responsible", property: "ApproverName", type: EdmType.String });
+            aCols.push({ label: "No SK", property: "NoSK", type: EdmType.String });
             return aCols;
         },
 
