@@ -25,6 +25,38 @@ sap.ui.define([
             this.getRouter().getRoute("approval").attachPatternMatched(this._onApprovalRouteMatched, this);
         },
 
+        onSelectionChange: function(oEvent) {
+            var oTable = oEvent.getSource();
+            var aSelectedItems = oTable.getSelectedItems();
+            var oModel = this.getView().getModel("approvalModel");
+            var aInvalidStatus = ["A", "P", "V", "R"];
+            aSelectedItems.forEach(function(oItem) {
+                var oCtx = oItem.getBindingContext("approvalModel");
+                if (oCtx) {
+                    var sStatus = oCtx.getProperty("Status");
+                    if (aInvalidStatus.includes(sStatus)) {
+                        oTable.setSelectedItem(oItem, false); // <-- This is the correct way
+                        sap.m.MessageToast.show("Mohon untuk memilih pengajuan yang belum diproses.");
+                    }
+                }
+            });
+        },
+
+        // onRowSelectionChange: function(oEvent) {
+        //     var oTable = this.byId("approvalTable");
+        //     var aIndices = oTable.getSelectedIndices();
+        //     var oModel = this.getView().getModel("approvalModel");
+        //     var aRows = oModel.getProperty("/items") || [];
+        //     var aInvalidStatus = ["A", "P", "V", "R"];
+        //     aIndices.forEach(function(iIdx) {
+        //         var oRow = aRows[iIdx];
+        //         if (oRow && aInvalidStatus.includes(oRow.Status)) {
+        //             oTable.removeSelectionInterval(iIdx, iIdx);
+        //             sap.m.MessageToast.show("You cannot select requests with status A, P, V, or R.");
+        //         }
+        //     });
+        // },
+
         reqListSearchField: function(oEvent) {
             let sValue = oEvent.getParameter("value");
             let oFilter = new Filter({
@@ -219,56 +251,193 @@ sap.ui.define([
 
         _currentUser: function () {
             return new Promise((resolve, reject) => {
-                // Show busy indicator
                 this._oBusy.open();
-        
-                var oDataModel = this.getOwnerComponent().getModel(); // Get the default OData model
-        
-                if (!oDataModel) {
-                    console.error("OData model not available");
-                    this._oBusy.close();
-                    MessageBox.error("System error: OData model not available");
-                    reject(new Error("OData model not available"));
-                    return;
-                }
-        
-                // Call the EmployeeDetailSet endpoint to get logged-in user details
-                oDataModel.read("/EmployeeDetailSet", {
-                    success: function (oData) {
-                        console.log("Current user data received:", oData);
-        
-                        if (!oData || !oData.results || oData.results.length === 0) {
-                            this._oBusy.close();
-                            MessageBox.error("No user data received from server");
-                            reject(new Error("No user data received from server"));
+
+                const oModels = {
+                    Movement: this.getOwnerComponent().getModel(),
+                    Promotion: this.getOwnerComponent().getModel("Promotion"),
+                    Acting: this.getOwnerComponent().getModel("Acting"),
+                    Demotion: this.getOwnerComponent().getModel("Demotion"),
+                    Assignment: this.getOwnerComponent().getModel("Assignment"),
+                    StatusChange: this.getOwnerComponent().getModel("StatusChange")
+                };
+
+                // For each model, read EmployeeDetailSet
+                const aPromises = Object.entries(oModels).map(([key, oModel]) => {
+                    return new Promise((resolveModel) => {
+                        if (!oModel) {
+                            console.warn(`[currentUser] OData model '${key}' not available.`);
+                            resolveModel({ key, data: null });
                             return;
                         }
-        
-                        // Get the first user from the results
-                        var oCurrentUser = oData.results[0];
-        
-                        // Store the employee ID for later use
-                        this._sEmployeeId = oCurrentUser.EmployeeNumber;
-        
-                        // Create a model for current user details
-                        var oCurrentUserModel = new sap.ui.model.json.JSONModel(oCurrentUser);
-                        this.getView().setModel(oCurrentUserModel, "currentUser");
-        
-                        this._oBusy.close();
-                        resolve(oCurrentUser); // Resolve the Promise with the current user data
-                    }.bind(this),
-                    error: function (oError) {
-                        this._oBusy.close();
-                        console.error("Error fetching current user data:", oError);
-                        MessageBox.error(
-                            "Failed to load user details: " +
-                            (oError.responseText ? JSON.parse(oError.responseText).error.message.value : "Unknown error")
-                        );
-                        reject(oError); // Reject the Promise with the error
-                    }.bind(this)
+                        console.log(`[currentUser] Loading EmployeeDetailSet from model: ${key}`);
+                        oModel.read("/EmployeeDetailSet", {
+                            success: function (oData) {
+                                console.log(`[currentUser] EmployeeDetailSet loaded from '${key}':`, oData);
+                                if (oData && oData.results && oData.results.length > 0) {
+                                    resolveModel({ key, data: oData.results[0] });
+                                } else {
+                                    resolveModel({ key, data: null });
+                                }
+                            },
+                            error: function (oError) {
+                                console.error(`[currentUser] Error loading EmployeeDetailSet from '${key}':`, oError);
+                                resolveModel({ key, data: null });
+                            }
+                        });
+                    });
                 });
+
+                Promise.all(aPromises)
+                    .then(aResults => {
+                        this._oBusy.close();
+                        const oUserMap = {};
+                        aResults.forEach(r => { oUserMap[r.key] = r.data; });
+                        this.getView().setModel(new sap.ui.model.json.JSONModel(oUserMap), "currentUser");
+                        resolve(oUserMap);
+                    })
+                    .catch((err) => {
+                        this._oBusy.close();
+                        reject(err);
+                    });
             });
         },
+
+        // _currentUser: function () {
+        //     return new Promise((resolve, reject) => {
+        //         // Show busy indicator
+        //         this._oBusy.open();
+        
+        //         var oDataModel = this.getOwnerComponent().getModel(); // Get the default OData model
+        
+        //         if (!oDataModel) {
+        //             console.error("OData model not available");
+        //             this._oBusy.close();
+        //             MessageBox.error("System error: OData model not available");
+        //             reject(new Error("OData model not available"));
+        //             return;
+        //         }
+        
+        //         // Call the EmployeeDetailSet endpoint to get logged-in user details
+        //         oDataModel.read("/EmployeeDetailSet", {
+        //             success: function (oData) {
+        //                 console.log("Current user data received:", oData);
+        
+        //                 if (!oData || !oData.results || oData.results.length === 0) {
+        //                     this._oBusy.close();
+        //                     MessageBox.error("No user data received from server");
+        //                     reject(new Error("No user data received from server"));
+        //                     return;
+        //                 }
+        
+        //                 // Get the first user from the results
+        //                 var oCurrentUser = oData.results[0];
+        
+        //                 // Store the employee ID for later use
+        //                 this._sEmployeeId = oCurrentUser.EmployeeNumber;
+        
+        //                 // Create a model for current user details
+        //                 var oCurrentUserModel = new sap.ui.model.json.JSONModel(oCurrentUser);
+        //                 this.getView().setModel(oCurrentUserModel, "currentUser");
+        
+        //                 this._oBusy.close();
+        //                 resolve(oCurrentUser); // Resolve the Promise with the current user data
+        //             }.bind(this),
+        //             error: function (oError) {
+        //                 this._oBusy.close();
+        //                 console.error("Error fetching current user data:", oError);
+        //                 MessageBox.error(
+        //                     "Failed to load user details: " +
+        //                     (oError.responseText ? JSON.parse(oError.responseText).error.message.value : "Unknown error")
+        //                 );
+        //                 reject(oError); // Reject the Promise with the error
+        //             }.bind(this)
+        //         });
+        //     });
+        // },
+
+        // onMassApprove: function () {
+        //     var oTable = this.byId("approvalTable");
+        //     var aSelectedContexts = oTable.getSelectedContexts();
+        //     if (!aSelectedContexts.length) {
+        //         sap.m.MessageBox.warning("Please select at least one request to approve.");
+        //         return;
+        //     }
+
+        //     var aSelectedRequests = aSelectedContexts
+        //         .map(function (oCtx) { return oCtx.getObject(); })
+        //         .filter(function (oReq) {
+        //             return ["A", "R", "P", "V"].indexOf(oReq.Status) === -1;
+        //         });
+
+        //     if (!aSelectedRequests.length) {
+        //         sap.m.MessageBox.warning("No valid requests selected for approval.");
+        //         return;
+        //     }
+
+        //     this._oBusy.open();
+
+        //     var that = this;
+        //     var aApprovePromises = aSelectedRequests.map(function (oReq) {
+        //         var oModel = that.getOwnerComponent().getModel(oReq.SourceModel || undefined);
+        //         var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+        //         const oDateTime = that._createApprovalDateTime();
+        //         var oPayload = {
+        //             RequestId: oReq.RequestId,
+        //             SequenceNumber: oReq.SequenceNumber,
+        //             Stat: oReq.Stat,
+        //             ObjectType: oReq.ObjectType,
+        //             ApproverId: oReq.ApproverId,
+        //             Abbreviation: oReq.Abbreviation,
+        //             Status: "A",
+        //             StatusText: "Approved",
+        //             ApprovalUser: oReq.ApproverId,
+        //             Notes: "",
+        //             ApprovalDate: oDateTime.ApprovalDate,
+        //             ApprovalTime: oDateTime.ApprovalTime
+        //         };
+
+        //         // --- Force single operation per request ---
+        //         var bWasBatch = oModel.bUseBatch;
+        //         oModel.setUseBatch(false);
+
+        //         return new Promise(function (resolve, reject) {
+        //             oModel.update(sPath, oPayload, {
+        //                 method: "MERGE",
+        //                 success: function () {
+        //                     oModel.setUseBatch(bWasBatch);
+        //                     resolve({ RequestId: oReq.RequestId, status: "success" });
+        //                 },
+        //                 error: function (err) {
+        //                     oModel.setUseBatch(bWasBatch);
+        //                     reject({ RequestId: oReq.RequestId, status: "failed", error: err });
+        //                 }
+        //             });
+        //         });
+        //     });
+
+        //     Promise.allSettled(aApprovePromises)
+        //         .then(function (results) {
+        //             var nSuccess = results.filter(r => r.status === "fulfilled").length;
+        //             var nFail = results.length - nSuccess;
+        //             // Optionally, log or process each result with RequestId
+        //             results.forEach(function(r) {
+        //                 if (r.status === "fulfilled") {
+        //                     console.log("Approved:", r.value.RequestId);
+        //                 } else {
+        //                     console.warn("Failed:", r.reason.RequestId, r.reason.error);
+        //                 }
+        //             });
+        //             sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+        //             that._getInitialData();
+        //         })
+        //         .catch(function () {
+        //             sap.m.MessageBox.error("Mass approval failed.");
+        //         })
+        //         .finally(function () {
+        //             that._oBusy.close();
+        //         });
+        // },
 
         onMassApprove: function () {
             var oTable = this.byId("approvalTable");
@@ -278,7 +447,6 @@ sap.ui.define([
                 return;
             }
 
-            // Only approve items with allowed statuses
             var aSelectedRequests = aSelectedContexts
                 .map(function (oCtx) { return oCtx.getObject(); })
                 .filter(function (oReq) {
@@ -291,33 +459,328 @@ sap.ui.define([
             }
 
             this._oBusy.open();
+            var that = this;
 
-            var aApprovePromises = aSelectedRequests.map(function (oReq) {
-                var oModel = this.getOwnerComponent().getModel(oReq.SourceModel || undefined);
-                var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
-                return new Promise(function (resolve, reject) {
-                    oModel.update(sPath, { Status: "A" }, {
-                        method: "MERGE",
-                        success: resolve,
-                        error: reject
+            // Load current user from all models
+            this._currentUser().then(function (oCurrentUser) {
+                var aApprovePromises = aSelectedRequests.map(function (oReq) {
+                    // Use SourceModel to get the correct model
+                    var oModel = oReq.SourceModel
+                        ? that.getOwnerComponent().getModel(oReq.SourceModel)
+                        : that.getOwnerComponent().getModel();
+
+                    if (!oModel) {
+                        return Promise.reject({ RequestId: oReq.RequestId, status: "failed", error: "Model not found for RequestId" });
+                    }
+
+                    // Get the correct EmployeeNumber for this SourceModel
+                    var sEmpId = oCurrentUser[oReq.SourceModel || "Movement"] && oCurrentUser[oReq.SourceModel || "Movement"].EmployeeNumber;
+
+                    // Find the correct approval step for the current user
+                    var sToApprovalPath = `/RequestSet(guid'${oReq.RequestId}')/toApproval`;
+                    return new Promise(function (resolve, reject) {
+                        oModel.read(sToApprovalPath, {
+                            success: function (oData) {
+                                // Find the approval entry for the logged-in user and not yet approved
+                                var oApproval = (oData.results || []).find(function (entry) {
+                                    return entry.ApproverId === sEmpId && (!entry.Status || entry.Status === "");
+                                });
+                                if (!oApproval) {
+                                    reject({ RequestId: oReq.RequestId, status: "failed", error: "Approval entry not found for current user" });
+                                    return;
+                                }
+                                var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+                                const oDateTime = that._createApprovalDateTime();
+                                var oPayload = {
+                                    RequestId: oReq.RequestId,
+                                    SequenceNumber: oApproval.SequenceNumber,
+                                    Stat: oApproval.Stat,
+                                    ObjectType: oApproval.ObjectType,
+                                    ApproverId: oApproval.ApproverId,
+                                    Abbreviation: oApproval.Abbreviation,
+                                    Status: "A",
+                                    StatusText: "Approved",
+                                    ApprovalUser: oApproval.ApproverId,
+                                    Notes: "",
+                                    ApprovalDate: oDateTime.ApprovalDate,
+                                    ApprovalTime: oDateTime.ApprovalTime
+                                };
+                                var bWasBatch = oModel.bUseBatch;
+                                oModel.setUseBatch(false);
+                                oModel.update(sPath, oPayload, {
+                                    method: "MERGE",
+                                    success: function () {
+                                        oModel.setUseBatch(bWasBatch);
+                                        resolve({ RequestId: oReq.RequestId, SequenceNumber: oApproval.SequenceNumber, status: "success" });
+                                    },
+                                    error: function (err) {
+                                        oModel.setUseBatch(bWasBatch);
+                                        reject({ RequestId: oReq.RequestId, SequenceNumber: oApproval.SequenceNumber, status: "failed", error: err });
+                                    }
+                                });
+                            },
+                            error: function (err) {
+                                reject({ RequestId: oReq.RequestId, status: "failed", error: err });
+                            }
+                        });
                     });
                 });
-            }.bind(this));
 
-            Promise.allSettled(aApprovePromises)
-                .then(function (results) {
-                    var nSuccess = results.filter(r => r.status === "fulfilled").length;
-                    var nFail = results.length - nSuccess;
-                    sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
-                    this._getInitialData();
-                }.bind(this))
-                .catch(function () {
-                    sap.m.MessageBox.error("Mass approval failed.");
-                })
-                .finally(function () {
-                    this._oBusy.close();
-                }.bind(this));
+                Promise.allSettled(aApprovePromises)
+                    .then(function (results) {
+                        var nSuccess = results.filter(r => r.status === "fulfilled").length;
+                        var nFail = results.length - nSuccess;
+                        results.forEach(function(r) {
+                            if (r.status === "fulfilled") {
+                                console.log("Approved:", r.value.RequestId, r.value.SequenceNumber);
+                            } else {
+                                console.warn("Failed:", r.reason.RequestId, r.reason.error);
+                            }
+                        });
+                        sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+                        that._getInitialData();
+                    })
+                    .catch(function () {
+                        sap.m.MessageBox.error("Mass approval failed.");
+                    })
+                    .finally(function () {
+                        that._oBusy.close();
+                    });
+            });
         },
+
+        // fix mass approve
+        // onMassApprove: function () {
+        //     var oTable = this.byId("approvalTable");
+        //     var aSelectedContexts = oTable.getSelectedContexts();
+        //     if (!aSelectedContexts.length) {
+        //         sap.m.MessageBox.warning("Please select at least one request to approve.");
+        //         return;
+        //     }
+
+        //     var aSelectedRequests = aSelectedContexts
+        //         .map(function (oCtx) { return oCtx.getObject(); })
+        //         .filter(function (oReq) {
+        //             return ["A", "R", "P", "V"].indexOf(oReq.Status) === -1;
+        //         });
+
+        //     if (!aSelectedRequests.length) {
+        //         sap.m.MessageBox.warning("No valid requests selected for approval.");
+        //         return;
+        //     }
+
+        //     this._oBusy.open();
+
+        //     var that = this;
+        //     // Load all OData models
+        //     var aODataModels = [
+        //         this.getOwnerComponent().getModel(),
+        //         this.getOwnerComponent().getModel("Promotion"),
+        //         this.getOwnerComponent().getModel("Acting"),
+        //         this.getOwnerComponent().getModel("Demotion"),
+        //         this.getOwnerComponent().getModel("Assignment"),
+        //         this.getOwnerComponent().getModel("StatusChange")
+        //     ];
+
+        //     // For each request, find the model where it exists, then approve
+        //     var aApprovePromises = aSelectedRequests.map(function (oReq) {
+        //         // Try to find the model that contains this RequestId
+        //         var aModelChecks = aODataModels.map(function (oModel) {
+        //             return new Promise(function (resolve) {
+        //                 if (!oModel) {
+        //                     resolve(null);
+        //                     return;
+        //                 }
+        //                 var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+        //                 oModel.read(sPath, {
+        //                     success: function () { resolve(oModel); },
+        //                     error: function () { resolve(null); }
+        //                 });
+        //             });
+        //         });
+
+        //         // Once we find the model, send the approval update
+        //         return Promise.all(aModelChecks).then(function (aModels) {
+        //             var oModel = aModels.find(Boolean);
+        //             if (!oModel) {
+        //                 return Promise.reject({ RequestId: oReq.RequestId, status: "failed", error: "Model not found for RequestId" });
+        //             }
+        //             var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+        //             const oDateTime = that._createApprovalDateTime();
+        //             var oPayload = {
+        //                 RequestId: oReq.RequestId,
+        //                 SequenceNumber: oReq.SequenceNumber,
+        //                 Stat: oReq.Stat,
+        //                 ObjectType: oReq.ObjectType,
+        //                 ApproverId: oReq.ApproverId,
+        //                 Abbreviation: oReq.Abbreviation,
+        //                 Status: "A",
+        //                 StatusText: "Approved",
+        //                 ApprovalUser: oReq.ApproverId,
+        //                 Notes: "",
+        //                 ApprovalDate: oDateTime.ApprovalDate,
+        //                 ApprovalTime: oDateTime.ApprovalTime
+        //             };
+        //             var bWasBatch = oModel.bUseBatch;
+        //             oModel.setUseBatch(false);
+        //             return new Promise(function (resolve, reject) {
+        //                 oModel.update(sPath, oPayload, {
+        //                     method: "MERGE",
+        //                     success: function () {
+        //                         oModel.setUseBatch(bWasBatch);
+        //                         resolve({ RequestId: oReq.RequestId, status: "success" });
+        //                     },
+        //                     error: function (err) {
+        //                         oModel.setUseBatch(bWasBatch);
+        //                         reject({ RequestId: oReq.RequestId, status: "failed", error: err });
+        //                     }
+        //                 });
+        //             });
+        //         });
+        //     });
+
+        //     Promise.allSettled(aApprovePromises)
+        //         .then(function (results) {
+        //             var nSuccess = results.filter(r => r.status === "fulfilled").length;
+        //             var nFail = results.length - nSuccess;
+        //             results.forEach(function(r) {
+        //                 if (r.status === "fulfilled") {
+        //                     console.log("Approved:", r.value.RequestId);
+        //                 } else {
+        //                     console.warn("Failed:", r.reason.RequestId, r.reason.error);
+        //                 }
+        //             });
+        //             sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+        //             that._getInitialData();
+        //         })
+        //         .catch(function () {
+        //             sap.m.MessageBox.error("Mass approval failed.");
+        //         })
+        //         .finally(function () {
+        //             that._oBusy.close();
+        //         });
+        // },ss
+
+        // onMassApprove: function () {
+        //     var oTable = this.byId("approvalTable");
+        //     var aSelectedContexts = oTable.getSelectedContexts();
+        //     if (!aSelectedContexts.length) {
+        //         sap.m.MessageBox.warning("Please select at least one request to approve.");
+        //         return;
+        //     }
+
+        //     var aSelectedRequests = aSelectedContexts
+        //         .map(function (oCtx) { return oCtx.getObject(); })
+        //         .filter(function (oReq) {
+        //             return ["A", "R", "P", "V"].indexOf(oReq.Status) === -1;
+        //         });
+
+        //     if (!aSelectedRequests.length) {
+        //         sap.m.MessageBox.warning("No valid requests selected for approval.");
+        //         return;
+        //     }
+
+        //     this._oBusy.open();
+
+        //     var aApprovePromises = aSelectedRequests.map(function (oReq) {
+        //         var oModel = this.getOwnerComponent().getModel(oReq.SourceModel || undefined);
+        //         var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+        //         const oDateTime = this._createApprovalDateTime();
+        //         var oPayload = {
+        //             SequenceNumber: oReq.SequenceNumber,
+        //             Stat: oReq.Stat,
+        //             ObjectType: oReq.ObjectType,
+        //             ApproverId: oReq.ApproverId,
+        //             Abbreviation: oReq.Abbreviation,
+        //             Status: "A",
+        //             StatusText: "Approved",
+        //             ApprovalUser: oReq.ApproverId,
+        //             Notes: "",
+        //             ApprovalDate: oDateTime.ApprovalDate,
+        //             ApprovalTime: oDateTime.ApprovalTime
+        //         };
+        //         return new Promise(function (resolve, reject) {
+        //             oModel.update(sPath, oPayload, {
+        //                 method: "MERGE",
+        //                 success: resolve,
+        //                 error: reject
+        //             });
+        //         });
+        //     }.bind(this));
+
+        //     Promise.allSettled(aApprovePromises)
+        //         .then(function (results) {
+        //             var nSuccess = results.filter(r => r.status === "fulfilled").length;
+        //             var nFail = results.length - nSuccess;
+        //             sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+        //             this._getInitialData();
+        //         }.bind(this))
+        //         .catch(function () {
+        //             sap.m.MessageBox.error("Mass approval failed.");
+        //         })
+        //         .finally(function () {
+        //             this._oBusy.close();
+        //         }.bind(this));
+        // },
+
+        _createApprovalDateTime: function () {
+            var oDate = new Date();
+            var sApprovalDate = oDate.toISOString().split(".")[0];
+            var sApprovalTime = `PT${oDate.getHours()}H${oDate.getMinutes()}M${oDate.getSeconds()}S`;
+            return {
+                ApprovalDate: sApprovalDate,
+                ApprovalTime: sApprovalTime
+            };
+        },
+
+        // onMassApprove: function () {
+        //     var oTable = this.byId("approvalTable");
+        //     var aSelectedContexts = oTable.getSelectedContexts();
+        //     if (!aSelectedContexts.length) {
+        //         sap.m.MessageBox.warning("Please select at least one request to approve.");
+        //         return;
+        //     }
+
+        //     // Only approve items with allowed statuses
+        //     var aSelectedRequests = aSelectedContexts
+        //         .map(function (oCtx) { return oCtx.getObject(); })
+        //         .filter(function (oReq) {
+        //             return ["A", "R", "P", "V"].indexOf(oReq.Status) === -1;
+        //         });
+
+        //     if (!aSelectedRequests.length) {
+        //         sap.m.MessageBox.warning("No valid requests selected for approval.");
+        //         return;
+        //     }
+
+        //     this._oBusy.open();
+
+        //     var aApprovePromises = aSelectedRequests.map(function (oReq) {
+        //         var oModel = this.getOwnerComponent().getModel(oReq.SourceModel || undefined);
+        //         var sPath = "/RequestSet(guid'" + oReq.RequestId + "')";
+        //         return new Promise(function (resolve, reject) {
+        //             oModel.update(sPath, { Status: "A" }, {
+        //                 method: "MERGE",
+        //                 success: resolve,
+        //                 error: reject
+        //             });
+        //         });
+        //     }.bind(this));
+
+        //     Promise.allSettled(aApprovePromises)
+        //         .then(function (results) {
+        //             var nSuccess = results.filter(r => r.status === "fulfilled").length;
+        //             var nFail = results.length - nSuccess;
+        //             sap.m.MessageBox.success(nSuccess + " approved, " + nFail + " failed.");
+        //             this._getInitialData();
+        //         }.bind(this))
+        //         .catch(function () {
+        //             sap.m.MessageBox.error("Mass approval failed.");
+        //         })
+        //         .finally(function () {
+        //             this._oBusy.close();
+        //         }.bind(this));
+        // },
 
         // _getInitialData: function () {
         //     // Define the OData models for all services
@@ -881,14 +1344,198 @@ sap.ui.define([
         //         });
         // },
 
+        // _getInitialData: function () {
+        //     const aODataModels = [
+        //         this.getOwnerComponent().getModel(),
+        //         this.getOwnerComponent().getModel("Promotion"),
+        //         this.getOwnerComponent().getModel("Acting"),
+        //         this.getOwnerComponent().getModel("Demotion"),
+        //         this.getOwnerComponent().getModel("Assignment"),
+        //         this.getOwnerComponent().getModel("StatusChange"),
+        //     ];
+
+        //     this._oBusy.open();
+
+        //     this._currentUser()
+        //         .then(oCurrentUser => {
+        //             const sLoggedInEmployeeId = oCurrentUser.EmployeeNumber;
+        //             const aFilters = [
+        //                 new sap.ui.model.Filter("ApproverId", sap.ui.model.FilterOperator.EQ, sLoggedInEmployeeId)
+        //             ];
+
+        //             const aPromises = aODataModels.map(oModel => {
+        //                 return new Promise((resolve) => {
+        //                     if (!oModel) {
+        //                         resolve([]);
+        //                         return;
+        //                     }
+
+        //                     oModel.read("/ApprovalListSet", {
+        //                         filters: aFilters,
+        //                         success: function (oApprovalData) {
+        //                             console.log("ApprovalListSet loaded:", oApprovalData);
+        //                             if (!oApprovalData.results || oApprovalData.results.length === 0) {
+        //                                 resolve([]);
+        //                                 return;
+        //                             }
+
+        //                             const aDetailPromises = oApprovalData.results.map(approval => {
+        //                                 // return new Promise((resolveDetail) => {
+        //                                 //     const sRequestPath = `/RequestSet(guid'${approval.RequestId}')`;
+        //                                 //     oModel.read(sRequestPath, {
+        //                                 //         success: function (oRequestData) {
+        //                                 //             const sEmployeePath = `/EmployeeDetailSet('${oRequestData.EmployeeNumber}')`;
+        //                                 //             oModel.read(sEmployeePath, {
+        //                                 //                 success: function (oEmployeeData) {
+        //                                 //                     resolveDetail({
+        //                                 //                         RequestId: approval.RequestId,
+        //                                 //                         EmployeeNumber: oRequestData.EmployeeNumber,
+        //                                 //                         EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
+        //                                 //                         DivisionText: oEmployeeData.DivisionText,
+        //                                 //                         ActionType: oEmployeeData.ActionType,
+        //                                 //                         ActionTypeDesc: oEmployeeData.ActionTypeDesc,
+        //                                 //                         // Show PositionName if ActionType is ZB, else PlansDesc_Dest
+        //                                 //                         PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
+        //                                 //                             ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
+        //                                 //                             : (oRequestData.PlansDesc_Dest || ""),
+        //                                 //                         Massg: oRequestData.Massg,
+        //                                 //                         MassgDesc: oRequestData.MassgDesc,
+        //                                 //                         ZbegdaEfktf: oRequestData.ZbegdaEfktf,
+        //                                 //                         CreatedOn: oRequestData.CreatedOn,
+        //                                 //                         StatusText: approval.StatusText,
+        //                                 //                         ApproverName: approval.ApproverName,
+        //                                 //                         ApproverId: approval.ApproverId,
+        //                                 //                         Status: approval.Status
+        //                                 //                     });
+        //                                 //                 },
+        //                                 //                 error: function () {
+        //                                 //                     resolveDetail(null);
+        //                                 //                 }
+        //                                 //             });
+        //                                 //         },
+        //                                 //         error: function () {
+        //                                 //             resolveDetail(null);
+        //                                 //         }
+        //                                 //     });
+        //                                 // });
+        //                                 return new Promise((resolveDetail) => {
+        //                                 const sRequestPath = `/RequestSet(guid'${approval.RequestId}')`;
+        //                                 oModel.read(sRequestPath, {
+        //                                     success: function (oRequestData) {
+        //                                         const sEmployeePath = `/EmployeeDetailSet('${oRequestData.EmployeeNumber}')`;
+        //                                         oModel.read(sEmployeePath, {
+        //                                             success: function (oEmployeeData) {
+        //                                                 // Fetch ApproverName from /toApproval
+        //                                                 const sToApprovalPath = `/RequestSet(guid'${approval.RequestId}')/toApproval`;
+        //                                                 oModel.read(sToApprovalPath, {
+        //                                                     success: function (oToApprovalData) {
+        //                                                         // Find the entry for the current ApproverId
+        //                                                         let sApproverName = approval.ApproverName;
+        //                                                         if (oToApprovalData.results && oToApprovalData.results.length > 0) {
+        //                                                             const oMatch = oToApprovalData.results.find(a => a.ApproverId === approval.ApproverId);
+        //                                                             if (oMatch && oMatch.ApproverName) {
+        //                                                                 sApproverName = oMatch.ApproverName;
+        //                                                             }
+        //                                                         }
+        //                                                         resolveDetail({
+        //                                                             RequestId: approval.RequestId,
+        //                                                             EmployeeNumber: oRequestData.EmployeeNumber,
+        //                                                             EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
+        //                                                             DivisionText: oEmployeeData.DivisionText,
+        //                                                             ActionType: oEmployeeData.ActionType,
+        //                                                             ActionTypeDesc: oEmployeeData.ActionTypeDesc,
+        //                                                             PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
+        //                                                                 ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
+        //                                                                 : (oRequestData.PlansDesc_Dest || ""),
+        //                                                             Massg: oRequestData.Massg,
+        //                                                             MassgDesc: oRequestData.MassgDesc,
+        //                                                             ZbegdaEfktf: oRequestData.ZbegdaEfktf,
+        //                                                             CreatedOn: oRequestData.CreatedOn,
+        //                                                             StatusText: approval.StatusText,
+        //                                                             ApproverName: sApproverName,
+        //                                                             ApproverId: approval.ApproverId,
+        //                                                             Status: approval.Status,
+        //                                                             Stat: approval.Stat
+        //                                                         });
+        //                                                     },
+        //                                                     error: function () {
+        //                                                         // fallback to approval.ApproverName if /toApproval fails
+        //                                                         resolveDetail({
+        //                                                             RequestId: approval.RequestId,
+        //                                                             EmployeeNumber: oRequestData.EmployeeNumber,
+        //                                                             EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
+        //                                                             DivisionText: oEmployeeData.DivisionText,
+        //                                                             ActionType: oEmployeeData.ActionType,
+        //                                                             ActionTypeDesc: oEmployeeData.ActionTypeDesc,
+        //                                                             PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
+        //                                                                 ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
+        //                                                                 : (oRequestData.PlansDesc_Dest || ""),
+        //                                                             Massg: oRequestData.Massg,
+        //                                                             MassgDesc: oRequestData.MassgDesc,
+        //                                                             ZbegdaEfktf: oRequestData.ZbegdaEfktf,
+        //                                                             CreatedOn: oRequestData.CreatedOn,
+        //                                                             StatusText: approval.StatusText,
+        //                                                             ApproverName: approval.ApproverName,
+        //                                                             ApproverId: approval.ApproverId,
+        //                                                             Status: approval.Status,
+        //                                                             Stat: approval.Stat
+        //                                                         });
+        //                                                     }
+        //                                                 });
+        //                                             },
+        //                                             error: function () {
+        //                                                 resolveDetail(null);
+        //                                             }
+        //                                         });
+        //                                     },
+        //                                     error: function () {
+        //                                         resolveDetail(null);
+        //                                     }
+        //                                 });
+        //                             });
+        //                             });
+
+        //                             Promise.all(aDetailPromises)
+        //                                 .then(aDetails => resolve(aDetails.filter(detail => detail !== null)))
+        //                                 .catch(() => resolve([]));
+        //                         },
+        //                         error: function () {
+        //                             resolve([]);
+        //                         }
+        //                     });
+        //                 });
+        //             });
+
+        //             Promise.all(aPromises)
+        //                 .then(aResults => {
+        //                     const aCombinedResults = aResults.flat();
+        //                     // Sort by CreatedOn descending (newest first)
+        //                     aCombinedResults.sort(function(a, b) {
+        //                         return new Date(b.CreatedOn) - new Date(a.CreatedOn);
+        //                     });
+
+        //                     const oApprovalModel = new sap.ui.model.json.JSONModel({ items: aCombinedResults });
+        //                     this.getView().setModel(oApprovalModel, "approvalModel");
+        //                     this._oBusy.close();
+        //                 })
+        //                 .catch(() => {
+        //                     this._oBusy.close();
+        //                 });
+        //         })
+        //         .catch(() => {
+        //             this._oBusy.close();
+        //         });
+        // },
+
         _getInitialData: function () {
+            // Define OData models with their names for SourceModel tracking
             const aODataModels = [
-                this.getOwnerComponent().getModel(),
-                this.getOwnerComponent().getModel("Promotion"),
-                this.getOwnerComponent().getModel("Acting"),
-                this.getOwnerComponent().getModel("Demotion"),
-                this.getOwnerComponent().getModel("Assignment"),
-                this.getOwnerComponent().getModel("StatusChange"),
+                { name: "", model: this.getOwnerComponent().getModel() },
+                { name: "Promotion", model: this.getOwnerComponent().getModel("Promotion") },
+                { name: "Acting", model: this.getOwnerComponent().getModel("Acting") },
+                { name: "Demotion", model: this.getOwnerComponent().getModel("Demotion") },
+                { name: "Assignment", model: this.getOwnerComponent().getModel("Assignment") },
+                { name: "StatusChange", model: this.getOwnerComponent().getModel("StatusChange") }
             ];
 
             this._oBusy.open();
@@ -900,7 +1547,9 @@ sap.ui.define([
                         new sap.ui.model.Filter("ApproverId", sap.ui.model.FilterOperator.EQ, sLoggedInEmployeeId)
                     ];
 
-                    const aPromises = aODataModels.map(oModel => {
+                    const aPromises = aODataModels.map(oModelEntry => {
+                        const oModel = oModelEntry.model;
+                        const sModelName = oModelEntry.name;
                         return new Promise((resolve) => {
                             if (!oModel) {
                                 resolve([]);
@@ -910,126 +1559,103 @@ sap.ui.define([
                             oModel.read("/ApprovalListSet", {
                                 filters: aFilters,
                                 success: function (oApprovalData) {
-                                    console.log("ApprovalListSet loaded:", oApprovalData);
                                     if (!oApprovalData.results || oApprovalData.results.length === 0) {
                                         resolve([]);
                                         return;
                                     }
 
                                     const aDetailPromises = oApprovalData.results.map(approval => {
-                                        // return new Promise((resolveDetail) => {
-                                        //     const sRequestPath = `/RequestSet(guid'${approval.RequestId}')`;
-                                        //     oModel.read(sRequestPath, {
-                                        //         success: function (oRequestData) {
-                                        //             const sEmployeePath = `/EmployeeDetailSet('${oRequestData.EmployeeNumber}')`;
-                                        //             oModel.read(sEmployeePath, {
-                                        //                 success: function (oEmployeeData) {
-                                        //                     resolveDetail({
-                                        //                         RequestId: approval.RequestId,
-                                        //                         EmployeeNumber: oRequestData.EmployeeNumber,
-                                        //                         EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
-                                        //                         DivisionText: oEmployeeData.DivisionText,
-                                        //                         ActionType: oEmployeeData.ActionType,
-                                        //                         ActionTypeDesc: oEmployeeData.ActionTypeDesc,
-                                        //                         // Show PositionName if ActionType is ZB, else PlansDesc_Dest
-                                        //                         PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
-                                        //                             ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
-                                        //                             : (oRequestData.PlansDesc_Dest || ""),
-                                        //                         Massg: oRequestData.Massg,
-                                        //                         MassgDesc: oRequestData.MassgDesc,
-                                        //                         ZbegdaEfktf: oRequestData.ZbegdaEfktf,
-                                        //                         CreatedOn: oRequestData.CreatedOn,
-                                        //                         StatusText: approval.StatusText,
-                                        //                         ApproverName: approval.ApproverName,
-                                        //                         ApproverId: approval.ApproverId,
-                                        //                         Status: approval.Status
-                                        //                     });
-                                        //                 },
-                                        //                 error: function () {
-                                        //                     resolveDetail(null);
-                                        //                 }
-                                        //             });
-                                        //         },
-                                        //         error: function () {
-                                        //             resolveDetail(null);
-                                        //         }
-                                        //     });
-                                        // });
                                         return new Promise((resolveDetail) => {
-                                        const sRequestPath = `/RequestSet(guid'${approval.RequestId}')`;
-                                        oModel.read(sRequestPath, {
-                                            success: function (oRequestData) {
-                                                const sEmployeePath = `/EmployeeDetailSet('${oRequestData.EmployeeNumber}')`;
-                                                oModel.read(sEmployeePath, {
-                                                    success: function (oEmployeeData) {
-                                                        // Fetch ApproverName from /toApproval
-                                                        const sToApprovalPath = `/RequestSet(guid'${approval.RequestId}')/toApproval`;
-                                                        oModel.read(sToApprovalPath, {
-                                                            success: function (oToApprovalData) {
-                                                                // Find the entry for the current ApproverId
-                                                                let sApproverName = approval.ApproverName;
-                                                                if (oToApprovalData.results && oToApprovalData.results.length > 0) {
-                                                                    const oMatch = oToApprovalData.results.find(a => a.ApproverId === approval.ApproverId);
-                                                                    if (oMatch && oMatch.ApproverName) {
-                                                                        sApproverName = oMatch.ApproverName;
+                                            const sRequestPath = `/RequestSet(guid'${approval.RequestId}')`;
+                                            oModel.read(sRequestPath, {
+                                                success: function (oRequestData) {
+                                                    const sEmployeePath = `/EmployeeDetailSet('${oRequestData.EmployeeNumber}')`;
+                                                    oModel.read(sEmployeePath, {
+                                                        success: function (oEmployeeData) {
+                                                            // Fetch ApproverName from /toApproval
+                                                            const sToApprovalPath = `/RequestSet(guid'${approval.RequestId}')/toApproval`;
+                                                            oModel.read(sToApprovalPath, {
+                                                                success: function (oToApprovalData) {
+                                                                    // Find the entry for the current ApproverId
+                                                                    let sApproverName = approval.ApproverName;
+                                                                    let sSequenceNumber = approval.SequenceNumber;
+                                                                    let sStat = approval.Stat;
+                                                                    let sAbbreviation = approval.Abbreviation;
+                                                                    let sObjectType = approval.ObjectType;
+                                                                    if (oToApprovalData.results && oToApprovalData.results.length > 0) {
+                                                                        const oMatch = oToApprovalData.results.find(a => a.ApproverId === approval.ApproverId);
+                                                                        if (oMatch) {
+                                                                            if (oMatch.ApproverName) sApproverName = oMatch.ApproverName;
+                                                                            if (oMatch.SequenceNumber) sSequenceNumber = oMatch.SequenceNumber;
+                                                                            if (oMatch.Stat) sStat = oMatch.Stat;
+                                                                            if (oMatch.Abbreviation) sAbbreviation = oMatch.Abbreviation;
+                                                                            if (oMatch.ObjectType) sObjectType = oMatch.ObjectType;
+                                                                        }
                                                                     }
+                                                                    resolveDetail({
+                                                                        RequestId: approval.RequestId,
+                                                                        SequenceNumber: sSequenceNumber,
+                                                                        EmployeeNumber: oRequestData.EmployeeNumber,
+                                                                        EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
+                                                                        DivisionText: oEmployeeData.DivisionText,
+                                                                        ActionType: oEmployeeData.ActionType,
+                                                                        ActionTypeDesc: oEmployeeData.ActionTypeDesc,
+                                                                        PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
+                                                                            ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
+                                                                            : (oRequestData.PlansDesc_Dest || ""),
+                                                                        Massg: oRequestData.Massg,
+                                                                        MassgDesc: oRequestData.MassgDesc,
+                                                                        ZbegdaEfktf: oRequestData.ZbegdaEfktf,
+                                                                        CreatedOn: oRequestData.CreatedOn,
+                                                                        StatusText: approval.StatusText,
+                                                                        ApproverName: sApproverName,
+                                                                        ApproverId: approval.ApproverId,
+                                                                        Status: approval.Status,
+                                                                        Stat: sStat,
+                                                                        Abbreviation: sAbbreviation,
+                                                                        ObjectType: sObjectType,
+                                                                        SourceModel: sModelName // <-- Track the source model
+                                                                    });
+                                                                },
+                                                                error: function () {
+                                                                    // fallback to approval.ApproverName if /toApproval fails
+                                                                    resolveDetail({
+                                                                        RequestId: approval.RequestId,
+                                                                        SequenceNumber: approval.SequenceNumber,
+                                                                        EmployeeNumber: oRequestData.EmployeeNumber,
+                                                                        EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
+                                                                        DivisionText: oEmployeeData.DivisionText,
+                                                                        ActionType: oEmployeeData.ActionType,
+                                                                        ActionTypeDesc: oEmployeeData.ActionTypeDesc,
+                                                                        PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
+                                                                            ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
+                                                                            : (oRequestData.PlansDesc_Dest || ""),
+                                                                        Massg: oRequestData.Massg,
+                                                                        MassgDesc: oRequestData.MassgDesc,
+                                                                        ZbegdaEfktf: oRequestData.ZbegdaEfktf,
+                                                                        CreatedOn: oRequestData.CreatedOn,
+                                                                        StatusText: approval.StatusText,
+                                                                        ApproverName: approval.ApproverName,
+                                                                        ApproverId: approval.ApproverId,
+                                                                        Status: approval.Status,
+                                                                        Stat: approval.Stat,
+                                                                        Abbreviation: approval.Abbreviation,
+                                                                        ObjectType: approval.ObjectType,
+                                                                        SourceModel: sModelName
+                                                                    });
                                                                 }
-                                                                resolveDetail({
-                                                                    RequestId: approval.RequestId,
-                                                                    EmployeeNumber: oRequestData.EmployeeNumber,
-                                                                    EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
-                                                                    DivisionText: oEmployeeData.DivisionText,
-                                                                    ActionType: oEmployeeData.ActionType,
-                                                                    ActionTypeDesc: oEmployeeData.ActionTypeDesc,
-                                                                    PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
-                                                                        ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
-                                                                        : (oRequestData.PlansDesc_Dest || ""),
-                                                                    Massg: oRequestData.Massg,
-                                                                    MassgDesc: oRequestData.MassgDesc,
-                                                                    ZbegdaEfktf: oRequestData.ZbegdaEfktf,
-                                                                    CreatedOn: oRequestData.CreatedOn,
-                                                                    StatusText: approval.StatusText,
-                                                                    ApproverName: sApproverName,
-                                                                    ApproverId: approval.ApproverId,
-                                                                    Status: approval.Status,
-                                                                    Stat: approval.Stat
-                                                                });
-                                                            },
-                                                            error: function () {
-                                                                // fallback to approval.ApproverName if /toApproval fails
-                                                                resolveDetail({
-                                                                    RequestId: approval.RequestId,
-                                                                    EmployeeNumber: oRequestData.EmployeeNumber,
-                                                                    EmployeeName: oEmployeeData.EmployeeName || oRequestData.EmployeeName,
-                                                                    DivisionText: oEmployeeData.DivisionText,
-                                                                    ActionType: oEmployeeData.ActionType,
-                                                                    ActionTypeDesc: oEmployeeData.ActionTypeDesc,
-                                                                    PlansDesc_Dest: oEmployeeData.ActionType === "ZB"
-                                                                        ? (oEmployeeData.PositionName || oRequestData.PositionName || "")
-                                                                        : (oRequestData.PlansDesc_Dest || ""),
-                                                                    Massg: oRequestData.Massg,
-                                                                    MassgDesc: oRequestData.MassgDesc,
-                                                                    ZbegdaEfktf: oRequestData.ZbegdaEfktf,
-                                                                    CreatedOn: oRequestData.CreatedOn,
-                                                                    StatusText: approval.StatusText,
-                                                                    ApproverName: approval.ApproverName,
-                                                                    ApproverId: approval.ApproverId,
-                                                                    Status: approval.Status,
-                                                                    Stat: approval.Stat
-                                                                });
-                                                            }
-                                                        });
-                                                    },
-                                                    error: function () {
-                                                        resolveDetail(null);
-                                                    }
-                                                });
-                                            },
-                                            error: function () {
-                                                resolveDetail(null);
-                                            }
+                                                            });
+                                                        },
+                                                        error: function () {
+                                                            resolveDetail(null);
+                                                        }
+                                                    });
+                                                },
+                                                error: function () {
+                                                    resolveDetail(null);
+                                                }
+                                            });
                                         });
-                                    });
                                     });
 
                                     Promise.all(aDetailPromises)

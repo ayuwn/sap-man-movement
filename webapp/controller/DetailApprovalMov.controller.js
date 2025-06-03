@@ -766,6 +766,10 @@ sap.ui.define([
         },
 
         _openApprovalDialog: function (sAction) {
+            if (this._oApprovalDialog) {
+                this._oApprovalDialog.destroy(); // Destroy previous instance to avoid duplicate IDs
+                this._oApprovalDialog = null;
+            }
             if (!this._oApprovalDialog) {
                 Fragment.load({
                     name: "bsim.hcmapp.man.movement.view.fragments.ApprovalDialog",

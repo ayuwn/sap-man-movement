@@ -1,0 +1,88 @@
+<mvc:View controllerName="bsim.hcmapp.man.movement.controller.Approval-fix"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.m.semantic"
+    xmlns:table="sap.ui.table">
+    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="true" floatingFooter="false" title="{i18n>appApproval}">
+        <semantic:content>
+            <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
+                <OverflowToolbar>
+                    <Title text="{i18n>employee}"/>
+                    <ToolbarSpacer/>
+                    <Button text="Approve Selected" type="Emphasized" press="onMassApprove"/>
+                    <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
+                    <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
+                    <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
+                    <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
+                    <SearchField id="FieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
+                </OverflowToolbar>
+                <table:Table
+                    id="approvalTableF"
+                    rows="{approvalModel>/items}"
+                    selectionMode="MultiToggle"
+                    visibleRowCount="10"
+                    enableSelectAll="true"
+                    alternateRowColors="true"
+                    rowSelectionChange=".onRowSelectionChange">
+                    <table:columns>
+                        <table:Column width="18rem">
+                            <Label text="{i18n>employee}"/>
+                            <table:template>
+                                <VBox>
+                                    <Text text="{approvalModel>EmployeeName/FormattedName} ({approvalModel>EmployeeNumber})"/>
+                                    <Text text="{approvalModel>PlansDesc_Dest}"/>
+                                </VBox>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="16rem">
+                            <Label text="{i18n>actionReason}"/>
+                            <table:template>
+                                <VBox class="sapMTableContentMargin">
+                                    <Text text="{approvalModel>ActionType} {approvalModel>ActionTypeDesc}"/>
+                                    <Text text="{approvalModel>Massg} {approvalModel>MassgDesc}"/>
+                                </VBox>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="8rem">
+                            <Label text="{i18n>dateAction}"/>
+                            <table:template>
+                                <Text text="{path: 'approvalModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="8rem">
+                            <Label text="{i18n>dateReq}"/>
+                            <table:template>
+                                <Text text="{path: 'approvalModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="8rem">
+                            <Label text="{i18n>status}"/>
+                            <table:template>
+                                <ObjectStatus
+                                    text="{
+                                        parts: [
+                                            {path: 'approvalModel>Status'},
+                                            {path: 'approvalModel>Stat'}
+                                        ],
+                                        formatter: '.formatter.formatStatusWithStat'
+                                    }"
+                                    state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}"
+                                    class="sapMTableContentMargin"
+                                />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="14rem">
+                            <Label text="{i18n>personResponsible}"/>
+                            <table:template>
+                                <VBox>
+                                    <Text text="{approvalModel>ApproverName} ({approvalModel>ApproverId})"/>
+                                    <Text text="{approvalModel>Abbreviation}"/>
+                                </VBox>
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:Table>
+            </VBox>
+        </semantic:content>
+    </semantic:FullscreenPage>
+</mvc:View>

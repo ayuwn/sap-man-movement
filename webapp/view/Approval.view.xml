@@ -1,98 +1,99 @@
-<mvc:View controllerName="bsim.hcmapp.man.movement.controller.Approval"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:semantic="sap.m.semantic">
-    <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="true" floatingFooter="false" title="{i18n>appApproval}">
-        <semantic:content>
-            <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
-                <Table 
-                    id="approvalTable" 
-                    inset="false" 
-                    alternateRowColors="true" 
-                    items="{approvalModel>/items}"
-                    mode="MultiSelect">
-                    <headerToolbar>
-                        <OverflowToolbar>
-                            <Title text="{i18n>employee}"></Title>
-                            <ToolbarSpacer/>
-                            <Button text="Approve Selected" type="Emphasized" press="onMassApprove"/>
-                            <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
-                            <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
-                            <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
-                            <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
-                            <SearchField id="FieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
-                        </OverflowToolbar>
-                    </headerToolbar>   
-                    <columns>
-                        <Column width="3.5rem">
-                            <Text text="{i18n>employeePhoto}" visible="false"/>
-                        </Column>
-                        <Column width="14rem" minScreenWidth="Tablet" demandPopin="true">
-					        <Text text="{i18n>employee}"/>
-                        </Column>
-                        <Column width="11rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>actionReason}"/>
-                        </Column>
-                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>dateAction}"/>
-                        </Column>
-                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>dateReq}"/>
-                        </Column>
-                        <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>status}"/>
-                        </Column>
-                        <Column width="9rem" minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="{i18n>personResponsible}"/>
-                        </Column>
-                    </columns>
-                    <items>
-                        <ColumnListItem 
-                            vAlign="Middle" 
-                            type="Navigation" 
-                            press="onEmployeeApprovalPressed"
-                            class="{
-                                = (${approvalModel>Status} === 'A' || 
-                                ${approvalModel>Status} === 'R' || 
-                                ${approvalModel>Status} === 'P' || 
-                                ${approvalModel>Status} === 'V') ? 'inactiveRow' : ''
-                            }">
-                            <cells>
-                                <Avatar displaySize="Custom"
-                                    initials="{path: 'approvalModel>EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
-                                    tooltip="{approvalModel>EmployeeName/FormattedName}" class="sapMTableContentMargin"/>
-                                <VBox>
-                                    <ObjectIdentifier title="{approvalModel>EmployeeName/FormattedName} ({approvalModel>EmployeeNumber})" />
-                                    <Text text="{approvalModel>PlansDesc_Dest}" />
-                                </VBox>
-                                <VBox class="sapMTableContentMargin">
-                                    <Text text="{approvalModel>ActionType} {approvalModel>ActionTypeDesc}" />
-                                    <Text text="{approvalModel>Massg} {approvalModel>MassgDesc}" />
-                                </VBox>
-                                <Text text="{path: 'approvalModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" />
-                                <Text text="{path: 'approvalModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}" />
-                                <ObjectStatus
-                                        text="{
-                                            parts: [
-                                                {path: 'approvalModel>Status'},
-                                                {path: 'approvalModel>Stat'}
-                                            ],
-                                            formatter: '.formatter.formatStatusWithStat'
-                                        }"
-                                        state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}"
-                                        class="sapMTableContentMargin"
-                                    />
-                                <!-- <ObjectStatus text="{path: 'approvalModel>Status', formatter: '.formatter.formatStatusWithStat'}" state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}" class="sapMTableContentMargin" /> -->
-                                <VBox>
-                                <ObjectIdentifier title="{approvalModel>ApproverName} ({approvalModel>ApproverId})"/>
-                                
-                                <Text text="{approvalModel>Abbreviation}" />
-                                </VBox>
-                            </cells>
-                        </ColumnListItem>
-                    </items>
-                </Table>
-            </VBox>
-        </semantic:content>
-    </semantic:FullscreenPage>
-</mvc:View>
+    <mvc:View controllerName="bsim.hcmapp.man.movement.controller.Approval"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns="sap.m"
+        xmlns:semantic="sap.m.semantic">
+        <semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="approvalPage" showSubHeader="true" showFooter="true" floatingFooter="false" title="{i18n>appApproval}">
+            <semantic:content>
+                <VBox class="sapUiSmallMarginBeginEnd sapUiMediumMarginTop">
+                    <Table 
+                        id="approvalTable" 
+                        inset="false" 
+                        alternateRowColors="true" 
+                        items="{approvalModel>/items}"
+                        mode="MultiSelect"
+                        selectionChange=".onSelectionChange">
+                        <headerToolbar>
+                            <OverflowToolbar>
+                                <Title text="{i18n>employee}"></Title>
+                                <ToolbarSpacer/>
+                                <Button text="Mass Approve" type="Emphasized" press="onMassApprove"/>
+                                <Button text="Submit" type="Accept" press="onSubmitPress" width="8rem" enabled="{appParams>/IsEditable}" visible="false"/>
+                                <Button tooltip="View Sort Settings" icon="sap-icon://sort" press="handleSortButtonPressed" visible="{listSetting>/isAll}"/>
+                                <Button tooltip="View Filter Settings" icon="sap-icon://filter" press="handleFilterButtonPressed" visible="{listSetting>/isAll}"/>
+                                <Button tooltip="View Group Settings" icon="sap-icon://group-2" press="handleGroupButtonPressed" visible="{listSetting>/isAll}"/>
+                                <SearchField id="FieldEmployee" placeholder="Enter NIK/Employee Name" value="" search="onEmpSearch" width="15rem"/>
+                            </OverflowToolbar>
+                        </headerToolbar>   
+                        <columns>
+                            <Column width="3.5rem">
+                                <Text text="{i18n>employeePhoto}" visible="false"/>
+                            </Column>
+                            <Column width="14rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>employee}"/>
+                            </Column>
+                            <Column width="11rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>actionReason}"/>
+                            </Column>
+                            <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>dateAction}"/>
+                            </Column>
+                            <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>dateReq}"/>
+                            </Column>
+                            <Column width="6rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>status}"/>
+                            </Column>
+                            <Column width="9rem" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>personResponsible}"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem 
+                                vAlign="Middle" 
+                                type="Navigation" 
+                                press="onEmployeeApprovalPressed"
+                                class="{
+                                    = (${approvalModel>Status} === 'A' || 
+                                    ${approvalModel>Status} === 'R' || 
+                                    ${approvalModel>Status} === 'P' || 
+                                    ${approvalModel>Status} === 'V') ? 'inactiveRow' : ''
+                                }">
+                                <cells>
+                                    <Avatar displaySize="Custom"
+                                        initials="{path: 'approvalModel>EmployeeName/FormattedName', formatter: '.formatter.getEmployeeInitial'}" backgroundColor="Random" customDisplaySize="2.6rem"
+                                        tooltip="{approvalModel>EmployeeName/FormattedName}" class="sapMTableContentMargin"/>
+                                    <VBox>
+                                        <ObjectIdentifier title="{approvalModel>EmployeeName/FormattedName} ({approvalModel>EmployeeNumber})" />
+                                        <Text text="{approvalModel>PlansDesc_Dest}" />
+                                    </VBox>
+                                    <VBox class="sapMTableContentMargin">
+                                        <Text text="{approvalModel>ActionType} {approvalModel>ActionTypeDesc}" />
+                                        <Text text="{approvalModel>Massg} {approvalModel>MassgDesc}" />
+                                    </VBox>
+                                    <Text text="{path: 'approvalModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" />
+                                    <Text text="{path: 'approvalModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}" />
+                                    <ObjectStatus
+                                            text="{
+                                                parts: [
+                                                    {path: 'approvalModel>Status'},
+                                                    {path: 'approvalModel>Stat'}
+                                                ],
+                                                formatter: '.formatter.formatStatusWithStat'
+                                            }"
+                                            state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}"
+                                            class="sapMTableContentMargin"
+                                        />
+                                    <!-- <ObjectStatus text="{path: 'approvalModel>Status', formatter: '.formatter.formatStatusWithStat'}" state="{path: 'approvalModel>Status', formatter: '.formatter.statusState'}" class="sapMTableContentMargin" /> -->
+                                    <VBox>
+                                    <ObjectIdentifier title="{approvalModel>ApproverName} ({approvalModel>ApproverId})"/>
+                                    
+                                    <Text text="{approvalModel>Abbreviation}" />
+                                    </VBox>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </VBox>
+            </semantic:content>
+        </semantic:FullscreenPage>
+    </mvc:View>
