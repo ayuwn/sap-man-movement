@@ -861,7 +861,7 @@ sap.ui.define([
                                     const sLoggedInEmployeeId = this._sEmployeeId;
         
                                     const aFilteredApprovalData = oApprovalData.results.filter(entry => {
-                                        return entry.Status === "A" || entry.Status === "R" || entry.Status === "P";
+                                        return entry.Status === "A" || entry.Status === "R" || entry.Status === "P" || entry.Status === "V";
                                     });
         
                                     const aApprovalHistory = [oRequestorEntry].concat(aFilteredApprovalData);

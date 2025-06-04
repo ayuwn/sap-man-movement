@@ -814,7 +814,8 @@
                                 forceSelection="false"
                                 selectedKey="{dropdown>/selectedTunjangan}"
                                 change=".onTunjanganChange"
-                                visible="{= ${currentUser>/Stat} === 'A5' }">
+                                visible="{= ${currentUser>/Stat} === 'A5' }"
+                                enabled="{verificationModel>/isTunjanganEditable}">
                                 <items>
                                     <core:Item key="{dropdown>key}" text="{dropdown>text}" />
                                 </items>
@@ -833,7 +834,13 @@
                             <HBox>
                             <Input 
                                 id="nominalTunjanganPlt"
-                                enabled="{dropdown>/isTunjanganEnabled}"
+                                enabled="{
+                                    parts: [
+                                        { path: 'dropdown>/isTunjanganEnabled' },
+                                        { path: 'verificationModel>/isTunjanganEditable' }
+                                    ],
+                                    formatter: '.formatter.isTunjanganInputEnabled'
+                                }"
                                 value="{
                                 path: 'detailApprovalActingModel>/AmountPLT',
                                 type: 'sap.ui.model.type.Currency',

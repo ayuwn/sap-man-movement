@@ -34,6 +34,10 @@ sap.ui.define([], function () {
             }
         },
 
+        isTunjanganInputEnabled: function(bIsTunjanganEnabled, bIsTunjanganEditable) {
+            return !!bIsTunjanganEnabled && !!bIsTunjanganEditable;
+        },  
+
         // fallbackValue: function(selected, fallback) {
         //     // Use selected if not empty/null/undefined, else fallback
         //     return selected ? selected : fallback;
