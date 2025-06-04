@@ -723,23 +723,23 @@ sap.ui.define([
             var oCurrentUserModel = this.getView().getModel("currentUser");
             var sStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
 
-            if (sStat === "VT") {
-                if (!this._onValidateAssessment()) {
-                    MessageBox.warning("Silakan verifikasi assessment result sebelum diajukan.");
-                    return;
-                }
-            }
-            if (sStat === "VC") {
-                if (!this._validateVCSubmission()) {
-                    // _validateVCSubmission already shows the warning
-                    return;
-                }
-            }
-            if (sStat === "A5") {
-                if (!this._validateA5Submission()) {
-                    return;
-                }
-            }
+            // if (sStat === "VT") {
+            //     if (!this._onValidateAssessment()) {
+            //         MessageBox.warning("Silakan verifikasi assessment result sebelum diajukan.");
+            //         return;
+            //     }
+            // }
+            // if (sStat === "VC") {
+            //     if (!this._validateVCSubmission()) {
+            //         // _validateVCSubmission already shows the warning
+            //         return;
+            //     }
+            // }
+            // if (sStat === "A5") {
+            //     if (!this._validateA5Submission()) {
+            //         return;
+            //     }
+            // }
             this._openApprovalDialog("reject");
         },
 

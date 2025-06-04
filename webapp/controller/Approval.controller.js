@@ -463,6 +463,17 @@ sap.ui.define([
 
             // Load current user from all models
             this._currentUser().then(function (oCurrentUser) {
+                // Check IsMass in all models
+                var bCanMassApprove = Object.values(oCurrentUser).some(function (userData) {
+                    return userData && userData.IsMass === true;
+                });
+
+                if (!bCanMassApprove) {
+                    that._oBusy.close();
+                    sap.m.MessageBox.error("Anda tidak diperbolehkan untuk melakukan mass approval.");
+                    return;
+                }
+
                 var aApprovePromises = aSelectedRequests.map(function (oReq) {
                     // Use SourceModel to get the correct model
                     var oModel = oReq.SourceModel

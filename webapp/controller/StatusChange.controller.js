@@ -217,11 +217,19 @@ sap.ui.define([
             //     }
             // });
 
+            // Refresh the page only once per session when first accessing the status change page
+            if (!sessionStorage.getItem("statusChangeFirstLoad")) {
+                sessionStorage.setItem("statusChangeFirstLoad", "true");
+                location.reload();
+                return; // Prevent further execution after reload
+            }
+
             this._loadPerformanceData();
             this._loadEvaluasiData();
         },
 
         _onStatusChangeRouteMatched: function (oEvent) {
+            this._clearStatusChangeForm();
             const oArguments = oEvent.getParameter("arguments") || {};
             const EmployeeNumber = oArguments.EmployeeNumber;
             const oAppModel = this.getModel("appModel");
@@ -292,6 +300,73 @@ sap.ui.define([
                     });
                 }
             });
+        },
+
+        _clearStatusChangeForm: function () {
+            // Clear employee model
+            let oEmployeeModel = this.getView().getModel("employee");
+            if (oEmployeeModel) oEmployeeModel.setData({});
+
+            // Clear employee detail model
+            let oEmployeeDetailModel = this.getView().getModel("employeeDetail");
+            if (oEmployeeDetailModel) oEmployeeDetailModel.setData({});
+
+            // Clear file attachments
+            let oFileAttachmentModel = this.getView().getModel("fileAttachment");
+            if (oFileAttachmentModel) oFileAttachmentModel.setProperty("/results", []);
+
+            
+            // Remove all items from the upload set control
+            var oUploadSet = this.byId("idUploadStatChange");
+            if (oUploadSet && typeof oUploadSet.removeAllItems === "function") {
+                oUploadSet.removeAllItems();
+            }
+
+            // Clear dropdown selections
+            let oDropdownModel = this.getView().getModel("dropdown");
+            if (oDropdownModel) {
+                oDropdownModel.setProperty("/selectedSalaryAdj", "");
+                oDropdownModel.setProperty("/selectedAs", "1");
+                oDropdownModel.setProperty("/isEmployeeChangeEnabled", false);
+                oDropdownModel.setProperty("/isSalaryAdjEnabled", false);
+            }
+
+            // Clear assessment and disposisi status
+            let oAssessmentStatusModel = this.getView().getModel("assessmentStatus");
+            if (oAssessmentStatusModel) oAssessmentStatusModel.setProperty("/selectedIndex", 0);
+
+            let oDisposisiStatusModel = this.getView().getModel("disposisiStatus");
+            if (oDisposisiStatusModel) oDisposisiStatusModel.setProperty("/selectedIndex", 0);
+
+            // Clear input fields by ID
+            [
+                "KontrakStatusChange",
+                "kontrakTextStatusChange",
+                "actDateStartStatusChange",
+                "actDateEndStatusChange",
+                "effectiveDateStartStatusChange",
+                "effectiveDateEndStatusChange",
+                "validDateStartStatusChange",
+                "totalNilaiStatusChange",
+                "salaryAdjValueStatusChange",
+                "basicConStatusChange",
+                "homebaseTujuanStatusChange",
+                "homebaseTujuanTextStatusChange",
+                "hasilperformStatusChange",
+                "kategoriEvaluasiStatusChange",
+                "idUploadStatChange"
+            ].forEach(function (sId) {
+                var oControl = this.byId(sId);
+                if (oControl && typeof oControl.setValue === "function") {
+                    oControl.setValue("");
+                }
+                if (oControl && typeof oControl.setText === "function") {
+                    oControl.setText("");
+                }
+                if (oControl && typeof oControl.setDateValue === "function") {
+                    oControl.setDateValue(null);
+                }
+            }.bind(this));
         },
 
         _getEmployeeData: function (EmployeeNumber) {

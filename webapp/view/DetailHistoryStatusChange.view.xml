@@ -644,7 +644,7 @@
                         <ColumnListItem vAlign="Middle">
                             <cells>
                                 <ObjectIdentifier title="{appr>ApproverId}" text="{appr>ApproverName}" class="sapUiSmallMarginBegin"/>
-                                <ObjectStatus text="{appr>StatusText}" state="{path:'appr>Status', formatter:'.formatter.formatStatus'}" />
+                                <ObjectStatus text="{path: 'appr>Status', formatter: '.formatter.statusText'}" state="{path: 'appr>Status', formatter: '.formatter.statusState'}" />
                                 <Text text="{path:'appr>ApprovalDate',type:'sap.ui.model.odata.type.Date',formatOptions:{pattern:'yyyy-MM-dd'}}" />
                                 <Text text="{path:'appr>ApprovalTime', formatter:'.formatter.formatApprovalTime'}" />
                                 <Text text="{path:'appr>Notes',type:'sap.ui.model.odata.type.Date',formatOptions:{style:'medium'}}" />

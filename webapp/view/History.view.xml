@@ -75,6 +75,7 @@
                                 </VBox>
                                 <Text text="{path: 'historyModel>ZbegdaEfktf', formatter: '.formatter.formatDateDisplay'}" />
                                 <Text text="{path: 'historyModel>CreatedOn', formatter: '.formatter.formatDateDisplay'}" />
+                                <!-- <ObjectStatus text="{historyModel>StatusText}" /> -->
                                 <ObjectStatus text="{historyModel>StatusText}" state="{path:'historyModel>StatusText', formatter:'.formatter.formatStatus'}" class="sapMTableContentMargin"/>
                                 <Text text="{historyModel>ApproverName} ({historyModel>ApproverId})" class="sapMTableContentMargin" />
                                 <Button
