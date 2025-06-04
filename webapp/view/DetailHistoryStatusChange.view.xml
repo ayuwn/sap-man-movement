@@ -31,7 +31,7 @@
             <content>
                 <f:SimpleForm 
                 id="employeeStatusForm"
-                editable="true"
+                editable="false"
                 layout="ResponsiveGridLayout"
                 labelSpanXL="4"
                 labelSpanL="4"
@@ -118,7 +118,7 @@
             <content>
                 <f:SimpleForm 
                 id="sanksiStatusForm"
-                editable="true"
+                editable="false"
                 layout="ResponsiveGridLayout"
                 labelSpanXL="4"
                 labelSpanL="4"
@@ -219,7 +219,7 @@
         <content>
             <f:SimpleForm 
                 id="sanksiBerjalanStatusChangeHistory"
-                editable="true"
+                editable="false"
                 layout="ResponsiveGridLayout"
                 labelSpanXL="4"
                 labelSpanL="4"
@@ -308,8 +308,8 @@
             width="auto">
             <content>
                 <f:SimpleForm 
-                    id="actionStatusForm"
-                    editable="true"
+                    id="actionStatusHistoryForm"
+                    editable="false"
                     layout="ResponsiveGridLayout"
                     labelSpanXL="3"
                     labelSpanL="3"
@@ -321,7 +321,7 @@
                     emptySpanS="1">
                     <f:content>
                         <Label text="{i18n>actionType}" />
-                            <Input id="actionTypeStatus" value="{HistoryStatusChange>/ActionType}" editable="false">
+                            <Input id="actionTypeStatusH" value="{HistoryStatusChange>/ActionType}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
@@ -333,7 +333,7 @@
                             </Text>
                         <Label text="{i18n>reason}" required="true"/>
                             <Input 
-                                id="reasonStatusChange" 
+                                id="reasonStatusChangeH" 
                                 value="{HistoryStatusChange>/Massg}" 
                                 editable="false" 
                                 required="true">
@@ -341,19 +341,22 @@
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text id="reasonTextStatusChange" text="{HistoryStatusChange>/MassgDesc}" wrapping="true" width="100%">
+                            <Text id="reasonTextStatusChangeH" text="{HistoryStatusChange>/MassgDesc}" wrapping="true" width="100%" visible="{= !${HistoryStatusChange>/isEditable} }">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>effectiveDate}" required="true" />
                         <HBox>
-                            <DatePicker id="effectiveDateStartStatusChange" value="{path: 'HistoryStatusChange>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" required="true" width="96%"/>
-                            <Text text="-" class="sapUiTinyMarginBegin sapUiSmallMarginEnd"/>
-                            <DatePicker id="effectiveDateEndStatusChange" value="{path: 'HistoryStatusChange>/ZenddaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" width="96%"/>
+                            <DatePicker id="effectiveDateStartStatusChangeH" value="{path: 'HistoryStatusChange>/ZbegdaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" required="true" width="96%" visible="{= !${HistoryStatusChange>/isEditable} }"/>
+                            <Text text="-" class="sapUiTinyMarginBegin sapUiSmallMarginEnd" visible="{= !${HistoryStatusChange>/isEditable} }"/>
+                            <DatePicker id="effectiveDateEndStatusChangeH" value="{path: 'HistoryStatusChange>/ZenddaEfktf', formatter: '.formatter.formatDateDisplayEfk'}" editable="false" width="96%" visible="{= !${HistoryStatusChange>/isEditable} }"/>
+                            <DatePicker id="effectiveDateStartStatusChange" value="" required="true" width="96%" visible="{HistoryStatusChange>/isEditable}"/>
+                            <Text text="-" class="sapUiTinyMarginBegin sapUiSmallMarginEnd" visible="{HistoryStatusChange>/isEditable}"/>
+                            <DatePicker id="effectiveDateEndStatusChange" value="" width="96%" editable="false" visible="{HistoryStatusChange>/isEditable}"/>
                         </HBox>
                         <Label text="{i18n>TipeKontrak}" />
-                            <Input id="TipeKontrakStatusChange" value="{HistoryStatusChange>/TipeKontrakAsl}" editable="false">
+                            <Input id="TipeKontrakStatusChangeH" value="{HistoryStatusChange>/TipeKontrakAsl}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
@@ -364,112 +367,252 @@
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>kontrakchange}"/>
+                            <HBox>
                             <Input 
-                                id="KontrakStatusChange" 
-                                value="{HistoryStatusChange>/TipeKontrakDest}" 
-                                editable="false">
+                                id="newKontrakStatusChange" 
+                                value="{tipekontrak>/selectedTipeKontrak/Key}" 
+                                fieldGroupIds="grpValidation" 
+                                editable="{HistoryStatusChange>/isEditable}"
+                                showValueHelp="true" 
+                                valueHelpRequest=".handleValueHelpTipeKontrak" 
+                                visible="{HistoryStatusChange>/isEditable}">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text id="kontrakTextStatusChange" text="{HistoryStatusChange>/TipeKontrakDescDest}" wrapping="true" width="100%">
+                            <Input 
+                                id="KontrakStatusChangeH" 
+                                value="{HistoryStatusChange>/TipeKontrakDest}" 
+                                editable="false"
+                                visible="{= !${HistoryStatusChange>/isEditable} }">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                            </HBox>
+                            <Text id="kontrakTextStatusChangeH" text="{HistoryStatusChange>/TipeKontrakDescDest}" wrapping="true" width="100%" visible="{= !${HistoryStatusChange>/isEditable} }">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>
-                        <Label id="validDateLabel" text="{i18n>validateDate}" />
+                            <Text id="newKontrakTextStatusChange" text="{tipekontrak>/selectedTipeKontrak/Value}" wrapping="true" width="100%" visible="{HistoryStatusChange>/isEditable}">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                        <Label id="validDateLabelH" text="{i18n>validateDate}" />
                         <HBox>
-                            <DatePicker id="validDateStartStatusChange" value="{path: 'HistoryStatusChange>/ValidDate', formatter: '.formatter.formatDateDisplayEfk'}" width="96%" editable="false"/>
-                            <Text id="validDateDesc" text="{i18n>datedesc}" class="italicText"/>
+                            <DatePicker id="validDateStartStatusChangeH" value="{path: 'HistoryStatusChange>/ValidDate', formatter: '.formatter.formatDateDisplayEfk'}" width="96%" editable="false" visible="{= !${HistoryStatusChange>/isEditable} }"/>
+                            <DatePicker id="newValidDateStartStatusChange" value="" width="96%" visible="{HistoryStatusChange>/isEditable}"/>
+                            <Text id="validDateDescH" text="{i18n>datedesc}" class="italicText"/>
                         </HBox>
                         <Label text="{i18n>hasilperform}" />
+                        <HBox>
+                        <Select 
+                            id="newHasilperformStatusChange" 
+                            selectedKey="{performance>/selectedPerformance/Key}" 
+                            fieldGroupIds="grpValidation" 
+                            editable="{HistoryStatusChange>/isEditable}" 
+                            change=".handlePerformanceChange"
+                            items="{ path: 'performance>/items'}"
+                            visible="{HistoryStatusChange>/isEditable}">
+                            <core:Item key="{performance>Key}" text="{performance>Value}" />
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Select>
                         <Input 
-                            id="hasilperformStatusChange" 
+                            id="hasilperformStatusChangeH" 
                             value="{HistoryStatusChange>/HasilPerformance}" 
-                            editable="false" >
+                            editable="false" 
+                            visible="{= !${HistoryStatusChange>/isEditable} }">
                             <layoutData>
                                 <l:GridData span="L2 M2 S12" />
                             </layoutData>
                         </Input>
+                        </HBox>
                         <Label text="{i18n>totalnilai}"/>
-                        <Input id="totalNilaiStatusChange" 
+                        <HBox>
+                        <Input id="newTotalNilaiStatusChange" value="" visible="{HistoryStatusChange>/isEditable}">
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Input>
+                        <Input id="totalNilaiStatusChangeH" 
                             value="{HistoryStatusChange>/TotalNilai}" 
-                            editable="false">
+                            editable="false"
+                            visible="{= !${HistoryStatusChange>/isEditable} }">
                             <layoutData>
                                 <l:GridData span="L2 M2 S12" />
                             </layoutData>
                         </Input>
+                        </HBox>
                         <Label text="{i18n>kategorieval}"/>
+                        <HBox>
+                        <Select 
+                            id="newKategoriEvaluasiStatusChange" 
+                            selectedKey="{evaluasi>/selectedEvaluasi/Key}" 
+                            fieldGroupIds="grpValidation" 
+                            editable="{HistoryStatusChange>/isEditable}" 
+                            change=".handleEvaluasiChange"
+                            items="{ path: 'evaluasi>/items', sorter: { path: 'Value' }}"
+                            visible="{HistoryStatusChange>/isEditable}">
+                            <items>
+                                <core:Item key="{evaluasi>Key}" text="{evaluasi>Value}" />
+                            </items>
+                            <layoutData>
+                                <l:GridData span="L2 M2 S12" />
+                            </layoutData>
+                        </Select>
                         <Input 
-                            id="kategoriEvaluasiStatusChange" 
+                            id="kategoriEvaluasiStatusChangeH" 
                             value="{HistoryStatusChange>/KategoriEvaluasi}" 
-                            editable="false" >
+                            editable="false" 
+                            visible="{= !${HistoryStatusChange>/isEditable} }">
                             <layoutData>
                                 <l:GridData span="L2 M2 S12" />
                             </layoutData>
                         </Input>
+                        </HBox>
                         <Label text="{i18n>salaryAdj}" required="true"/>
-                            <Input id="salaryAdjStatusChange" 
+                        <HBox>
+                            <Select id="newSalaryAdjStatusChange" fieldGroupIds="grpValidation"
+                                items="{ path: 'dropdown>/salaryAdjColl', sorter: { path: 'text' }}"
+                                forceSelection="false"
+                                selectedKey="{dropdown>/selectedSalaryAdj}"
+                                change=".onSalaryAdjChange"
+                                enabled="{dropdown>/isSalaryAdjEnabled}"
+                                visible="{HistoryStatusChange>/isEditable}">
+                                <items>
+                                    <core:Item key="{dropdown>key}" text="{dropdown>text}" />
+                                </items>
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Select>
+                            <Input id="salaryAdjStatusChangeH" 
                             value="{parts: [
                                         { path: 'HistoryStatusChange>/Adjstmn' }, 
                                         { path: 'dropdown>/salaryAdjColl' }
                                     ], 
                                     formatter: '.formatter.asTextFormatter'}"  
-                                    editable="false">
+                                    editable="false"
+                                    visible="{= !${HistoryStatusChange>/isEditable} }">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
+                        </HBox>
                         <Label text="{i18n>salaryAdjValue}"/>
+                        <HBox>
                             <Input 
-                                id="salaryAdjValueStatusChange"
-                                value="{path: 'HistoryStatusChange>/Zsalary', formatter: '.formatter.formatSalary'}"
-                                        editable="false">
+                                id="newSalaryAdjValueStatusChange"
+                                enabled="{dropdown>/isSalaryAdjEnabled}" 
+                                value="{
+                                path: 'create>/salaryAdj',
+                                type: 'sap.ui.model.type.Currency',
+                                formatOptions: {
+                                    showMeasure: false,
+                                    currencyCode: 'IDR',
+                                    useSymbol: false,
+                                    minFractionDigits: 0,
+                                    maxFractionDigits: 0 }
+                                }"
+                                placeholder="0"
+                                visible="{HistoryStatusChange>/isEditable}">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
+                            <Input 
+                                id="salaryAdjValueStatusChangeH"
+                                value="{path: 'HistoryStatusChange>/Zsalary', formatter: '.formatter.formatSalary'}"
+                                        editable="false"
+                                        visible="{= !${HistoryStatusChange>/isEditable} }">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                        </HBox>
                             <Text text="IDR">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>                            
                         <Label text="{i18n>homebaseasal}"/>
-                            <Input id="homebaseAsalStatusChange" value="{HistoryStatusChange>HmbsAsl}" editable="false">
+                            <Input id="homebaseAsalStatusChangeH" value="{HistoryStatusChange>HmbsAsl}" editable="false">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text id="homebaseAsalTextStatusChange" text="{HistoryStatusChange>/HmbsDescAsl}" wrapping="true" width="100%">
+                            <Text id="homebaseAsalTextStatusChangeH" text="{HistoryStatusChange>/HmbsDescAsl}" wrapping="true" width="100%">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>homebasetujuan}"/>
+                        <HBox>
                             <Input 
-                                id="homebaseTujuanStatusChange" 
-                                value="{HistoryStatusChange>/HbsDest}" 
-                                editable="false" 
-                                required="true">
+                                id="newHomebaseTujuanStatusChange" 
+                                value="{homebase>/selectedHomebase/Key}" 
+                                fieldGroupIds="grpValidation" 
+                                editable="{HistoryStatusChange>/isEditable}"
+                                showValueHelp="true" 
+                                valueHelpRequest=".handleValueHelpHomebase"
+                                visible="{HistoryStatusChange>/isEditable}">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Input>
-                            <Text id="homebaseTujuanTextStatusChange" text="{HistoryStatusChange>/HbsDescDest}" wrapping="true" width="100%">
+                            <Input 
+                                id="homebaseTujuanStatusChangeH" 
+                                value="{HistoryStatusChange>/HbsDest}" 
+                                editable="false" 
+                                required="true"
+                                visible="{= !${HistoryStatusChange>/isEditable} }">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Input>
+                        </HBox>
+                            <Text id="homebaseTujuanTextStatusChangeH" text="{HistoryStatusChange>/HbsDescDest}" wrapping="true" width="100%" visible="{= !${HistoryStatusChange>/isEditable} }">
+                                <layoutData>
+                                    <l:GridData span="L2 M2 S12" />
+                                </layoutData>
+                            </Text>
+                            <Text id="newHomebaseTujuanTextStatusChange" text="{homebase>/selectedHomebase/Value}" wrapping="true" width="100%" visible="{HistoryStatusChange>/isEditable}">
                                 <layoutData>
                                     <l:GridData span="L2 M2 S12" />
                                 </layoutData>
                             </Text>
                         <Label text="{i18n>basicCon}"/>
+                        <HBox>
                             <TextArea 
-                                id="basicConStatusChange"
-                                value="{HistoryStatusChange>/Zdasar2}" 
+                                id="newBasicConStatusChange"
+                                value="" 
                                 rows="4"
-                                editable="false">
+                                showExceededText="true" 
+                                maxLength="255" 
+                                liveChange="handleLiveChange" 
+                                valueLiveUpdate="true"
+                                editable="{HistoryStatusChange>/isEditable}"
+                                visible="{HistoryStatusChange>/isEditable}">
                                 <layoutData>
                                     <l:GridData span="L6 M6 S12" />
                                 </layoutData>
                             </TextArea>
+                            <TextArea 
+                                id="basicConStatusChangeH"
+                                value="{HistoryStatusChange>/Zdasar2}" 
+                                rows="4"
+                                editable="false"
+                                visible="{= !${HistoryStatusChange>/isEditable} }">
+                                <layoutData>
+                                    <l:GridData span="L6 M6 S12" />
+                                </layoutData>
+                            </TextArea>
+                        </HBox>
+                        <Input value="Test" editable="{HistoryStatusChange>/isEditable}" />
                     </f:content>
                 </f:SimpleForm>
             </content>
@@ -481,8 +624,8 @@
                     width="auto">
                     <content>
                     <f:SimpleForm
-                    editable="true"
                     id="dispoHistoryForm"
+                    editable="false"
                     layout="ResponsiveGridLayout" 
                     labelSpanXL="4"
                     labelSpanL="4"
@@ -541,8 +684,8 @@
                     </f:content>
                 </f:SimpleForm>
                 <f:SimpleForm
-                    editable="true"
                     id="upDocMutationForm"
+                    editable="false"
                     layout="ResponsiveGridLayout" 
                     labelSpanXL="2"
                     labelSpanL="2"
@@ -654,5 +797,11 @@
                 </Table>
             </Panel>
     </semantic:content>
+    <semantic:mainAction>
+        <semantic:MainAction 
+            text="Submit" 
+            press=".onSubmitEdit" 
+            visible="{HistoryStatusChange>/isEditable}"/>
+    </semantic:mainAction>
 </semantic:FullscreenPage>
 </mvc:View>

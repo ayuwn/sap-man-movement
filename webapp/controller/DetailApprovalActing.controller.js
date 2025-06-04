@@ -22,9 +22,9 @@ sap.ui.define([
             this.getView().setModel(this._oDetailApprovalActingModel, "detailApprovalActingModel");
 
             const oButtonStateModel = new sap.ui.model.json.JSONModel({
-                isApproveEnabled: true,
-                isRejectEnabled: true,
-                isReviseEnabled: true,
+                isApproveEnabled: false,
+                isRejectEnabled: false,
+                isReviseEnabled: false,
                 isReviseVisible: true
             });
             this.getView().setModel(oButtonStateModel, "buttonState");
@@ -192,33 +192,36 @@ sap.ui.define([
                 this._updateDisposisiSelection();
             });
 
-             this._currentUser(sRequestId)
+            this._currentUser(sRequestId)
             .then(() => {
                 const oCurrentUserModel = this.getView().getModel("currentUser");
                 const sEmployeeId = oCurrentUserModel && oCurrentUserModel.getProperty("/EmployeeNumber");
                 const oButtonStateModel = this.getView().getModel("buttonState");
 
-                // Read /toApproval for this request
                 this._oSelectedModel.read(`/RequestSet(guid'${sRequestId}')/toApproval`, {
                     success: (oData) => {
+                        const aApprovals = oData.results || [];
                         // Find the approval entry for the current user
-                        const oMatchedApproval = oData.results.find(entry => entry.ApproverId === sEmployeeId);
+                        const oMatchedApproval = aApprovals.find(entry => entry.ApproverId === sEmployeeId);
 
                         if (!oMatchedApproval) {
-                            // No approval entry found for this user, disable all
                             oButtonStateModel.setProperty("/isApproveEnabled", false);
                             oButtonStateModel.setProperty("/isRejectEnabled", false);
                             oButtonStateModel.setProperty("/isReviseEnabled", false);
                             return;
                         }
 
-                        const sStatus = oMatchedApproval.Status; // e.g. "S", "A", "R", "V"
-                        const sStat = oMatchedApproval.Stat;     // e.g. "A1", "A2", etc.
+                        const sStatus = oMatchedApproval.Status;
 
-                        console.log("DEBUG: Stat =", sStat, "Status =", sStatus);
+                        // Find the first approval entry with status "V"
+                        const oFirstV = aApprovals.find(entry => entry.Status === "V");
 
-                        // Disable buttons if already processed
-                        if (sStatus === "V" || sStatus === "A" || sStatus === "R" || sStatus === "P") {
+                        // Allow action if current user is the first with status "V"
+                        if (sStatus === "V" && oFirstV && oFirstV.ApproverId === sEmployeeId) {
+                            oButtonStateModel.setProperty("/isApproveEnabled", true);
+                            oButtonStateModel.setProperty("/isRejectEnabled", true);
+                            oButtonStateModel.setProperty("/isReviseEnabled", true);
+                        } else if (sStatus === "V" || sStatus === "A" || sStatus === "R" || sStatus === "P") {
                             oButtonStateModel.setProperty("/isApproveEnabled", false);
                             oButtonStateModel.setProperty("/isRejectEnabled", false);
                             oButtonStateModel.setProperty("/isReviseEnabled", false);
@@ -229,13 +232,57 @@ sap.ui.define([
                         }
                     },
                     error: (oError) => {
-                        // On error, disable all
                         oButtonStateModel.setProperty("/isApproveEnabled", false);
                         oButtonStateModel.setProperty("/isRejectEnabled", false);
                         oButtonStateModel.setProperty("/isReviseEnabled", false);
                     }
                 });
             })
+
+            // this._currentUser(sRequestId)
+            // .then(() => {
+            //     const oCurrentUserModel = this.getView().getModel("currentUser");
+            //     const sEmployeeId = oCurrentUserModel && oCurrentUserModel.getProperty("/EmployeeNumber");
+            //     const oButtonStateModel = this.getView().getModel("buttonState");
+
+            //     // Read /toApproval for this request
+            //     this._oSelectedModel.read(`/RequestSet(guid'${sRequestId}')/toApproval`, {
+            //         success: (oData) => {
+            //             // Find the approval entry for the current user
+            //             const oMatchedApproval = oData.results.find(entry => entry.ApproverId === sEmployeeId);
+
+            //             if (!oMatchedApproval) {
+            //                 // No approval entry found for this user, disable all
+            //                 oButtonStateModel.setProperty("/isApproveEnabled", false);
+            //                 oButtonStateModel.setProperty("/isRejectEnabled", false);
+            //                 oButtonStateModel.setProperty("/isReviseEnabled", false);
+            //                 return;
+            //             }
+
+            //             const sStatus = oMatchedApproval.Status; // e.g. "S", "A", "R", "V"
+            //             const sStat = oMatchedApproval.Stat;     // e.g. "A1", "A2", etc.
+
+            //             console.log("DEBUG: Stat =", sStat, "Status =", sStatus);
+
+            //             // Disable buttons if already processed
+            //             if (sStatus === "V" || sStatus === "A" || sStatus === "R" || sStatus === "P") {
+            //                 oButtonStateModel.setProperty("/isApproveEnabled", false);
+            //                 oButtonStateModel.setProperty("/isRejectEnabled", false);
+            //                 oButtonStateModel.setProperty("/isReviseEnabled", false);
+            //             } else {
+            //                 oButtonStateModel.setProperty("/isApproveEnabled", true);
+            //                 oButtonStateModel.setProperty("/isRejectEnabled", true);
+            //                 oButtonStateModel.setProperty("/isReviseEnabled", true);
+            //             }
+            //         },
+            //         error: (oError) => {
+            //             // On error, disable all
+            //             oButtonStateModel.setProperty("/isApproveEnabled", false);
+            //             oButtonStateModel.setProperty("/isRejectEnabled", false);
+            //             oButtonStateModel.setProperty("/isReviseEnabled", false);
+            //         }
+            //     });
+            // })
             .catch((error) => {
                 console.error("Error setting verification access:", error);
             });
@@ -1548,12 +1595,12 @@ sap.ui.define([
                 this._oApprovalDialog.close();
             }
 
-            const sRequestId = this._oDetailApprovalActingModel.getProperty("/RequestId");
+            // const sRequestId = this._oDetailApprovalActingModel.getProperty("/RequestId");
 
-            // If approval has already been submitted (flagged in localStorage), do not re-enable buttons
-            if (sRequestId && localStorage.getItem("approvalMovAction_" + sRequestId) === "done") {
-                return;
-            }
+            // // If approval has already been submitted (flagged in localStorage), do not re-enable buttons
+            // if (sRequestId && localStorage.getItem("approvalMovAction_" + sRequestId) === "done") {
+            //     return;
+            // }
 
             // Otherwise, re-enable all approval buttons
             const oButtonStateModel = this.getView().getModel("buttonState");
