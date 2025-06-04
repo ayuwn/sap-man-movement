@@ -1067,7 +1067,7 @@ sap.ui.define([
                                 // const sDisposisi = this.getView().getModel("disposisiApproval1").getProperty("/selectedIndex");
                                 const sDispoNote = this.byId("dispoNoteApprovalActing").getValue();
                                 const sSalaryFnl = this.byId("gajiApprovalActing").getValue() ? this.byId("gajiApprovalActing").getValue().replace(/\D/g, '') : "0";
-                                const sEffectiveDateStart = getFormattedDate("effectiveDateStartApprovalActing");
+                                // const sEffectiveDateStart = getFormattedDate("effectiveDateStartApprovalActing");
                                 const sTunjangan = this.getView().getModel("dropdown").getProperty("/selectedTunjangan") || "";
                                 const sAmountPlt = this.byId("nominalTunjanganPlt").getValue() ? this.byId("nominalTunjanganPlt").getValue().replace(/\D/g, '') : "0";
 
@@ -1080,7 +1080,14 @@ sap.ui.define([
                                 const bRevisiCombine = this.byId("reviseVCApprovalActing").getSelected();
                                 oApprovalData.RevisiCombine = bRevisiCombine ? "1" : "";
         
-                                oApprovalData.ZbegdaEfktf = sEffectiveDateStart;
+                                // Get the original ZbegdaEfktf from the detailApprovalActingModel
+                                const sOriginalZbegdaEfktf = this.getView().getModel("detailApprovalActingModel").getProperty("/ZbegdaEfktf");
+
+                                // Get the new value from the date picker
+                                const sEffectiveDateStart = getFormattedDate("effectiveDateStartApprovalActing");
+
+                                // If the user did not change the date, use the original value
+                                oApprovalData.ZbegdaEfktf = sEffectiveDateStart || sOriginalZbegdaEfktf;
                                 oApprovalData.ZrekomHcm = sRekomHcm;
                                 oApprovalData.Zdisposisi = (iDisposisiIndex + 1).toString();
                                 oApprovalData.Znotedisp = sDispoNote;
