@@ -26,9 +26,9 @@ sap.ui.define([
             // });
 
             const oButtonStateModel = new sap.ui.model.json.JSONModel({
-                isApproveEnabled: true,
-                isRejectEnabled: true,
-                isReviseEnabled: true,
+                isApproveEnabled: false,
+                isRejectEnabled: false,
+                isReviseEnabled: false,
                 isReviseVisible: true
             });
             this.getView().setModel(oButtonStateModel, "buttonState");
@@ -165,13 +165,13 @@ sap.ui.define([
             // Fetch detail data, approval history, and current user info
             this._getDetailApprovalData(sRequestId);
             this.loadApprovalHistoryWithRequestor(sRequestId);
-            this._currentUser(sRequestId)
-                .then(() => {
-                    console.log("Verification access set successfully.");
-                })
-                .catch((error) => {
-                    console.error("Error setting verification access:", error);
-                });
+            // this._currentUser(sRequestId)
+            //     .then(() => {
+            //         console.log("Verification access set successfully.");
+            //     })
+            //     .catch((error) => {
+            //         console.error("Error setting verification access:", error);
+            //     });
 
             // Clear upload set and file attachment model
             const oUploadSet = this.byId("idUploadSet");
@@ -188,19 +188,53 @@ sap.ui.define([
                 this._updateDisposisiSelection();
             });
 
-            // Check localStorage to disable buttons if already acted
-            if (sRequestId && localStorage.getItem("approvalMovAction_" + sRequestId) === "done") {
+            this._currentUser(sRequestId)
+            .then(() => {
+                const oCurrentUserModel = this.getView().getModel("currentUser");
+                const sEmployeeId = oCurrentUserModel && oCurrentUserModel.getProperty("/EmployeeNumber");
                 const oButtonStateModel = this.getView().getModel("buttonState");
-                oButtonStateModel.setProperty("/isApproveEnabled", false);
-                oButtonStateModel.setProperty("/isRejectEnabled", false);
-                oButtonStateModel.setProperty("/isReviseEnabled", false);
-            } else {
-                // Enable buttons if not acted yet
-                const oButtonStateModel = this.getView().getModel("buttonState");
-                oButtonStateModel.setProperty("/isApproveEnabled", true);
-                oButtonStateModel.setProperty("/isRejectEnabled", true);
-                oButtonStateModel.setProperty("/isReviseEnabled", true);
-            }
+
+                // Read /toApproval for this request
+                this._oSelectedModel.read(`/RequestSet(guid'${sRequestId}')/toApproval`, {
+                    success: (oData) => {
+                        // Find the approval entry for the current user
+                        const oMatchedApproval = oData.results.find(entry => entry.ApproverId === sEmployeeId);
+
+                        if (!oMatchedApproval) {
+                            // No approval entry found for this user, disable all
+                            oButtonStateModel.setProperty("/isApproveEnabled", false);
+                            oButtonStateModel.setProperty("/isRejectEnabled", false);
+                            oButtonStateModel.setProperty("/isReviseEnabled", false);
+                            return;
+                        }
+
+                        const sStatus = oMatchedApproval.Status; // e.g. "S", "A", "R", "V"
+                        const sStat = oMatchedApproval.Stat;     // e.g. "A1", "A2", etc.
+
+                        console.log("DEBUG: Stat =", sStat, "Status =", sStatus);
+
+                        // Disable buttons if already processed
+                        if (sStatus === "V" || sStatus === "A" || sStatus === "R" || sStatus === "P") {
+                            oButtonStateModel.setProperty("/isApproveEnabled", false);
+                            oButtonStateModel.setProperty("/isRejectEnabled", false);
+                            oButtonStateModel.setProperty("/isReviseEnabled", false);
+                        } else {
+                            oButtonStateModel.setProperty("/isApproveEnabled", true);
+                            oButtonStateModel.setProperty("/isRejectEnabled", true);
+                            oButtonStateModel.setProperty("/isReviseEnabled", true);
+                        }
+                    },
+                    error: (oError) => {
+                        // On error, disable all
+                        oButtonStateModel.setProperty("/isApproveEnabled", false);
+                        oButtonStateModel.setProperty("/isRejectEnabled", false);
+                        oButtonStateModel.setProperty("/isReviseEnabled", false);
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error("Error setting verification access:", error);
+            });
         },
 
         onAfterRendering: function () {
@@ -622,23 +656,23 @@ sap.ui.define([
             var oCurrentUserModel = this.getView().getModel("currentUser");
             var sStat = oCurrentUserModel && oCurrentUserModel.getProperty("/Stat");
 
-            if (sStat === "VT") {
-                if (!this._onValidateAssessment()) {
-                    MessageBox.warning("Silakan verifikasi assessment result sebelum diajukan.");
-                    return;
-                }
-            }
-            if (sStat === "VC") {
-                if (!this._validateVCSubmission()) {
-                    // _validateVCSubmission already shows the warning
-                    return;
-                }
-            }
-            if (sStat === "A5") {
-                if (!this._validateA5Submission()) {
-                    return;
-                }
-            }
+            // if (sStat === "VT") {
+            //     if (!this._onValidateAssessment()) {
+            //         MessageBox.warning("Silakan verifikasi assessment result sebelum diajukan.");
+            //         return;
+            //     }
+            // }
+            // if (sStat === "VC") {
+            //     if (!this._validateVCSubmission()) {
+            //         // _validateVCSubmission already shows the warning
+            //         return;
+            //     }
+            // }
+            // if (sStat === "A5") {
+            //     if (!this._validateA5Submission()) {
+            //         return;
+            //     }
+            // }
             this._openApprovalDialog("reject");
         },
 
@@ -663,14 +697,18 @@ sap.ui.define([
             oButtonStateModel.setProperty("/isRejectEnabled", false);
             oButtonStateModel.setProperty("/isReviseEnabled", false);
 
-            // Persist the state using localStorage
-            const sRequestId = this._oDetailApprovalDemModel.getProperty("/RequestId");
-            if (sRequestId) {
-                localStorage.setItem("approvalMovAction_" + sRequestId, "done");
-            }
+            // // Persist the state using localStorage
+            // const sRequestId = this._oDetailApprovalDemModel.getProperty("/RequestId");
+            // if (sRequestId) {
+            //     localStorage.setItem("approvalMovAction_" + sRequestId, "done");
+            // }
         },
 
         _openApprovalDialog: function (sAction) {
+            if (this._oApprovalDialog) {
+                this._oApprovalDialog.destroy(); // Destroy previous instance to avoid duplicate IDs
+                this._oApprovalDialog = null;
+            }
             if (!this._oApprovalDialog) {
                 Fragment.load({
                     name: "bsim.hcmapp.man.movement.view.fragments.ApprovalDialog",
