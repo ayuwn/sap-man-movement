@@ -897,7 +897,7 @@ sap.ui.define([
             const oSelectedEmployee = oEmployeeChangeModel.getProperty("/selectedEmployeeChange");
         
             if (!oSelectedEmployee || sValue !== oSelectedEmployee.Key) {
-                this.byId("employeeChangeMutation").setValue(oSelectedEmployee ? oSelectedEmployee.Key : "");
+                this.byId("employeeChangeActing").setValue(oSelectedEmployee ? oSelectedEmployee.Key : "");
                 MessageBox.warning("Please select a valid employee from the list.");
             }
         },

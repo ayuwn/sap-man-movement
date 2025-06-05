@@ -667,12 +667,12 @@
                                         <layoutData>
                                             <l:GridData span="L3 M3 S12" />
                                         </layoutData>
-                                    </Text>
-                                    <Text id="UnitOrgTextMutation" text="{position>/selectedPosition/KeyDesc2}" wrapping="true" width="100%" visible="{HistoryMutation>/isEditable}">
+                                    </Text><Text id="UnitOrgTextMutation" text="{position>/selectedPosition/KeyDesc2}" wrapping="true" width="100%" visible="{HistoryMutation>/isEditable}">
                                         <layoutData>
                                             <l:GridData span="L3 M3 S12" />
                                         </layoutData>
                                     </Text>
+                                    
                                 <Label text="{i18n>divisionId}"/>
                                     <Input id="currentDivisionIdHistory" value="{HistoryMutation>/DivisiAsl}" editable="false">
                                         <layoutData>

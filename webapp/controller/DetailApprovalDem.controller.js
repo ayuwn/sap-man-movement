@@ -901,7 +901,7 @@ sap.ui.define([
             }
 
             // Validate Disposisi input
-            const oDisposisiModel = this.getView().getModel("disposisiApprovalMov1");
+            const oDisposisiModel = this.getView().getModel("disposisiApprovalDem1");
             const iSelectedIndex = oDisposisiModel.getProperty("/selectedIndex");
 
             if (iSelectedIndex === -1) {
