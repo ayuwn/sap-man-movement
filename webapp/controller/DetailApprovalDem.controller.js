@@ -1062,11 +1062,11 @@ sap.ui.define([
                                 //     return;
                                 // }
 
-                                const bRevisiTalent = this.byId("revisiVTApprovalDem").getSelected();
-                                oApprovalData.RevisiTalent = bRevisiTalent ? "1" : "";
+                                // const bRevisiTalent = this.byId("revisiVTApprovalDem").getSelected();
+                                // oApprovalData.RevisiTalent = bRevisiTalent ? "1" : "";
 
-                                const bRevisiCombine = this.byId("reviseVCApprovalDem").getSelected();
-                                oApprovalData.RevisiCombine = bRevisiCombine ? "1" : "";
+                                // const bRevisiCombine = this.byId("reviseVCApprovalDem").getSelected();
+                                // oApprovalData.RevisiCombine = bRevisiCombine ? "1" : "";
         
                                 oApprovalData.ZrekomHcm = sRekomHcm;
                                 oApprovalData.Zdisposisi = (iDisposisiIndex + 1).toString();
