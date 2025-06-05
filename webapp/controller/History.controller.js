@@ -1251,7 +1251,7 @@ sap.ui.define([
             } else if (sActionType === "ZG") {
                 sUrl = `/sap/opu/odata/sap/ZHR_ASSIGNMENT_MAN_SRV_01/AssFormCollection(EmployeeNumber='${sEmpNo}',StartDate=datetime'${sFormattedStartDate}',EndDate=datetime'${sFormattedEndDate}')/$value`;
             } else if (sActionType === "ZE") {
-                sUrl = `/sap/opu/odata/sap/ZHR_DEMOTION_MAN_SRV_01/DemoFormCollection(EmployeeNumber='${sEmpNo}',StartDate=datetime'${sFormattedStartDate}',EndDate=datetime'${sFormattedEndDate}')/$value`;
+                sUrl = `/sap/opu/odata/sap/ZHR_DEMOTION_MAN_SRV_01/DemFormCollection(EmployeeNumber='${sEmpNo}',StartDate=datetime'${sFormattedStartDate}',EndDate=datetime'${sFormattedEndDate}')/$value`;
             } else if (sActionType === "ZB") {
                 sUrl = `/sap/opu/odata/sap/ZHR_STAT_CHANGE_MAN_SRV_01/StatFormCollection(EmployeeNumber='${sEmpNo}',StartDate=datetime'${sFormattedStartDate}',EndDate=datetime'${sFormattedEndDate}')/$value`;
             } else {

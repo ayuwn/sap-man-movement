@@ -30,6 +30,11 @@ sap.ui.define([
             this.getView().setModel(oEmployeeModel, "employee");
 
             const oDropdownModel = new sap.ui.model.json.JSONModel({
+                selectedSalaryAdj: "",
+                selectedAs: "",
+                isEmployeeChangeEnabled: false,
+                isSalaryAdjEnabled: false,
+
                 asColl: [
                     { key: "1", text: "Baru" },
                     { key: "2", text: "Pengganti" }
@@ -1141,6 +1146,31 @@ sap.ui.define([
                     }
                 });
             });
+        },
+
+        onAsFieldChange: function (oEvent) {
+            const sSelectedAs = oEvent.getSource().getSelectedKey(); 
+            const oModel = this.getView().getModel("dropdown"); 
+        
+            if (sSelectedAs === "1") { // 
+                oModel.setProperty("/isEmployeeChangeEnabled", false); 
+            } else if (sSelectedAs === "2") {
+                oModel.setProperty("/isEmployeeChangeEnabled", true);
+            }
+
+            oModel.setProperty("/selectedAs", sSelectedAs);
+        },
+
+        onSalaryAdjChange: function (oEvent) {
+            const sSelectedKey = oEvent.getSource().getSelectedKey();
+            const oModel = this.getView().getModel("dropdown");
+        
+            if (sSelectedKey === "1") { // "Ya"
+                oModel.setProperty("/isSalaryAdjEnabled", true);
+            } else if (sSelectedKey === "2") { // "Tidak"
+                oModel.setProperty("/isSalaryAdjEnabled", false);
+                this.byId("salaryAdjValueMutation").setValue(""); // Clear the input value
+            }
         },
 
         handleValueHelpEmployeeChange: function() {
